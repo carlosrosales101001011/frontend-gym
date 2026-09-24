@@ -1,0 +1,181 @@
+// TODO: INPUT
+.input-textfield{
+  // margin-bottom: 5px;
+  background-color: inherit;
+}
+.textfield-filled {
+  background-color: inherit;
+          position: relative;
+          width: 100%;
+          &:focus{
+            background-color: #1976d2;
+          }
+        }
+
+        .textfield-input {
+          width: 100%;
+          height: 32px;
+          padding: 10px 0px 8px 10px;
+          border: $border-light .3px solid;
+          border-radius: 6px;
+          // background: #f1f3f4;
+          font-size: 13px;
+          outline: none;
+          transition: all 0.2s ease;
+        }
+        // El <Select> de InputSelectCR usa la prop `unstyled`, así que todo su
+        // aspecto (colores, bordes, etc.) sale de estas clases react-select__*,
+        // conectadas a las variables de _variables-custom.scss.
+        .react-select__control{
+          width: 100%;
+          min-width: 0;
+          border: $border-light .3px solid !important;
+          border-radius: 6px;
+          background-color: $card-actual !important;
+          font-size: 13px;
+          outline: none;
+          transition: all 0.2s ease;
+
+          &--is-focused {
+            border-color: #1976d2 !important;
+          }
+        }
+
+        .react-select__value-container {
+          color: $color-actual;
+        }
+
+        .react-select__input-container,
+        .react-select__single-value {
+          color: $color-actual !important;
+        }
+
+        .react-select__placeholder {
+          color: $border-light;
+        }
+
+        .react-select__indicator-separator {
+          background-color: $border-light;
+        }
+
+        .react-select__dropdown-indicator,
+        .react-select__clear-indicator {
+          color: $color-actual;
+        }
+
+        .react-select__menu {
+          background-color: $card-actual;
+          border: $border-light .3px solid;
+        }
+
+        .react-select__option {
+          background-color: $card-actual;
+          color: $color-actual;
+
+          &--is-focused {
+            background-color: $select-actual;
+          }
+
+          &--is-selected {
+            background-color: $select-actual;
+          }
+        }
+        // .textfield-input:hover {
+        //   background: #e9ecef;
+        // }
+
+        .textfield-input:focus {
+          border-color: #1976d2;
+        }
+
+        .textfield-label {
+          position: absolute;
+          left: 14px;
+          top: 5px;
+          font-size: 14px;
+          color: #6b7280;
+          pointer-events: none;
+          transition: all 0.2s ease;
+        }
+        .textfield-label-focusable{
+          position: absolute;
+          left: 14px;
+          top: -12px;
+          font-size: 16px;
+          color: #1976d2;
+          padding: 0px 4px;
+          background-color: $bg-actual;
+          pointer-events: none;
+          transition: all 0.2s ease;
+        }
+
+        .textfield-input:focus + .textfield-label,
+        .textfield-input:not(:placeholder-shown) + .textfield-label {
+          top: -10px;
+          background-color: inherit;
+          font-size: 12px;
+          height: 20px;
+          padding: 0 4px;
+        }
+
+        .textfield-input:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+
+
+
+        // SELECT — single y multi
+.textfield-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-bottom: 6px;
+}
+
+.textfield-select--multi {
+  height: auto;
+  min-height: 90px;       // muestra ~3 opciones
+  padding-top: 22px;
+  resize: vertical;       // el usuario puede redimensionar si quiere
+}
+
+// Flecha del select
+.textfield-select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+// Label flotante activa (JS la agrega cuando hay valor o es multi)
+.textfield-label--active {
+  top: -10px !important;
+  background-color: white;
+  font-size: 12px !important;
+  height: 20px;
+  padding: 0 4px;
+  color: #1976d2;
+}
+
+
+.label-select-focus{
+  position: 'relative' !important;
+  top: -12px !important;
+  font-size: 13px !important;
+  background-color: $card-actual !important;
+  color: $color-actual !important;
+  padding: 0 4px;
+}
+
+.label-select-blur{
+  position: 'relative' !important;
+  top: 7px !important;
+  font-size: 15px !important;
+  background: transparent !important;
+  color: $color-actual !important;
+}

@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@import "bootstrap/scss/functions";
+@import "config/variables-custom";
+@import "config/variables";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/bootstrap";
+
+.cursor-pointer{
+  cursor: pointer;
+}
+.cursor-default{
+  cursor: default;
+}
+body{
+  background-color: $bg-actual;
+}
+*{
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  color: $color-actual;
+}
+@import "custom/components/DataTable";
+
+@import "custom/components/TextFields";
+@import "custom/components/StickyOrden";
+@import "custom/components/NavBarMobile";
+@import "custom/components/TopBar";
+@import "custom/components/LeftSideBar";
+@import "custom/components/PrincipalView";
+@import "custom/components/ModulosHome";
+@import "custom/components/Item1";
+@import "custom/components/LoadingOverlay";
+@import "../../pages/GestionProgramasEntrenamiento/scss/cardPrograma";
+@import "../../pages/PuntoVenta/scss/stepperCR";
+@import "../../pages/PuntoVenta/scss/tiendaMembresia";
+@import "../../pages/PuntoVenta/scss/tiendaProductos";
+@import "../../pages/PuntoVenta/scss/cardItemsVenta";
+@import "../../pages/PuntoVenta/scss/carrito";
+@import "../../pages/AgendaNutricionista/scss/agenda";
+@import "../../pages/login/scss/login";

@@ -1,0 +1,54 @@
+
+.sticky-table-header{
+    position: sticky !important;
+    top: 0px;
+    min-height: 30px;
+    z-index: 10;
+    background-color: #fff;
+}
+
+.sticky-table-footer{
+    position: sticky !important;
+    bottom: 0px;
+    min-height: 30px;
+    z-index: 10;
+    background-color: #fff;
+}
+
+// Dropdowns del toolbar de DataTableTest (buscar en columnas, congelar, ocultar),
+// con el mismo esquema de color que InputSelectCR, tomado de _variables-custom.scss.
+.dropdown-toggle-actual.btn-outline-secondary {
+    background-color: $card-actual !important;
+    border-color: $border-light !important;
+    color: $color-actual !important;
+
+    &:hover,
+    &:focus,
+    &:active {
+        background-color: $select-actual !important;
+        border-color: $border-light !important;
+        color: $color-actual !important;
+    }
+}
+
+.dropdown-menu-actual {
+    background-color: $card-actual;
+    border: $border-light .3px solid;
+
+    .dropdown-header {
+        color: $color-actual;
+        opacity: .75;
+    }
+
+    .form-check-label {
+        color: $color-actual;
+    }
+
+    .dropdown-divider {
+        border-top-color: $border-light;
+    }
+
+    > div:hover {
+        background-color: $select-actual;
+    }
+}

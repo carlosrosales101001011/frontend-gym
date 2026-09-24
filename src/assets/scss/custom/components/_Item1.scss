@@ -1,0 +1,123 @@
+.estimate-card {
+  width: 360px;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
+  padding: 22px;
+  font-family: Inter, sans-serif;
+}
+
+.estimate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.estimate-header h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #707070;
+  font-size: 14px;
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+
+.accepted {
+  color: #22a55b;
+  background: #e8f8ef;
+}
+
+.pending {
+  color: #d97706;
+  background: #fff4d6;
+}
+
+.rejected {
+  color: #dc2626;
+  background: #fde8e8;
+}
+
+.estimate-total {
+  margin-top: 25px;
+}
+
+.estimate-total span {
+  color: #8a8a8a;
+}
+
+.estimate-total h1 {
+  margin: 4px 0 0;
+  font-size: 38px;
+}
+
+.summary {
+  display: flex;
+  gap: 40px;
+  margin-top: 25px;
+}
+
+.summary div {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary small {
+  color: #8a8a8a;
+}
+
+.summary strong {
+  margin-top: 4px;
+  font-size: 20px;
+}
+
+.estimate-info {
+  margin: 25px 0;
+  padding: 18px 0;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #ececec;
+  border-bottom: 1px solid #ececec;
+}
+
+.estimate-info small {
+  display: block;
+  color: #888;
+}
+
+.right {
+  text-align: right;
+}
+
+.estimate-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.estimate-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.estimate-row:last-child {
+  border-bottom: none;
+}
+
+.estimate-row span {
+  color: #555;
+}
+
+.estimate-row strong {
+  font-weight: 700;
+}

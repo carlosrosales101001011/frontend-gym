@@ -1,0 +1,298 @@
+.modal-title{
+    h4{
+        color: #000;
+    }
+}
+
+// ===================================================
+// ModalCR - estilos
+// Paleta: tinta (#14171F), papel (#FAF8F3), acento (#D9622B)
+// ===================================================
+
+$modal-z-index: 1000;
+$modal-radius: 14px;
+$modal-border: rgba(20, 23, 31, 0.08);
+$modal-shadow: 0 24px 60px -12px rgba(20, 23, 31, 0.35),
+  0 0 0 1px rgba(20, 23, 31, 0.04);
+$modal-accent: #d9622b;
+$modal-ink: #14171f;
+$modal-paper: #fffdfa;
+$modal-muted: #6b7280;
+
+@keyframes modalcr-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalcr-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modalcr-slide-top {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalcr-slide-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalcr-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes modalcr-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.modalcr-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: $modal-z-index;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(1px);
+  display: flex;
+  animation: modalcr-fade-in 160ms ease-out;
+
+  // posiciones del contenedor
+  &--center {
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  &--top {
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+  &--bottom {
+    align-items: flex-end;
+    justify-content: center;
+    padding: 24px;
+  }
+  &--left {
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+  &--right {
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+}
+
+.modalcr {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: $modal-paper;
+  border-radius: $modal-radius;
+  border: 1px solid $modal-border;
+  box-shadow: $modal-shadow;
+  color: $modal-ink;
+  margin: 8px;
+  max-height: calc(100vh - 10px);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+
+  // ---- tamaños ----
+  &--sm {
+    width: 100%;
+    max-width: 360px;
+  }
+  &--md {
+    width: 100%;
+    max-width: 520px;
+  }
+  &--lg {
+    width: 100%;
+    max-width: 760px;
+  }
+  &--xl {
+    width: 100%;
+    max-width: 1040px;
+  }
+  &--full {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  // ---- animaciones según posición ----
+  &--anim-center {
+    animation: modalcr-pop-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  &--anim-top {
+    animation: modalcr-slide-top 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  &--anim-bottom {
+    animation: modalcr-slide-bottom 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  &--anim-left {
+    animation: modalcr-slide-left 240ms cubic-bezier(0.16, 1, 0.3, 1);
+    height: 100vh;
+    border-radius: 0;
+  }
+  &--anim-right {
+    animation: modalcr-slide-right 740ms cubic-bezier(0.16, 1, 0.3, 1);
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  &:focus-visible {
+    // outline: 2px solid $modal-accent;
+    outline-offset: 2px;
+  }
+}
+
+.modalcr-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  // background: linear-gradient(90deg, $modal-accent, transparent 80%);
+}
+
+.modalcr-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid $modal-border;
+  flex-shrink: 0;
+}
+
+.modalcr-title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin: 0;
+  color: $modal-ink;
+}
+
+.modalcr-close {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $modal-muted;
+  flex-shrink: 0;
+  transition: background 120ms ease, color 120ms ease;
+
+  &:hover {
+    background: rgba(20, 23, 31, 0.06);
+    color: $modal-ink;
+  }
+  &:focus-visible {
+    // outline: 2px solid $modal-accent;
+    outline-offset: 1px;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.modalcr-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  font-size: 14px;
+  line-height: 1.6;
+  color: $modal-ink;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(20, 23, 31, 0.15);
+    border-radius: 8px;
+  }
+}
+
+.modalcr-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid $modal-border;
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  .modalcr-backdrop {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  .modalcr {
+    max-width: 100% !important;
+    width: 100%;
+    border-radius: $modal-radius $modal-radius 0 0;
+    max-height: 90vh;
+  }
+
+  .modalcr--full {
+    border-radius: 0;
+    max-height: 100vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modalcr-backdrop,
+  .modalcr {
+    animation: none !important;
+  }
+}

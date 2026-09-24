@@ -1,0 +1,44 @@
+.topbar {
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 5px;
+  background: $bg-actual;
+  color: $color-actual;
+  // border-bottom: 1px solid #ddd;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon {
+    font-size: 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  // &__search {
+  //   padding: 4px 18px;
+  //   border-radius: 15px;
+  //   border: 1px solid #ccc;
+  //   outline: none;
+
+  //   &:focus {
+  //     border-color: #999;
+  //   }
+  // }
+}

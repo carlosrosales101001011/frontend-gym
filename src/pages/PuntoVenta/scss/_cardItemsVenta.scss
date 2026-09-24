@@ -1,0 +1,21 @@
+// Permite que el contenido de cada tab (TiendaMembresia / TiendaProductos)
+// haga scroll internamente, mientras la cabecera del Card y el nav de tabs
+// quedan fijos y visibles.
+.card-items-venta {
+  // Ojo: usar `>` para no afectar los `.card-body` de las cards anidadas
+  // (ItemPrograma, ItemPlan, ItemProducto) dentro del contenido de los tabs.
+  > .card-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .tab-pane {
+    height: 100%;
+  }
+}

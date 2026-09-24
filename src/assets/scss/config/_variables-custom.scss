@@ -1,0 +1,141 @@
+$topbar-height:    45px;
+$title-height:    0px;
+$sidebar-width:    220px;
+$sidebar-breakpoint: 1250px;
+
+
+$font-item-sidebar: 14px;
+$font-item-sidebar-level0: 12px;
+
+$mode-dark: #0a151b;
+$bg-black: #000;
+$bg-dark: #0a151b;
+$color-mode-dark: #000;
+$card-bg-dark: #0c1820;
+$mode-light: #fff;
+$bg-light: #fff;
+$color-light: #fff;
+$card-light: #fff;
+$table-dark: #0c1820;
+$table-light: #fff;
+$border-light: #7e7e7e;
+$item-hover-dark: #1c2a33;
+$item-hover-light: #eceff1;
+
+// Tema actual: se resuelve en tiempo de ejecución con variables CSS.
+// Por defecto es oscuro; <html data-theme="light"> activa el modo claro (ver useThemeStore).
+$bg-actual: var(--cr-bg);
+$color-actual: var(--cr-color);
+$card-actual: var(--cr-card);
+$table-actual: var(--cr-table);
+$icons-actual: var(--cr-icons);
+$select-actual: var(--cr-select);
+$item-hover-actual: var(--cr-item-hover);
+$input-bg-actual: var(--cr-input-bg);
+$border-actual: var(--cr-border);
+$card-border-actual: var(--cr-card-border);
+
+:root {
+    --cr-bg: #{$bg-dark};
+    --cr-color: #{$color-light};
+    --cr-card: #{$card-bg-dark};
+    --cr-table: #{$table-dark};
+    --cr-icons: #{$bg-light};
+    --cr-select: #{$bg-black};
+    --cr-item-hover: #{$item-hover-dark};
+    --cr-input-bg: #111e26;
+    --cr-border: #{$border-light};
+    --cr-card-border: #474747;
+}
+
+:root[data-theme="light"] {
+    --cr-bg: #f4f6f8;
+    --cr-color: #212529;
+    --cr-card: #{$card-light};
+    --cr-table: #{$table-light};
+    --cr-icons: #212529;
+    --cr-select: #{$bg-light};
+    --cr-item-hover: #{$item-hover-light};
+    --cr-input-bg: #{$bg-light};
+    --cr-border: #ced4da;
+    --cr-card-border: #dee2e6;
+}
+.bg-actual {
+    background-color: $bg-actual !important;
+    color: $color-actual !important;
+}
+.card-actual{
+    background-color: $card-actual !important;
+}
+
+.table-actual{
+    background-color: $table-actual !important;
+}
+.thead-actual{
+    background-color: var(--bs-primary) !important;
+    color: #fff !important;
+}
+// El selector global * del app.scss pinta todo con $color-actual; dentro del header
+// (texto, íconos de orden, grip, pin) forzamos blanco para que contraste con el primario.
+.thead-actual *{
+    color: #fff !important;
+}
+.tbody-actual{
+    background-color: $table-actual !important;
+    color: $color-actual !important;
+}
+
+.tfoot-actual{
+    background-color: $table-actual !important;
+    color: $color-actual !important;
+}
+.icon-mode-actual{
+    color: $icons-actual !important;
+}
+.input-mode-actual{
+    border: $border-actual .3px solid !important;
+    background-color: $input-bg-actual !important;
+    color: $color-actual !important;
+}
+
+.label-mode-actual{
+    color: $color-actual !important;
+}
+
+.modal-mode-actual{
+    background-color: $input-bg-actual !important;
+    color: $color-actual !important;
+}
+
+.inputselect-model-actual{
+    background-color: $input-bg-actual !important;
+    color: $color-actual !important;
+}
+.color-mode-actual{
+    color: $color-actual !important;
+}
+
+.item-hover-actual{
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover{
+        background-color: $item-hover-actual !important;
+    }
+}
+.card-mode-actual{
+    background-color: $card-actual !important;
+    border: 1px solid $card-border-actual !important;
+    color: $color-actual !important;
+}
+.scroll-mode-actual{
+    overflow-y: auto;
+
+    &::-webkit-scrollbar{
+        width: 6px;
+    }
+    &::-webkit-scrollbar-thumb{
+        background-color: $item-hover-actual;
+        border-radius: 8px;
+    }
+}

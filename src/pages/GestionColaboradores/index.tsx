@@ -1,0 +1,1 @@
+export { App as default } from '@/pages/GestionColaboradores/App'

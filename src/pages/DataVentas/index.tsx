@@ -1,0 +1,1 @@
+export { DataTableVentas as default } from './DataTableVentas'

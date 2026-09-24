@@ -1,0 +1,24 @@
+.principal-view{
+    width: 100%;
+    margin-left: 0;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    &.shift {
+        margin-left: $sidebar-width;
+        width: calc(100% - #{$sidebar-width});
+    }
+
+    @media (max-width: #{$sidebar-breakpoint - 1px}) {
+        &.shift {
+            margin-left: 0;
+            width: 100%;
+        }
+    }
+}
+
+.view-h-100{
+    height: calc(100vh - #{$topbar-height});
+}
+
+.card{
+    overflow-x: auto;
+}

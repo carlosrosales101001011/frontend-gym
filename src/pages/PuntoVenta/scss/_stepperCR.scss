@@ -1,0 +1,233 @@
+.stepper-cr {
+    --step-active: #ff163d;
+    --step-bg: #1b2731;
+    --step-bg-hover: #24323d;
+
+    --text-primary: #e6ebef;
+    --text-secondary: #8e9aa5;
+
+    --line-color: #34414a;
+
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    padding: 12px 22px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #0d171d 0%,
+            #091218 100%
+        );
+
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+
+    box-sizing: border-box;
+
+    // ============================
+    // STEP
+    // ============================
+
+    &__step {
+        appearance: none;
+
+        border: none;
+        outline: none;
+
+        background: transparent;
+
+        padding: 0;
+        margin: 0;
+
+        display: flex;
+        align-items: center;
+
+        flex-shrink: 0;
+
+        color: inherit;
+
+        text-align: left;
+
+        cursor: default;
+
+        font-family: inherit;
+
+        &:disabled {
+            opacity: 0.4;
+        }
+
+        &.is-clickable {
+            cursor: pointer;
+
+            &:hover {
+
+                .stepper-cr__circle {
+                    background: var(--step-bg-hover);
+                }
+
+                .stepper-cr__title {
+                    color: #ffffff;
+                }
+            }
+        }
+
+        &.is-active {
+
+            .stepper-cr__circle {
+                background: var(--step-active);
+                color: #ffffff;
+                box-shadow:
+                    0 0 0 4px rgba(255, 22, 61, 0.06);
+            }
+
+            .stepper-cr__title {
+                color: var(--step-active);
+                font-weight: 700;
+            }
+        }
+
+        &.is-completed:not(.is-active) {
+
+            .stepper-cr__circle {
+                background: rgba(255, 22, 61, 0.15);
+
+                color: var(--step-active);
+
+                border:
+                    1px solid
+                    rgba(255, 22, 61, 0.5);
+            }
+        }
+    }
+
+    // ============================
+    // CIRCLE
+    // ============================
+
+    &__circle {
+        width: 40px;
+        height: 40px;
+
+        border-radius: 50%;
+
+        flex-shrink: 0;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        background: var(--step-bg);
+
+        color: #dfe6eb;
+
+        font-size: 17px;
+        font-weight: 700;
+
+        transition:
+            background 0.18s ease,
+            color 0.18s ease,
+            border 0.18s ease,
+            box-shadow 0.18s ease,
+            transform 0.18s ease;
+    }
+
+    // ============================
+    // TEXT
+    // ============================
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+
+        margin-left: 15px;
+
+        min-width: 155px;
+    }
+
+    &__title {
+        color: var(--text-primary);
+
+        font-size: 13px;
+        font-weight: 500;
+
+        line-height: 1.3;
+
+        transition: color 0.18s ease;
+    }
+
+    &__subtitle {
+        margin-top: 3px;
+
+        color: var(--text-secondary);
+
+        font-size: 11px;
+        font-weight: 400;
+
+        white-space: nowrap;
+    }
+
+    // ============================
+    // LINE
+    // ============================
+
+    &__line {
+        height: 1px;
+
+        flex: 1;
+
+        min-width: 35px;
+
+        margin: 0 18px;
+
+        background: var(--line-color);
+
+        transition: background 0.2s ease;
+
+        &.is-completed {
+            background:
+                rgba(255, 22, 61, 0.6);
+        }
+    }
+
+    // ============================
+    // SIZES
+    // ============================
+
+    &--sm {
+
+        .stepper-cr__circle {
+            width: 34px;
+            height: 34px;
+
+            font-size: 14px;
+        }
+
+        .stepper-cr__title {
+            font-size: 12px;
+        }
+
+        .stepper-cr__subtitle {
+            font-size: 10px;
+        }
+    }
+
+    &--lg {
+
+        .stepper-cr__circle {
+            width: 48px;
+            height: 48px;
+
+            font-size: 19px;
+        }
+
+        .stepper-cr__title {
+            font-size: 14px;
+        }
+
+        .stepper-cr__subtitle {
+            font-size: 12px;
+        }
+    }
+}
