@@ -102,7 +102,7 @@ export const ItemProductos = ({ producto, onSumar, onRestar }: ItemProductosProp
           <div className="fw-bolder text-truncate" title={producto.label_producto}>
             {producto.label_producto}
           </div>
-          <div className="small">{formatoMoneda.format(producto.precio_unitario)} c/u</div>
+          <div className="small">{formatoMoneda.format(Number(producto.precio_unitario_producto))} c/u</div>
           <div className="d-flex align-items-center gap-2">
             <button
               type="button"

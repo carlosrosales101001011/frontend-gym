@@ -6,12 +6,13 @@ export const uniqueById = <T extends { id: number | string }>(
   Array.from(
     new Map(items.map((item) => [item.id, item])).values(),
   );
+// Agrupa por una propiedad ('id_tipo') o por una función ((item) => item.seccion.subSeccion)
 export const groupBy = <T>(
   items: T[],
-  key: keyof T,
+  key: keyof T | ((item: T) => string | number),
 ): Record<string, T[]> =>
   items.reduce<Record<string, T[]>>((acc, item) => {
-    const group = String(item[key]);
+    const group = String(typeof key === 'function' ? key(item) : item[key]);
 
     acc[group] ??= [];
     acc[group].push(item);

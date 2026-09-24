@@ -4,7 +4,7 @@ import type { RootState } from '@/stores/Store'
 import IconCR from '@/components/Icons/IconCR'
 import { useState } from 'react'
 import { ModalContratoEmpleado } from '@/pages/PerfilCliente/ModalContratoEmpleado'
-import type { ContratoColaboradorProps } from '@/pages/PerfilCliente/store/contratoColaboradorSlice'
+import type { ContratoColaboradorProps } from '@/pages/PerfilColaborador/store/contratoColaboradorSlice'
 
 export const DataTableContratoLaboral = () => {
   const {contratosColaborador} = useSelector((state: RootState)=>state.CONTRATO_COLABORADOR)

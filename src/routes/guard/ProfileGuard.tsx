@@ -3,7 +3,7 @@ import { useUserModuloStore } from "@/routes/hook/useUserModuloStore";
 type props = {
     gestion: string;
 }
-export const ProfileGuard = ({gestion}:props) => {
+export const ProfileGuard = (_props: props) => {
   console.log({g: `/sss`});
   const { uid_mod } = useParams();
   const location = useLocation();

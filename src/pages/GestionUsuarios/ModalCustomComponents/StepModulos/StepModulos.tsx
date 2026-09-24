@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useGestionStore } from "@/pages/GestionUsuarios/useGestionUsuariosStore";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/stores/Store";
-import { addSeccionesxEntidad, type SeccionesEntidadProps, type SeccionxModuloProps } from "@/pages/GestionUsuarios/store/usuariosSlice";
+import { addSeccionesxEntidad, type SeccionesEntidadProps, type SeccionesProps, type SeccionxModuloProps } from "@/pages/GestionUsuarios/store/usuariosSlice";
 import { ButtonCR } from "@/components/Button/ButtonCR";
 type Props = {
     setStep: (step:number)=>void;
@@ -12,9 +12,12 @@ type Props = {
   onChange?: (assignedIds: string[]) => void;
 }
 
+// Las secciones del modulo siempre traen id y label
+type SeccionAsignable = SeccionesEntidadProps & SeccionesProps;
+
 interface ResolvedCategory extends SeccionxModuloProps {
-  availableSections: SeccionesEntidadProps[];
-  assignedSections: SeccionesEntidadProps[];
+  availableSections: SeccionAsignable[];
+  assignedSections: SeccionAsignable[];
   totalCount: number;
   assignedCount: number;
 }
@@ -64,17 +67,17 @@ export const StepModulos = ({
     const normalizedTerm = normalize(searchTerm.trim());
  
     return seccionesxModulo.map((category) => {
-      const assignedSections: SeccionesEntidadProps[] = category.sections
+      const assignedSections: SeccionAsignable[] = category.sections
         .filter((s) => assignedIds.has(s.id.toString()))
         .map((s) => ({ ...s, id_modulo: category.id, entities: (s as SeccionesEntidadProps).entities ?? [] }));
-      const availableSections: SeccionesEntidadProps[] = category.sections
+      const availableSections: SeccionAsignable[] = category.sections
         .filter(
           (s) =>
             !assignedIds.has(s.id.toString()) &&
             (normalizedTerm === "" ||
               normalize(s.label).includes(normalizedTerm))
         )
-        .map((s) => ({ ...s, entities: (s as SeccionesEntidadProps).entities ?? [] }));
+        .map((s) => ({ ...s, id_modulo: category.id, entities: (s as SeccionesEntidadProps).entities ?? [] }));
       return {
         ...category,
         assignedSections,
@@ -227,7 +230,7 @@ const SearchInput: React.FC<{
 };
  //
 const AvailableSectionRow: React.FC<{
-  section: SeccionesEntidadProps;
+  section: SeccionAsignable;
   onAdd: (sectionId: number) => void;
 }> = ({ section, onAdd }) => {
   return (

@@ -24,6 +24,8 @@ export type EntidadProps = {
   id_estado_READ: number;
   id_estado_UPDATE: number;
   id_estado_DELETE: number;
+  id_estado_EXPORT?: number;
+  id_estado_IMPORT?: number;
   id_seccion: number;
   is_fijado: boolean;
   description:string;

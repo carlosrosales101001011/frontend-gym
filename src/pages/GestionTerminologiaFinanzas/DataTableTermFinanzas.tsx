@@ -10,6 +10,7 @@ interface DataTableTermFinanzasProps {
 }
  
 interface TreeNodeCR extends Omit<TermFinanzasProps, 'id'>, TreeNodeBase<TreeNodeCR> {
+  id: number;
   children?: TreeNodeCR[];
 }
 

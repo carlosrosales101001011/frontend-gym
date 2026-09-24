@@ -1,17 +1,17 @@
-import httpClient from "@/helpers/httpClient";
+import httpClient from "@/common/helpers/httpClient";
 
 function AuthService() {
 	return {
-		login: (values: unknown) => {
+		login: (values: object) => {
 			return httpClient.post('/login/', values);
 		},
 		logout() {
 			return httpClient.post('/logout/', {});
 		},
-		register: (values: unknown) => {
+		register: (values: object) => {
 			return httpClient.post('/register/', values);
 		},
-		forgetPassword: (values: unknown) => {
+		forgetPassword: (values: object) => {
 			return httpClient.post('/forget-password/', values);
 		},
 	};

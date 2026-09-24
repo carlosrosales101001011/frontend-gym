@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export type SeccionxmodulouserProps = {
-  id?: number,
+  id: number,
   id_modulouser:number,
   id_seccion:number,
 };

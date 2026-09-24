@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import httpClient from '@/common/helpers/httpClient';
+import type { OpcionesSelect } from '@/types/props';
 
 export const obtenerPropiedadxEntidadxGrupoxSub = async (
   entidad: string,
@@ -29,7 +30,7 @@ export const obtenerDistritosProv = async (sub:string) => {
 };
 
 const useTerminologia = (entidad: string, grupo: string, sub: string) => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<OpcionesSelect[]>([]);
 
   const cargar = useCallback(async () => {
     const response =

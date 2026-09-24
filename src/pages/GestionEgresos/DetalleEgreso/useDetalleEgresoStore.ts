@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux"
 
 export const useDetalleEgresosStore = () => {
 const dispatch = useDispatch()
-    const { post, data, obtener, patch, obtenerxID, dataxID, remove } = useCrudhook<DetalleEgresoProps>('/detalleArticulos-gasto', onSetDataDetalleEgresos)
+    const { post, obtener, patch, obtenerxID, dataxID, remove } = useCrudhook<DetalleEgresoProps>('/detalleArticulos-gasto', onSetDataDetalleEgresos)
     const obtenerDetalleEgresosxIDMov = async(id_movimiento_financiero: number)=>{
       try {
         const {data} = await httpClient.get(`/detalleArticulos-gasto/id_movimiento_financiero/${id_movimiento_financiero}`)
@@ -26,7 +26,6 @@ const dispatch = useDispatch()
     patch,
     post,
     obtener,
-    data,
     obtenerDetalleEgresosxIDMov,
   }
 }

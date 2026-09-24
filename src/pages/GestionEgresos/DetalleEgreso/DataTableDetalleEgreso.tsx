@@ -93,10 +93,10 @@ export const DataTableDetalleEgreso = () => {
             ),
           },
         ]
-        const onDelete = (id: number, id_movimiento_financiero: number)=>{
+        const onDelete = (_id: number, _id_movimiento_financiero: number)=>{
           
         }
-        const onEdit = (id: number, id_movimiento_financiero: number)=>{
+        const onEdit = (_id: number, _id_movimiento_financiero: number)=>{
 
         }
   return (

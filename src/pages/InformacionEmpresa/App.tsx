@@ -1,24 +1,24 @@
-import React from 'react'
 import { Col, Row } from 'react-bootstrap'
 import { InputCR } from '@/components/TextFields/InputCR'
 import { useForm } from '@/hook/useForm'
+import { initialInfoEmpresa } from '@/pages/InformacionEmpresa/store/infoEmpresaSlice'
 
 export const App = () => {
-        const { formState, getValues, register, handleSubmit, reset } = useForm({defaultValues: initialStateImpuesto.impuesto, mode: 'onChange'})
+  const { formState, register } = useForm({defaultValues: initialInfoEmpresa, mode: 'onChange'})
   return (
     <div>
         <form>
             <Row>
-                        <Col lg={6}>
-                        <InputSelectCR options={data} {...register("id_codigo_monedaOrigen", {
-                            required: "Este campo es obligatorio"
-                        })} label="Moneda Origen" name="id_codigo_monedaOrigen" messageErrors={errors.id_codigo_monedaOrigen?.message}/>
-                        </Col>
-                        <Col lg={6}>
-                            <InputCR {...register("venta", {
-                            required: "La venta es obligatoria"
-                            })} label="Venta" name="venta" messageErrors={errors.venta?.message}/>
-                        </Col>
+                <Col lg={6}>
+                    <InputCR {...register("razon_social", {
+                    required: "La razón social es obligatoria"
+                    })} label="Razón social" name="razon_social" messageErrors={formState.errors.razon_social?.message}/>
+                </Col>
+                <Col lg={6}>
+                    <InputCR {...register("ruc", {
+                    required: "El RUC es obligatorio"
+                    })} label="RUC" name="ruc" messageErrors={formState.errors.ruc?.message}/>
+                </Col>
             </Row>
         </form>
     </div>

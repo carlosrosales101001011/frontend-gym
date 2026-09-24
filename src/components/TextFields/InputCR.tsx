@@ -81,7 +81,7 @@ const renderTextArea = () => {
                 required={required}
                 style={{height: '90px'}}
                 onChange={handleDateChange}
-                {...props}
+                {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
             />
                 <label className={`textfield-label ${messageErrors.trim().length !==0 && 'text-danger'} ${classNameLabel}`}>{label}{required && <span className="text-danger"> *</span>}</label>
             </div>

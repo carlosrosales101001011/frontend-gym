@@ -60,7 +60,7 @@ export const useCrudhook = <T,>(model: string,  action?: (payload: T[]) => Unkno
             return data;
         };
     return {
-        postBulk: async(values:Array<T>[]) => {
+        postBulk: async(values: T[]) => {
             const data = await httpClient.post(`${model}/bulk`, values)
             return data;
         },

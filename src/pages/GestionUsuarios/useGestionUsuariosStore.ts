@@ -22,7 +22,7 @@ export const useGestionStore = () => {
     try {
       const { data } = await httpClient.get(`/modulo-x-user/user/secciones`)
       const { data:dataEntidadxUser } = await httpClient.get(`/entidad-x-user/user/all`)
-      console.log({obtenerSeccionxModuloUser: agruparPorModulo(data, dataEntidadxUser), dataEntidadxUser, entitiesDeSeccionxModuloUser: agruparPorModulo(data, dataEntidadxUser).flatMap(e=>e.sections).flatMap(e=>e.entities), data, dataEntidadxUser});
+      console.log({obtenerSeccionxModuloUser: agruparPorModulo(data, dataEntidadxUser), entitiesDeSeccionxModuloUser: agruparPorModulo(data, dataEntidadxUser).flatMap(e=>e.sections).flatMap(e=>e.entities), data, dataEntidadxUser});
       setseccionesxModulo(agruparPorModulo(data, dataEntidadxUser))
     } catch (error) {
       console.log(error);
@@ -106,7 +106,7 @@ function agruparPorModulo(array:any[], arrayEntidadxUser:any[] = []) {
             ...arrayEntidadxUser.find(e=>e.id_entidad===entidad.id_entidad)
           }
         })
-      })).filter(f=>f.entities.length>0)
+      })).filter((f: { entities: unknown[] })=>f.entities.length>0)
     }
   });
 }
