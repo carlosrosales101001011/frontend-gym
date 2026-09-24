@@ -1,4 +1,4 @@
-import {  Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { ModulosHome } from "@/layouts/Home/ModulosHome";
 import { AuthGuard } from "@/routes/guard/AuthGuard";
 import { Login } from "@/pages/login/Login";
@@ -51,6 +51,7 @@ const ExtensionRegalos = lazy(() => import('@/pages/GestionExtensionRegalos'));
 export const AppRoutes = () => {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path=":uid_mod/*" element={<ProtectedRoutes/>}>
             {/* INVENTARIO */}
             <Route path="punto-venta" element={<PuntoVenta/>}/>
