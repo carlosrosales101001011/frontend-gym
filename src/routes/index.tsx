@@ -29,6 +29,7 @@ const GestionTC = lazy(() => import('@/pages/GestionTipoCambio'));
 const GestionTermGrupoFinanzas = lazy(() => import('@/pages/GestionTermGrupoFinanzas'));
 const GestionTerminologiaFinanzas = lazy(() => import('@/pages/GestionTerminologiaFinanzas'));
 // TODO: PERFILES
+const Perfil = lazy(() => import('@/pages/perfil'));
 const PerfilColaborador = lazy(() => import('@/pages/PerfilColaborador/Index'));
 const PerfilCliente = lazy(() => import('@/pages/PerfilCliente/Index'));
 //TODO: CONFIGURACIONES APROXI
@@ -86,7 +87,7 @@ export const AppRoutes = () => {
             <Route path="extension-regalos" element={<ExtensionRegalos/>}/>
             <Route element={<ProfileGuard gestion="gestion-cliente"/>}>
               <Route path="gestion-clientes" element={<GestionClientes/>}/>
-              <Route path="perfil-cliente/:uid_cliente" element={<PerfilCliente/>}/>
+              <Route path="perfil-cliente/:uid_cliente" element={<Perfil/>}/>
             </Route>
             <Route element={<ProfileGuard gestion="gestion-empleados"/>}>
                 <Route path="gestion-empleados" element={<GestionColaboradores/>}/>
