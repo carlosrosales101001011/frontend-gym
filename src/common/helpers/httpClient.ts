@@ -23,6 +23,8 @@ const _httpClient = axios.create({
 		'Content-Type': 'application/json',
 	},
 });
+console.log({bb: import.meta.env.VITE_API_URL});
+
 _httpClient.interceptors.request.use((config) => {
 	const token = localStorage.getItem(STORAGE_KEY);
 	if (token && config.headers) {
