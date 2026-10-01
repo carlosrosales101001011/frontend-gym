@@ -46,12 +46,12 @@ export const DataTableMovProductos = ({ otrosBotones }: { otrosBotones?: React.R
     const columns = [
         {
             id: 0,
-            header: 'Producto',
+            header: 'Producto', campoBusqueda: 'label_producto',
             render: (rowData: ResumenProducto) => <span>{rowData.label_producto}</span>,
         },
         {
             id: 1,
-            header: 'Marca',
+            header: 'Marca', campoBusqueda: 'label_marca_producto',
             render: (rowData: ResumenProducto) => <span>{rowData.label_marca_producto}</span>,
         },
         {

@@ -21,27 +21,27 @@ export const DataTableImpuestos = ({ onOpenModalCustom, otrosBotones }: { onOpen
         },
         {
             id: 2,
-            header: 'Nombre',
+            header: 'Nombre', campoBusqueda: 'nombre',
             render: (rowData: ImpuestosProps) => <span>{rowData.nombre}</span>,
         },
         {
             id: 3,
-            header: 'Descripción',
+            header: 'Descripción', campoBusqueda: 'descripcion',
             render: (rowData: ImpuestosProps) => <span>{rowData.descripcion}</span>,
         },
         {
             id: 4,
-            header: 'Aplica Sobre',
+            header: 'Aplica Sobre', campoBusqueda: 'label_aplica_sobre',
             render: (rowData: ImpuestosProps) => <span>{rowData.label_aplica_sobre}</span>,
         },
         {
             id: 5,
-            header: 'Base de Cálculo',
+            header: 'Base de Cálculo', campoBusqueda: 'label_base_calculo',
             render: (rowData: ImpuestosProps) => <span>{rowData.label_base_calculo}</span>,
         },
         {
             id: 6,
-            header: 'Tipo de Impuesto',
+            header: 'Tipo de Impuesto', campoBusqueda: 'label_tipo',
             render: (rowData: ImpuestosProps) => <span>{rowData.label_tipo}</span>,
         },
         {

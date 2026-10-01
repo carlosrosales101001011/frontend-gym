@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Button, Dropdown, Form, Table } from 'react-bootstrap';
 import IconCR from '@/components/Icons/IconCR';
 import { InputCR } from '@/components/TextFields/InputCR';
+import { PaginacionCR } from '@/components/Paginacion/PaginacionCR';
 
 export type ColumnaSimple2<T> = {
   id: number | string;
@@ -18,30 +19,24 @@ type Props<T> = {
   columns: ColumnaSimple2<T>[];
   /** Filas por página inicial (default: 10) */
   defaultPageSize?: number;
+  /** Muestra el buscador y "Buscar en columnas" (default: true) */
+  mostrarBuscador?: boolean;
+  /** Muestra "Mostrando [n] de N" para elegir filas por página (default: true) */
+  mostrarTamanoPagina?: boolean;
 };
 
 type SortState = { id: number | string; dir: 'asc' | 'desc' } | null;
 
-const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
-
 /** Etiqueta de texto de una columna: usa el header si es string, si no cae al id */
 const getColumnLabel = <T,>(column: ColumnaSimple2<T>): ReactNode =>
   typeof column.header === 'string' ? column.header : String(column.id);
-
-/** Números de página a mostrar, con "..." cuando hay muchas páginas */
-const getPages = (page: number, totalPages: number): (number | '...')[] => {
-  if (totalPages <= 6) return Array.from({ length: totalPages }, (_, i) => i + 1);
-  if (page <= 4) return [1, 2, 3, 4, 5, '...', totalPages];
-  if (page >= totalPages - 3) return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-  return [1, '...', page - 1, page, page + 1, '...', totalPages];
-};
 
 /**
  * Tabla con buscador, ordenamiento y paginación en el cliente.
  * A diferencia de DataTableTest, todo el estado es local (no usa la URL ni Redux),
  * así que se pueden tener varias en la misma página sin que se pisen.
  */
-export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10 }: Props<T>) {
+export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostrarBuscador = true, mostrarTamanoPagina = true }: Props<T>) {
   const [search, setSearch] = useState('');
   const [searchColumns, setSearchColumns] = useState<Set<number | string>>(() => new Set());
   const [sort, setSort] = useState<SortState>(null);
@@ -100,56 +95,58 @@ export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10 }: Pro
 
   return (
     <div>
-      <div className="d-flex gap-2 flex-nowrap justify-content-end mb-2">
-        <InputCR
-          label="Buscar..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ maxWidth: 220 }}
-        />
-        {searchableColumns.length > 0 && (
-          <Dropdown autoClose="outside">
-            <Dropdown.Toggle
-              as={Button}
-              size="sm"
-              variant={searchColumns.size > 0 ? 'primary' : 'outline-secondary'}
-              className="d-flex align-items-center gap-1 dropdown-toggle-actual"
-              style={{ fontSize: '12px' }}
-            >
-              <IconCR name="filtro" size={14} />
-              {searchColumns.size > 0 ? `Buscar en (${searchColumns.size})` : 'Buscar en columnas'}
-            </Dropdown.Toggle>
-            <Dropdown.Menu className="dropdown-menu-actual" style={{ minWidth: 230 }}>
-              <Dropdown.Header>Seleccionar columnas donde buscar</Dropdown.Header>
-              {searchableColumns.map((column) => (
-                <div key={column.id} className="px-3 py-1">
-                  <Form.Check
-                    type="checkbox"
-                    label={getColumnLabel(column)}
-                    checked={searchColumns.has(column.id)}
-                    onChange={() => toggleSearchColumn(column.id)}
-                  />
-                </div>
-              ))}
-              {searchColumns.size > 0 && (
-                <>
-                  <Dropdown.Divider />
-                  <div className="px-3 pb-1">
-                    <Button
-                      size="sm"
-                      variant="link"
-                      className="p-0 text-decoration-none"
-                      onClick={() => setSearchColumns(new Set())}
-                    >
-                      Buscar en todas
-                    </Button>
+      {mostrarBuscador && (
+        <div className="d-flex gap-2 flex-nowrap justify-content-end mb-2">
+          <InputCR
+            label="Buscar..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ maxWidth: 220 }}
+          />
+          {searchableColumns.length > 0 && (
+            <Dropdown autoClose="outside">
+              <Dropdown.Toggle
+                as={Button}
+                size="sm"
+                variant={searchColumns.size > 0 ? 'primary' : 'outline-secondary'}
+                className="d-flex align-items-center gap-1 dropdown-toggle-actual"
+                style={{ fontSize: '12px' }}
+              >
+                <IconCR name="filtro" size={14} />
+                {searchColumns.size > 0 ? `Buscar en (${searchColumns.size})` : 'Buscar en columnas'}
+              </Dropdown.Toggle>
+              <Dropdown.Menu className="dropdown-menu-actual" style={{ minWidth: 230 }}>
+                <Dropdown.Header>Seleccionar columnas donde buscar</Dropdown.Header>
+                {searchableColumns.map((column) => (
+                  <div key={column.id} className="px-3 py-1">
+                    <Form.Check
+                      type="checkbox"
+                      label={getColumnLabel(column)}
+                      checked={searchColumns.has(column.id)}
+                      onChange={() => toggleSearchColumn(column.id)}
+                    />
                   </div>
-                </>
-              )}
-            </Dropdown.Menu>
-          </Dropdown>
-        )}
-      </div>
+                ))}
+                {searchColumns.size > 0 && (
+                  <>
+                    <Dropdown.Divider />
+                    <div className="px-3 pb-1">
+                      <Button
+                        size="sm"
+                        variant="link"
+                        className="p-0 text-decoration-none"
+                        onClick={() => setSearchColumns(new Set())}
+                      >
+                        Buscar en todas
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
+        </div>
+      )}
 
       <Table striped style={{ marginBottom: 0 }}>
         <thead>
@@ -198,64 +195,13 @@ export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10 }: Pro
         </tbody>
       </Table>
 
-      <div className="tfoot-actual">
-        <div className="d-flex justify-content-between align-items-center p-2 flex-wrap gap-2">
-          <div className="d-flex align-items-center">
-            <button
-              type="button"
-              onClick={() => setPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              style={{ border: 'none', background: 'transparent' }}
-            >
-              <IconCR name="arrowLeft" />
-            </button>
-            {getPages(currentPage, totalPages).map((p, i) =>
-              p === '...' ? (
-                <span key={`dots-${i}`} style={{ padding: '2px 8px' }}>...</span>
-              ) : (
-                <button
-                  type="button"
-                  key={p}
-                  onClick={() => setPage(p)}
-                  style={{
-                    fontSize: '12px',
-                    padding: '2px 8px',
-                    background: p === currentPage ? '#e9d5ff' : 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: p === currentPage ? 'bold' : 'normal',
-                  }}
-                >
-                  {p}
-                </button>
-              )
-            )}
-            <button
-              type="button"
-              onClick={() => setPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              style={{ border: 'none', background: 'transparent' }}
-            >
-              <IconCR name="arrowRight" />
-            </button>
-          </div>
-          <div style={{ fontSize: '12px' }}>
-            Mostrando{' '}
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setPage(1);
-              }}
-            >
-              {PAGE_SIZE_OPTIONS.map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>{' '}
-            de {sorted.length}
-          </div>
-        </div>
-      </div>
+      <PaginacionCR
+        pagina={currentPage}
+        porPagina={pageSize}
+        total={sorted.length}
+        onCambiarPagina={setPage}
+        onCambiarPorPagina={mostrarTamanoPagina ? (n) => { setPageSize(n); setPage(1); } : undefined}
+      />
     </div>
   );
 }

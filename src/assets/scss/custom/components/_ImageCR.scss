@@ -1,0 +1,114 @@
+// ImageCR: imagen que se amplía a pantalla completa (components/ImageCR/ImageCR.tsx)
+// Contenedor de la imagen ampliable: la lupa la cubre al pasar el mouse
+.image-cr {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  line-height: 0;
+  cursor: zoom-in;
+
+  &__lupa {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+
+    // La lupa crece con la imagen: 40% del lado, entre 12px y 32px
+    svg {
+      width: clamp(12px, 40%, 32px);
+      height: clamp(12px, 40%, 32px);
+    }
+  }
+
+  &:hover &__lupa {
+    opacity: 1;
+  }
+}
+
+// Dentro de FotoEncuadrada el contenedor cubre todo el cuadrado (la imagen se posiciona respecto a él)
+.foto-encuadrada > .image-cr {
+  position: absolute;
+  inset: 0;
+}
+
+// Visor: overlay oscuro con la imagen centrada; por encima de los modales (1000) y del loading (2000)
+.image-cr-visor {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.85);
+  cursor: zoom-out;
+  animation: image-cr-visor-entrar 0.15s ease-out;
+
+  &__img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    cursor: default;
+    transition: transform 0.2s ease;
+
+    // Girada 90° / 270°: el ancho ocupa el alto de la pantalla y viceversa
+    &--de-costado {
+      max-width: calc(100vh - 48px);
+      max-height: calc(100vw - 48px);
+    }
+  }
+
+  // Botones en columna arriba a la derecha: cerrar, acercar, alejar, girar
+  &__barra {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__boton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+
+    // Íconos siempre blancos (sin icon-mode-actual, que cambia con el modo claro/nocturno)
+    .image-cr-visor__icono {
+      color: #fff;
+      fill: #fff;
+    }
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}
+
+@keyframes image-cr-visor-entrar {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

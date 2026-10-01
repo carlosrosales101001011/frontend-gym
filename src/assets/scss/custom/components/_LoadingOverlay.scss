@@ -21,4 +21,18 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
+
+  // Dentro de una card: cubre solo el contenedor (position: relative) y con esquinas redondeadas
+  &--interno {
+    position: absolute;
+    z-index: 5;
+    border-radius: inherit;
+
+    .loading-overlay-content {
+      gap: 8px;
+    }
+    .loading-overlay-text {
+      font-size: 11px;
+    }
+  }
 }

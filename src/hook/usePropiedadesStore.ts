@@ -82,6 +82,7 @@ const TERMINOLOGIAS = {
   categoriaPrograma: ['programa', 'categoria', 'tipo'],
   origenVenta: ['venta', 'origen', 'tipo'],
   formaPagoVenta: ['venta', 'forma-pago', 'tipo'],
+  tipoEventoAsistencia: ['persona', 'asistencia', 'tipo'], //Entrada, Salida (persona_eventos_asistencia)
   distritosLima: ['persona', 'distrito', 'Lima'],
   distritosCallao: ['persona', 'distrito', 'Callao'],
 } as const;

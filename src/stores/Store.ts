@@ -24,6 +24,7 @@ import { proveedorSlice } from "@/pages/GestionProveedores/store/proveedorSlice"
 import { permisoSlice } from "@/stores/permisos/permisoSlice";
 import { grupoFinanzasSlice } from "@/pages/GestionTermGrupoFinanzas/store/grupoFinanzasSlice";
 import { uiSlice } from "@/stores/ui/uiSlice";
+import { sesionSlice } from "@/stores/sesion/sesionSlice";
 import { SucursalSlice } from "@/pages/GestionSucursal/store/sucursalSlice";
 import { AlmacenSlice } from "@/pages/GestionAlmacen/store/almacenSlice";
 import { movProductoSlice } from "@/pages/GestionMovimientoAlmacen/store/movProductoSlice";
@@ -34,6 +35,11 @@ import { dataVentaSlice } from "@/pages/DataVentas/store/dataVentaSlice";
 import { SeguimientoMembresiaSlice } from "@/pages/SeguimientoMembresia/store/seguimientoMembresiaSlice";
 import { agendaNutricionistaSlice } from "@/pages/AgendaNutricionista/store/agendaNutricionistaSlice";
 import { extRegaloSlice } from "@/pages/GestionExtensionRegalos/store/extRegaloSlice";
+import { planEntrenamientoSlice } from "@/pages/GestionPlanesEntrenamiento/store/planEntrenamientoSlice";
+import { metaSlice } from "@/pages/GestionMeta/store/metaSlice";
+import { reporteMetaSlice } from "@/pages/ReporteMeta/store/reporteMetaSlice";
+import { reporteVentasSlice } from "@/pages/ReporteVentas/store/reporteVentasSlice";
+import { asistenciasSlice } from "@/pages/GestionAsistencias/store/asistenciasSlice";
 
 export const store = configureStore({
     reducer: {
@@ -61,6 +67,7 @@ export const store = configureStore({
     PERMISO: permisoSlice.reducer,
     GRUPO_FINANZAS: grupoFinanzasSlice.reducer,
     UI: uiSlice.reducer,
+    SESION: sesionSlice.reducer,
     SUCURSAL: SucursalSlice.reducer,
     ALMACEN: AlmacenSlice.reducer,
     MOVPRODUCTO: movProductoSlice.reducer,
@@ -70,7 +77,12 @@ export const store = configureStore({
     DATAVENTAS: dataVentaSlice.reducer,
     SEGUIMIENTO_MEMBRESIA: SeguimientoMembresiaSlice.reducer,
     AGENDA_NUTRICIONISTA: agendaNutricionistaSlice.reducer,
-    EXT_REGALO: extRegaloSlice.reducer
+    EXT_REGALO: extRegaloSlice.reducer,
+    PLAN_ENTRENAMIENTO: planEntrenamientoSlice.reducer,
+    META: metaSlice.reducer,
+    REPORTE_META: reporteMetaSlice.reducer,
+    REPORTE_VENTAS: reporteVentasSlice.reducer,
+    ASISTENCIAS: asistenciasSlice.reducer
 }
 })
 

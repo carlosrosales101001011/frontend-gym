@@ -1,0 +1,89 @@
+// TabsCR / TabCR (components/Tabs). Colores del tema: funcionan en modo claro y nocturno.
+.tabs-cr {
+  &__lista {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    overflow-x: auto; // muchas pestañas en pantallas chicas: scroll horizontal
+    overflow-y: hidden;
+    scrollbar-width: thin;
+  }
+
+  &__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    opacity: .7;
+    transition: background-color .15s ease, color .15s ease, opacity .15s ease;
+
+    // Texto e íconos del título toman el color de la pestaña (el selector global * los pintaría aparte)
+    &,
+    & * {
+      color: $color-actual !important;
+    }
+
+    &:hover:not(:disabled) {
+      opacity: 1;
+      background-color: $item-hover-actual;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $primary;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    &--activa {
+      opacity: 1;
+      font-weight: 600;
+    }
+  }
+
+  // ── Línea (por defecto): subrayado primario en la activa ──
+  // La línea base va como sombra interna (sin margen negativo: evita un scroll vertical en la lista);
+  // el subrayado de la activa se pinta encima
+  &--linea &__lista {
+    box-shadow: inset 0 -1px 0 $card-border-actual;
+  }
+  &--linea &__tab {
+    border-bottom: 2px solid transparent;
+    border-radius: 6px 6px 0 0;
+  }
+  &--linea &__tab--activa {
+    border-bottom-color: $primary;
+
+    &,
+    & * {
+      color: $primary !important;
+    }
+  }
+
+  // ── Píldora: fondo primario en la activa ──
+  &--pildora &__tab {
+    border-radius: 8px;
+  }
+  &--pildora &__tab--activa {
+    background-color: $primary;
+
+    &,
+    & * {
+      color: #fff !important;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: $primary;
+    }
+  }
+}

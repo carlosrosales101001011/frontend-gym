@@ -1,0 +1,11 @@
+// Botones con fondo primary: texto e íconos en blanco.
+// El `* { color: $color-actual }` de app.scss pinta el contenido del botón (ej. el <div> del label de ButtonCR)
+// con el color del tema; aquí se fuerza el blanco sobre el rojo en ambos modos.
+// Incluye los outline-primary cuando se rellenan (hover / activo).
+.btn-primary,
+.btn-primary *,
+.btn-outline-primary:hover *,
+.btn-outline-primary.active *,
+.btn-outline-primary:active * {
+  color: $white;
+}

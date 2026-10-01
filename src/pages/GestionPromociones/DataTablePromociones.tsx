@@ -16,17 +16,17 @@ export const DataTablePromociones = ({ onOpenModalCustom, otrosBotones }: { onOp
         },
         {
             id: 1,
-            header: 'Código',
+            header: 'Código', campoBusqueda: 'codigo',
             render: (rowData: PromocionProps) => <span>{rowData.codigo}</span>,
         },
         {
             id: 2,
-            header: 'Nombre',
+            header: 'Nombre', campoBusqueda: 'nombre',
             render: (rowData: PromocionProps) => <span>{rowData.nombre}</span>,
         },
         {
             id: 3,
-            header: 'Tipo',
+            header: 'Tipo', campoBusqueda: 'label_tipo_promocion',
             render: (rowData: PromocionProps) => <span>{rowData.label_tipo_promocion}</span>,
         },
         {

@@ -16,7 +16,7 @@ export const DataTableSecciones = ({ onOpenModalCustom, otrosBotones }: { onOpen
         },
         {
             id: 1,
-            header: 'Sub Sección',
+            header: 'Sub Sección', campoBusqueda: 'subSeccion',
             render: (rowData: SeccionProps) => <span>{rowData.subSeccion}</span>,
         },
         {
@@ -26,13 +26,20 @@ export const DataTableSecciones = ({ onOpenModalCustom, otrosBotones }: { onOpen
         },
         {
             id: 3,
-            header: 'Label',
+            header: 'Label', campoBusqueda: 'label',
             render: (rowData: SeccionProps) => <span>{rowData.label}</span>,
         },
         {
             id: 6,
-            header: 'URL',
+            header: 'URL', campoBusqueda: 'url',
             render: (rowData: SeccionProps) => <span>{rowData.url}</span>,
+        },
+        {
+            id: 8,
+            header: 'Página en mantenimiento',
+            render: (rowData: SeccionProps) => rowData.is_seccion_mantenimiento
+                ? <span className="badge text-bg-warning">En mantenimiento</span>
+                : <span className="small opacity-75">No</span>,
         },
         {
             id: 7,

@@ -1,6 +1,7 @@
 import ModalCR from '@/components/Modal/ModalCR'
 import type { modalCustom } from '@/types/props'
-import { Tab, Tabs } from 'react-bootstrap'
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import { TabInfoVenta } from './Modal/Tabs/TabInfoVenta'
 import { TabDetalleVenta } from './Modal/Tabs/TabDetalleVenta'
 import { TabDetallePagos } from './Modal/Tabs/TabDetallePagos'
@@ -31,15 +32,15 @@ export const ModalInfoVentas = ({ show, onHide, id, onCambio }: ModalInfoVentasP
             )}
             {!data && loading && <div className="text-center text-secondary py-5">Cargando venta...</div>}
             {data && (
-              <Tabs defaultActiveKey="info" mountOnEnter>
-                  <Tab eventKey="info" title="Información de la venta">
+              <TabsCR defaultActiveKey="info" mountOnEnter>
+                  <TabCR eventKey="info" title="Información de la venta">
                       <TabInfoVenta
                         key={data.venta.id}
                         venta={data.venta}
                         actualizarVenta={ventaDetalle.actualizarVenta}
                       />
-                  </Tab>
-                  <Tab eventKey="detalle" title="Detalle de la venta">
+                  </TabCR>
+                  <TabCR eventKey="detalle" title="Detalle de la venta">
                       <TabDetalleVenta
                         membresias={data.membresias}
                         productos={data.productos}
@@ -48,16 +49,16 @@ export const ModalInfoVentas = ({ show, onHide, id, onCambio }: ModalInfoVentasP
                         guardarProducto={ventaDetalle.guardarProducto}
                         eliminarProducto={ventaDetalle.eliminarProducto}
                       />
-                  </Tab>
-                  <Tab eventKey="pagos" title="Detalle de pagos">
+                  </TabCR>
+                  <TabCR eventKey="pagos" title="Detalle de pagos">
                       <TabDetallePagos
                         venta={data.venta}
                         pagos={data.pagos}
                         guardarPago={ventaDetalle.guardarPago}
                         eliminarPago={ventaDetalle.eliminarPago}
                       />
-                  </Tab>
-              </Tabs>
+                  </TabCR>
+              </TabsCR>
             )}
         </ModalCR.Body>
     </ModalCR>

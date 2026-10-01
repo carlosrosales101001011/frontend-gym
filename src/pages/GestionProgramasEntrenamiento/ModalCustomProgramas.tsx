@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { modalCustom } from '@/types/props'
 import ModalCR from '@/components/Modal/ModalCR'
-import { Col, Row, Tab, Tabs } from 'react-bootstrap'
+import { Col, Row } from 'react-bootstrap'
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import { AppInformacion } from '@/pages/GestionProgramasEntrenamiento/Tabs/TabInformacion/AppInformacion'
 import { AppPlanes } from '@/pages/GestionProgramasEntrenamiento/Tabs/TabPlanes/AppPlanes'
 import { AppHorarios } from '@/pages/GestionProgramasEntrenamiento/Tabs/TabHorarios/AppHorarios'
@@ -76,17 +78,17 @@ export const ModalCustomProgramas = ({show, onHide, id}: modalCustom) => {
                     </div>
                 </Col>
                 <Col lg={9}>
-                    <Tabs>
-                        <Tab title='Informacion' eventKey={'info-pgm'}>
+                    <TabsCR>
+                        <TabCR title='Informacion' eventKey={'info-pgm'}>
                             <AppInformacion/>
-                        </Tab>
-                        <Tab title='Planes(Meses)' eventKey={'planes-pgm'}>
+                        </TabCR>
+                        <TabCR title='Planes(Meses)' eventKey={'planes-pgm'}>
                             <AppPlanes/>
-                        </Tab>
-                        <Tab title='Horarios' eventKey={'horario-pgm'}>
+                        </TabCR>
+                        <TabCR title='Horarios' eventKey={'horario-pgm'}>
                             <AppHorarios/>
-                        </Tab>
-                    </Tabs>
+                        </TabCR>
+                    </TabsCR>
                 </Col>
             </Row>
         </ModalCR.Body>

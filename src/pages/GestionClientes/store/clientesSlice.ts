@@ -1,3 +1,4 @@
+import type { AjusteFoto } from '@/components/Avatar/encuadreFoto';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export type ClienteProps = {
@@ -15,6 +16,14 @@ export type ClienteProps = {
   id_tipo: number;
   uid_avatar?: string;
   url_avatar?: string;
+  /** Url de la última imagen del avatar en blob_storage ('' si se quitó la foto) */
+  url_avatar_ultimo?: string;
+  /** Encuadre de esa última imagen (null si no tiene foto) */
+  avatar_x_ultimo?: number | null;
+  avatar_y_ultimo?: number | null;
+  avatar_zoom_ultimo?: number | null;
+  /** Foto vigente en blob_storage con su encuadre (solo lectura: se guarda con PATCH /blob-storage/id/:id) */
+  avatar?: ({ id: number } & AjusteFoto) | null;
 
   //CAMPOS INVALIDOS
   apellido_materno?: string;

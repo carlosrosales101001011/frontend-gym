@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
-import httpClient from '@/common/helpers/httpClient'
 import { CardEditable } from '@/components/CardEditable/CardEditable'
 import { FieldGrid } from '@/components/FieldText/FieldGrid'
 import { ResumenMontos } from '@/components/ResumenMontos/ResumenMontos'
@@ -10,8 +9,8 @@ import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
 import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
 import type { OpcionesSelect } from '@/types/props'
 import { BuscadorPersona } from '@/components/BuscadorPersona/BuscadorPersona'
-import type { SucursalProps } from '@/pages/PuntoVenta/store/ventaSlice'
 import type { UseVentaDetalle } from '../../hook/useVentaDetalle'
+import { useOpcionesVenta } from '../../hook/useOpcionesVenta'
 import type { VentaEditableForm, VentaInfoProps } from '../../types'
 import { aFechaHoraLocal, aNumero, formatearFechaHora } from '../../helpers'
 
@@ -43,6 +42,7 @@ export const TabInfoVenta = ({ venta, actualizarVenta }: TabInfoVentaProps) => {
   const [cliente, setCliente] = useState<ItemResultado | null>(null)
   const [asesor, setAsesor] = useState<ItemResultado | null>(null)
   const [sucursales, setSucursales] = useState<OpcionesSelect[]>([])
+  const { obtenerSucursales } = useOpcionesVenta()
   const { cargar: cargarComprobantes, data: dataComprobantes } = useTerminologiaPersona('tipoComprobantes')
   const { cargar: cargarOrigenVenta, data: dataOrigenVenta } = useTerminologiaPersona('origenVenta')
 
@@ -50,8 +50,8 @@ export const TabInfoVenta = ({ venta, actualizarVenta }: TabInfoVentaProps) => {
     if (!editando) return
     cargarComprobantes()
     cargarOrigenVenta()
-    httpClient.get('/empresa-sucursal')
-      .then(({ data }: { data: { lista: SucursalProps[] } }) => setSucursales(data.lista.map((s) => ({ value: s.id, label: s.nombre }))))
+    obtenerSucursales()
+      .then((lista) => setSucursales(lista.map((s) => ({ value: s.id, label: s.nombre }))))
       .catch(console.error)
   }, [editando, cargarComprobantes, cargarOrigenVenta])
 

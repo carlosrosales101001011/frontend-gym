@@ -3,16 +3,20 @@ import { Oval } from 'react-loader-spinner'
 type Props = {
   texto: string;
   show?: boolean;
+  /** Cubre solo su contenedor (que debe tener position: relative) en vez de toda la pantalla */
+  interno?: boolean;
 }
 
-export const LoadingOverlay = ({ texto, show = true }: Props) => {
+export const LoadingOverlay = ({ texto, show = true, interno = false }: Props) => {
   if (!show) return null;
+  // Dentro de una card el spinner es más chico para que quepa
+  const tamano = interno ? 32 : 60;
   return (
-    <div className='loading-overlay' role='status' aria-live='polite'>
+    <div className={`loading-overlay ${interno ? 'loading-overlay--interno' : ''}`} role='status' aria-live='polite'>
       <div className='loading-overlay-content'>
         <Oval
-          height={60}
-          width={60}
+          height={tamano}
+          width={tamano}
           color="#2b00ff"
           secondaryColor="#ffffff"
           strokeWidth={2}

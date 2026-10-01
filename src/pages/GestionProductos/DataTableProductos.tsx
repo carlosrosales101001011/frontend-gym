@@ -16,37 +16,37 @@ export const DataTableProductos = ({ onOpenModalCustom, otrosBotones }: { onOpen
         },
         {
             id: 1,
-            header: 'Nombre',
+            header: 'Nombre', campoBusqueda: 'nombre',
             render: (rowData: ProductoProps) => <span>{rowData.nombre}</span>,
         },
         {
             id: 2,
-            header: 'Código de Barra',
+            header: 'Código de Barra', campoBusqueda: 'codigo_barra',
             render: (rowData: ProductoProps) => <span>{rowData.codigo_barra}</span>,
         },
         {
             id: 3,
-            header: 'Código SKU',
+            header: 'Código SKU', campoBusqueda: 'codigo_sku',
             render: (rowData: ProductoProps) => <span>{rowData.codigo_sku}</span>,
         },
         {
             id: 4,
-            header: 'Descripción',
+            header: 'Descripción', campoBusqueda: 'descripcion',
             render: (rowData: ProductoProps) => <span>{rowData.descripcion}</span>,
         },
         {
             id: 5,
-            header: 'Categoría',
+            header: 'Categoría', campoBusqueda: 'label_categoria',
             render: (rowData: ProductoProps) => <span>{rowData.label_categoria}</span>,
         },
         {
             id: 6,
-            header: 'Marca',
+            header: 'Marca', campoBusqueda: 'label_marca',
             render: (rowData: ProductoProps) => <span>{rowData.label_marca}</span>,
         },
         {
             id: 7,
-            header: 'Unidad de Medida',
+            header: 'Unidad de Medida', campoBusqueda: 'label_unidadMedida',
             render: (rowData: ProductoProps) => <span>{rowData.label_unidadMedida}</span>,
         },
         {

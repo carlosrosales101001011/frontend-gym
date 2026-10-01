@@ -1,5 +1,7 @@
-import { addDays, format, parseISO } from "date-fns"
-import { sesionesDisponibles } from "@/pages/SeguimientoMembresia/DataTableSeguimiento"
+import { addDays } from "date-fns"
+import { localDateStringToDate } from "@/helpers/getDate"
+import { formatDate } from "@/helpers/FormatDate"
+import { sesionesDisponibles } from "@/helpers/diasMembresia"
 import type { SeguimientoMembresiaProps } from "@/pages/SeguimientoMembresia/store/seguimientoMembresiaSlice"
 
 type MembresiaActivaClienteProps = {
@@ -8,8 +10,6 @@ type MembresiaActivaClienteProps = {
   /** Días a regalar: se muestra cómo quedaría el vencimiento (solo al crear) */
   diasRegalo?: number
 }
-
-const formatFecha = (fecha: string) => format(parseISO(fecha), 'dd/MM/yyyy')
 
 /** Dato de la membresía: etiqueta arriba, valor abajo */
 const Dato = ({ label, valor }: { label: string, valor: React.ReactNode }) => (
@@ -31,7 +31,7 @@ export const MembresiaActivaCliente = ({ membresia, diasRegalo = 0 }: MembresiaA
 
   // Igual que el backend: el regalo empieza en el vencimiento actual y suma días corridos
   const nuevoVencimiento = diasRegalo > 0
-    ? format(addDays(parseISO(membresia.fecha_vencimiento), diasRegalo), 'dd/MM/yyyy')
+    ? formatDate(addDays(localDateStringToDate(membresia.fecha_vencimiento), diasRegalo), 'yyyy-mm-dd', 'dd/mm/yyyy')
     : null
 
   return (
@@ -39,7 +39,7 @@ export const MembresiaActivaCliente = ({ membresia, diasRegalo = 0 }: MembresiaA
       <div className="fw-bold mb-3">Membresía activa</div>
       <Dato label="Cliente" valor={membresia.label_nombres_apellidos_cli} />
       <Dato label="Comprobante" valor={membresia.label_venta || '-'} />
-      <Dato label="Vence" valor={formatFecha(membresia.fecha_vencimiento)} />
+      <Dato label="Vence" valor={formatDate(membresia.fecha_vencimiento, 'yyyy-mm-dd', 'dd/mm/yyyy')} />
       <Dato label="Sesiones disponibles" valor={sesionesDisponibles(membresia.fecha_vencimiento)} />
       {membresia.label_extension_actual && <Dato label="Extensión actual" valor={membresia.label_extension_actual} />}
       {nuevoVencimiento && (

@@ -1,0 +1,149 @@
+// Stepper2: círculos numerados unidos por una línea (vertical u horizontal)
+$stepper2-circulo: 28px;
+
+.stepper2 {
+  display: flex;
+
+  &--vertical {
+    flex-direction: column;
+  }
+
+  &--horizontal {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.stepper2__paso {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  cursor: default;
+
+  &--clickeable {
+    cursor: pointer;
+  }
+
+  // Línea que une cada círculo con el siguiente
+  &:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    background-color: $card-border-actual;
+  }
+
+  &--completado:not(:last-child)::after {
+    background-color: $primary;
+  }
+}
+
+.stepper2--vertical .stepper2__paso {
+  align-items: flex-start;
+  padding-bottom: 28px;
+
+  &:not(:last-child)::after {
+    top: $stepper2-circulo + 4px;
+    bottom: 4px;
+    left: calc($stepper2-circulo / 2) - 1px;
+    width: 2px;
+  }
+}
+
+.stepper2--horizontal .stepper2__paso {
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  &:not(:last-child)::after {
+    top: calc($stepper2-circulo / 2) - 1px;
+    left: calc(50% + #{calc($stepper2-circulo / 2) + 6px});
+    right: calc(-50% + #{calc($stepper2-circulo / 2) + 6px});
+    height: 2px;
+  }
+
+  // Pantalla grande: el texto al lado del círculo y la línea ocupa el espacio hasta el siguiente paso
+  @include media-breakpoint-up(md) {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+
+    &:last-child {
+      flex: 0 0 auto;
+    }
+
+    &:not(:last-child)::after {
+      position: static;
+      flex: 1;
+      min-width: 24px;
+      height: 2px;
+      margin-right: 12px;
+    }
+
+    .stepper2__texto {
+      padding-top: 0;
+      white-space: nowrap;
+    }
+  }
+}
+
+.stepper2__circulo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: $stepper2-circulo;
+  height: $stepper2-circulo;
+  border-radius: 50%;
+  border: 2px solid $card-border-actual;
+
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.7;
+
+  .stepper2__paso--activo & {
+    border-color: $primary;
+    background-color: $primary;
+    opacity: 1;
+
+    &,
+    * {
+      color: #fff;
+    }
+  }
+
+  .stepper2__paso--completado & {
+    border-color: $primary;
+    opacity: 1;
+
+    &,
+    * {
+      color: $primary;
+    }
+  }
+}
+
+.stepper2__texto {
+  padding-top: 3px;
+}
+
+.stepper2__titulo {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.7;
+
+  .stepper2__paso--activo &,
+  .stepper2__paso--completado & {
+    opacity: 1;
+  }
+
+  .stepper2__paso--activo & {
+    font-weight: 700;
+  }
+}
+
+.stepper2__descripcion {
+  display: block;
+  font-size: 12px;
+  opacity: 0.6;
+}

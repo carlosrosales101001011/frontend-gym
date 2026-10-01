@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react'
-import { Badge, Card, Tab, Tabs } from 'react-bootstrap'
+import { Badge, Card } from 'react-bootstrap'
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import { useVentascliStore } from '../hook/useVentascliStore'
 import { DataTableSimple } from '@/components/DataTableSimple/DataTableSimple'
 import type { DataVentaProps } from '../store/ventaSlice'
@@ -76,20 +78,20 @@ export const CardHistorialVentas = ({nombreCliente, id_cli}: {nombreCliente:stri
         Historial de compras realizadas por <span className='fw-bold' style={{fontSize: '15px'}}>{nombreCliente}</span>
     </Card.Header>
     <Card.Body>
-        <Tabs>
-            <Tab eventKey={'ventas'} title={'Ventas'}>
+        <TabsCR>
+            <TabCR eventKey={'ventas'} title={'Ventas'}>
                 <DataTableSimple
                     columns={columns}
                     data={dataVentas}
                 />
-            </Tab>
-            <Tab eventKey={'membresias'} title={'Membresias'}>
+            </TabCR>
+            <TabCR eventKey={'membresias'} title={'Membresias'}>
 
-            </Tab>
-            <Tab eventKey={'productos'} title={'Productos'}>
+            </TabCR>
+            <TabCR eventKey={'productos'} title={'Productos'}>
 
-            </Tab>
-        </Tabs>
+            </TabCR>
+        </TabsCR>
     </Card.Body>
     </Card>
   )

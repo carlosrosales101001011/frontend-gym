@@ -18,6 +18,7 @@ export const App = () => {
         const { searcher } = useColaboradorStore()
     const {  get } = useQueryParams();
     const querySearch = (get(querys.search)||'')
+    const queryColumnas = get(querys.columnas)
     const page = Number(get(querys.page))
     const show = Number(get(querys.show))
     useEffect(() => {
@@ -26,7 +27,7 @@ export const App = () => {
         if (e.name !== 'CanceledError') console.error(e);
         });
         return () => ctrl.abort();
-    }, [querySearch, page, show])
+    }, [querySearch, queryColumnas, page, show])
     const onCloseModalCustomColaborador = ()=>{
         setisOpenModalCustomColaborador({id:0, isCopy: false, isOpen: false})
     }

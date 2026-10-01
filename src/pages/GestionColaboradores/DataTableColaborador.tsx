@@ -24,7 +24,7 @@ export const DataTableColaborador = ({otrosBotones}:Props) => {
         }
     },
     {
-        header: 'Nombres y Apellidos',
+        header: 'Nombres y Apellidos', campoBusqueda: ['nombres', 'apellido_paterno', 'apellido_materno'],
         id: 1,
         sortable: false,
         render:(row:ColaboradorProps)=>{
@@ -36,7 +36,7 @@ export const DataTableColaborador = ({otrosBotones}:Props) => {
         }
     },
     {
-        header: 'Email personal',
+        header: 'Email personal', campoBusqueda: 'email_personal',
         id: 2,
         sortable: false,
         render:(row:ColaboradorProps)=>{
@@ -48,7 +48,7 @@ export const DataTableColaborador = ({otrosBotones}:Props) => {
         }
     },
     {
-        header: 'Email corporativo',
+        header: 'Email corporativo', campoBusqueda: 'email_corporativo',
         id: 3,
         sortable: false,
         render:(row:ColaboradorProps)=>{
@@ -60,7 +60,7 @@ export const DataTableColaborador = ({otrosBotones}:Props) => {
         }
     },
     {
-        header: 'Telefono principal',
+        header: 'Telefono principal', campoBusqueda: 'telefono',
         id: 4,
         sortable: false,
         render:(row:ColaboradorProps)=>{

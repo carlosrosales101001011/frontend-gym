@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/stores/Store';
 import type { moduloProps } from '@/routes/store/moduloSlice';
@@ -7,7 +6,13 @@ import { usePermisosStore } from '@/hook/usePermisosStore';
 import IconCR from '@/components/Icons/IconCR';
 import getDateHoy from '@/helpers/getDateHoy';
 import { useAuth } from '@/hook/useAuth';
+import { useSesionStore } from '@/hook/useSesionStore';
+import { useIrAModulo } from '@/hook/useIrAModulo';
+import { IconosTopbar } from '@/components/TopBar/IconosTopbar';
+import { LogoEmpresa } from '@/components/LogoEmpresa/LogoEmpresa';
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay';
+import { colorPorTexto } from '@/helpers/colorPorTexto';
+import { ID_TIPO_MODULO_EMPRESARIAL } from '@/stores/permisos/permisoSlice';
 
 /**
  * NOTA DE INTEGRACIÓN
@@ -35,26 +40,8 @@ type ModuloExtra = {
 
 const withExtra = (m: moduloProps) => m as moduloProps & ModuloExtra;
 
-// Paleta de acentos por módulo, derivada del nombre para que sea estable
-// sin depender de un campo "color" en el backend.
-const PALETTE = [
-  { bg: '#E8F3EC', fg: '#1E7A52' }, // verde
-  { bg: '#E8EEF9', fg: '#2A56A8' }, // azul
-  { bg: '#F3EAF6', fg: '#7C3F9E' }, // violeta
-  { bg: '#FBEFE4', fg: '#B4611B' }, // naranja
-  { bg: '#FCE8EC', fg: '#B23A5A' }, // rosa
-  { bg: '#E9F1F2', fg: '#1F6E75' }, // teal
-  { bg: '#F0EEE6', fg: '#6B6455' }, // gris cálido
-];
-
-const colorForLabel = (label: string) => {
-  let hash = 0;
-  for (let i = 0; i < label.length; i++) hash = label.charCodeAt(i) + ((hash << 5) - hash);
-  return PALETTE[Math.abs(hash) % PALETTE.length];
-};
 export const ModulosHome: React.FC = () => {
   const [selected, setSelected] = useState<number>(0);
-  const navigate = useNavigate();
   const { obtenerModulos, loadingModulos } = usePermisosStore();
   const { modulos } = useSelector((state: RootState) => state.PERMISO);
 
@@ -62,15 +49,13 @@ export const ModulosHome: React.FC = () => {
     obtenerModulos();
   }, []);
 
+  const entrarAModulo = useIrAModulo();
   const irAModulo = (modulo: moduloProps) => {
-    const extra = withExtra(modulo);
-    if (extra.sin_acceso) return;
-    setSelected(modulo.id);
-    navigate(`/${modulo?.id}/`);
+    if (entrarAModulo(withExtra(modulo))) setSelected(modulo.id);
   };
 
   // const favoritos = useMemo(() => modulos.filter((f) => f.is_favorito), [modulos]);
-  const empresariales = useMemo(() => modulos.filter((f) => f.modulo?.id_tipo === 2012), [modulos]);
+  const empresariales = useMemo(() => modulos.filter((f) => f.modulo?.id_tipo === ID_TIPO_MODULO_EMPRESARIAL), [modulos]);
   // const personales = useMemo(() => modulos.filter((f) => f.modulo?.id_tipo === 2013), [modulos]);
 
   const totalSeccionesEmpresariales = empresariales.reduce(
@@ -83,8 +68,12 @@ export const ModulosHome: React.FC = () => {
     return `${dia} ${date} ${mes} ${anio} · ${hora}:${minuto.toString().padStart(2, '0')}`;
   }, []);
 
-  // TODO: reemplazar por datos reales del usuario autenticado.
-  const usuario = { nombre: 'Carlos Rosales', rol: 'Almacén', planta: 'Planta Monterrey' };
+  // TODO: la planta sigue fija hasta que el backend la exponga
+  const usuario = { planta: 'Planta Monterrey' };
+  const { nombreUsuario, obtenerUsuarioSesion } = useSesionStore();
+  useEffect(() => {
+    obtenerUsuarioSesion();
+  }, []);
   // Borra el token de localStorage; AuthGuard redirige solo a /login
   const { logout } = useAuth();
 
@@ -95,19 +84,25 @@ export const ModulosHome: React.FC = () => {
 
       <header className="nk-header">
         <div className="nk-logo">
-          <span className="nk-logo-mark" />
-          <span className="nk-logo-text">Change</span>
+          <LogoEmpresa alto={56} />
         </div>
-        <div className="nk-user">
-          <button type="button" className="bg-danger text-white" onClick={logout}>Cerrar sesión</button>
+        {/* Mismos íconos que el Topbar de los módulos, a la derecha sin mover el logo del centro */}
+        <div className="nk-header-iconos">
+          <IconosTopbar />
         </div>
       </header>
+
+      {/* Fijo abajo a la derecha; en mobile queda solo el ícono */}
+      <button type="button" className="nk-logout" onClick={logout} title="Cerrar sesión" aria-label="Cerrar sesión">
+        <IconCR name="power" size={18} className="nk-logout-icon" />
+        <span className="nk-logout-text">Cerrar sesión</span>
+      </button>
 
       <main className="nk-main">
         <div className="nk-welcome">
           <div>
             <span className="nk-eyebrow">Bienvenido</span>
-            <h1 className="nk-title">{usuario.nombre}</h1>
+            <h1 className="nk-title">{nombreUsuario}</h1>
           </div>
           <div className="nk-meta">{fechaHoy} · {usuario.planta}</div>
         </div>
@@ -178,7 +173,7 @@ type ItemClickProps = {
 };
 
 // const FavoritoCard: React.FC<ItemClickProps> = ({ opt, isActive, onClick }) => {
-//   const color = colorForLabel(opt.modulo.label);
+//   const color = colorPorTexto(opt.modulo.label);
 //   // const extra = withExtra(opt);
 //   return (
 //     <button
@@ -199,7 +194,7 @@ type ItemClickProps = {
 // };
 
 const ModuloCard: React.FC<ItemClickProps> = ({ opt, isActive, onClick }) => {
-  const color = colorForLabel(opt.modulo.label);
+  const color = colorPorTexto(opt.modulo.label);
   const extra = withExtra(opt);
   const bloqueado = !!extra.sin_acceso;
   return (
@@ -225,7 +220,7 @@ const ModuloCard: React.FC<ItemClickProps> = ({ opt, isActive, onClick }) => {
 };
 
 // const PersonalItem: React.FC<ItemClickProps> = ({ opt, isActive, onClick }) => {
-//   const color = colorForLabel(opt.modulo.label);
+//   const color = colorPorTexto(opt.modulo.label);
 //   return (
 //     <button type="button" className={`nk-personal-item${isActive ? ' is-active' : ''}`} onClick={() => onClick(opt)}>
 //       <span className="nk-icon-badge nk-icon-badge--sm" style={{ background: color.bg, color: color.fg }}>
@@ -245,15 +240,29 @@ const nkStyles = `
   color: #1F2421;
 }
 .nk-header {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* solo lleva el logo de la empresa, centrado */
   gap: 24px;
   padding: 9px 28px;
 }
 .nk-logo { display: flex; align-items: center; gap: 10px; }
-.nk-logo-mark { width: 24px; height: 24px; border-radius: 6px; background: #14352D; display: inline-block; }
-.nk-logo-text { font-weight: 700; font-size: 16px; }
+.nk-header-iconos { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); }
+
+.nk-logout {
+  position: fixed; right: 24px; bottom: 24px; z-index: 1030;
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 44px; padding: 0 18px 0 14px;
+  border: none; border-radius: 999px;
+  background: var(--bs-primary); cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.nk-logout, .nk-logout * { color: #fff !important; }
+.nk-logout:hover { filter: brightness(0.9); transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); }
+.nk-logout:active { transform: translateY(0); }
+.nk-logout-text { font-size: 13px; font-weight: 600; }
 
 .nk-main { max-width: 1320px; margin: 0 40px; padding: 10px; }
 .nk-welcome { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; }
@@ -333,6 +342,8 @@ const nkStyles = `
 }
 @media (max-width: 640px) {
   .nk-header { flex-wrap: wrap; }
+  .nk-logout { right: 16px; bottom: 16px; width: 48px; height: 48px; padding: 0; justify-content: center; }
+  .nk-logout-text { display: none; }
   .nk-modulo-grid { grid-template-columns: 1fr; }
 }
 `;

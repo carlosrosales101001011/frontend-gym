@@ -1,10 +1,8 @@
-import { format, parseISO } from "date-fns"
 import { DataTableTest } from "@/components/DataTableTest/DataTableTest"
 import IconCR from "@/components/Icons/IconCR"
 import type { ExtRegaloProps } from "@/pages/GestionExtensionRegalos/store/extRegaloSlice"
 import { useExtRegaloStore } from "@/pages/GestionExtensionRegalos/useExtRegaloStore"
-
-const formatFecha = (fecha?: string|null) => fecha ? format(parseISO(fecha), 'dd/MM/yyyy') : ''
+import { formatDate } from "@/helpers/FormatDate"
 
 export const DataTableExtRegalos = ({ onOpenModalCustom, otrosBotones }: { onOpenModalCustom: (id:number) => void, otrosBotones: React.ReactNode }) => {
     const { extRegalos, eliminarExtRegalo } = useExtRegaloStore()
@@ -17,17 +15,17 @@ export const DataTableExtRegalos = ({ onOpenModalCustom, otrosBotones }: { onOpe
         },
         {
             id: 1,
-            header: 'Cliente',
+            header: 'Cliente', campoBusqueda: 'label_nombres_apellidos_cli',
             render: (rowData: ExtRegaloProps) => <span>{rowData.label_nombres_apellidos_cli}</span>,
         },
         {
             id: 2,
-            header: 'Comprobante',
+            header: 'Comprobante', campoBusqueda: 'label_venta',
             render: (rowData: ExtRegaloProps) => <span>{rowData.label_venta}</span>,
         },
         {
             id: 3,
-            header: 'Tipo',
+            header: 'Tipo', campoBusqueda: 'label_tipo_extension',
             render: (rowData: ExtRegaloProps) => <span>{rowData.label_tipo_extension}</span>,
         },
         {
@@ -38,12 +36,12 @@ export const DataTableExtRegalos = ({ onOpenModalCustom, otrosBotones }: { onOpe
         {
             id: 5,
             header: 'Desde',
-            render: (rowData: ExtRegaloProps) => <span>{formatFecha(rowData.fecha_inicio)}</span>,
+            render: (rowData: ExtRegaloProps) => <span>{formatDate(rowData.fecha_inicio ?? '', 'yyyy-mm-dd', 'dd/mm/yyyy')}</span>,
         },
         {
             id: 6,
             header: 'Hasta',
-            render: (rowData: ExtRegaloProps) => <span>{formatFecha(rowData.fecha_fin)}</span>,
+            render: (rowData: ExtRegaloProps) => <span>{formatDate(rowData.fecha_fin ?? '', 'yyyy-mm-dd', 'dd/mm/yyyy')}</span>,
         },
         {
             id: 7,

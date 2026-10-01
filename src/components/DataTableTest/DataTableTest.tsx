@@ -1,5 +1,5 @@
 import { Children, Fragment, cloneElement, isValidElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Button, Col, Dropdown, Form, Row, Table } from 'react-bootstrap'
+import { Table } from 'react-bootstrap'
 import { useLocation } from 'react-router-dom'
 import ResizeHandle from '@/components/DataTable/ResizeHandle'
 import { GripIcon, PinIcon, ChevronLeftIcon, ChevronRightIcon } from '@/components/DataTable/DataTableIcons'
@@ -8,6 +8,7 @@ import IconCR from '@/components/Icons/IconCR'
 import { useQueryParams } from '@/hook/useQueryParams'
 import { querys } from '@/types/parametros'
 import { SearchedCR } from '@/components/DataTableTest/SearchedCR'
+import { DropdownCR, DropdownCheckCR } from '@/components/DropdownCR/DropdownCR'
 import DataTableSkeleton from '@/components/DataTableTest/DataTableSkeleton'
 
 /** Escapa caracteres especiales de regex para poder buscar el término literal */
@@ -69,7 +70,17 @@ export type Column<T> = {
   render: (row: T) => ReactNode
   /** Si es true, el usuario puede arrastrar el borde derecho del header para redimensionar la columna */
   widthEditable?: boolean
+  /**
+   * Campo(s) del backend donde se busca lo que muestra la columna (ej. ['nombres', 'apellido_paterno']).
+   * Solo las columnas con campoBusqueda salen en "Buscar en columnas"; el backend solo acepta los campos
+   * de su lista permitida (FullTextSearchService).
+   */
+  campoBusqueda?: string | string[]
 }
+
+/** Campos de búsqueda de una columna como array ([] si no se puede buscar en ella) */
+const camposBusqueda = <T,>(column: Column<T>): string[] =>
+  column.campoBusqueda ? (Array.isArray(column.campoBusqueda) ? column.campoBusqueda : [column.campoBusqueda]) : []
 
 export type DataTableTestProps<T> = {
   data: T[]
@@ -147,7 +158,7 @@ export function DataTableTest<T>({
   const { pathname } = useLocation()
   const storageKey = `${STORAGE_PREFIX}-${pathname}${persistKey ? `-${persistKey}` : ''}`
 
-  const { get: getQueryParam } = useQueryParams()
+  const { get: getQueryParam, set: setQueryParam } = useQueryParams()
   const searchTerm = getQueryParam(querys.search)
   /** Cantidad de filas por página actual (misma fuente que usa Paginacion) */
   const skeletonRows = Number(getQueryParam(querys.show)) || 20
@@ -194,7 +205,17 @@ export function DataTableTest<T>({
   const [frozenIds, setFrozenIds] = useState<Set<number | string>>(
     () => new Set(initialPersisted.current!.frozenIds)
   )
-  const [searchColumns, setSearchColumns] = useState<Set<number | string>>(() => new Set())
+  // Columnas desmarcadas en "Buscar en columnas" (por defecto ninguna: se busca en todas).
+  // Al recargar se reconstruye desde ?columnas= (las columnas sin ninguno de sus campos en la URL)
+  const [noBuscarIds, setNoBuscarIds] = useState<Set<number | string>>(() => {
+    const pedidas = getQueryParam(querys.columnas).split(',').filter(Boolean)
+    if (!pedidas.length) return new Set()
+    return new Set(
+      columns
+        .filter((c) => camposBusqueda(c).length && !camposBusqueda(c).some((campo) => pedidas.includes(campo)))
+        .map((c) => c.id)
+    )
+  })
   const [dragOverId, setDragOverId] = useState<number | string | null>(null)
   const [needsHScroll, setNeedsHScroll] = useState(false)
   const [needsVScroll, setNeedsVScroll] = useState(false)
@@ -282,7 +303,7 @@ export function DataTableTest<T>({
   }, [])
 
   const toggleSearchColumn = useCallback((id: number | string) => {
-    setSearchColumns((prev) => {
+    setNoBuscarIds((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
       else next.add(id)
@@ -290,11 +311,29 @@ export function DataTableTest<T>({
     })
   }, [])
 
-  /** Array de strings con las columnas seleccionadas para buscar (vacío = todas) */
-  const searchColumnsArray = useMemo(
-    () => orderedColumns.filter((c) => searchColumns.has(c.id)).map(getColumnLabel),
-    [orderedColumns, searchColumns]
+  /** Columnas en las que se puede buscar (tienen campoBusqueda) y las marcadas */
+  const columnasBuscables = useMemo(() => orderedColumns.filter((c) => camposBusqueda(c).length > 0), [orderedColumns])
+  const columnasBuscadas = useMemo(
+    () => columnasBuscables.filter((c) => !noBuscarIds.has(c.id)),
+    [columnasBuscables, noBuscarIds]
   )
+  /** true si se desmarcó alguna: la búsqueda se limita a las marcadas */
+  const busquedaAcotada = columnasBuscadas.length < columnasBuscables.length
+
+  /** Etiquetas de las columnas donde se busca (vacío = todas), para el placeholder del buscador */
+  const searchColumnsArray = useMemo(
+    () => (busquedaAcotada ? columnasBuscadas.map(getColumnLabel) : []),
+    [busquedaAcotada, columnasBuscadas]
+  )
+
+  // Las columnas marcadas van a la URL (?columnas=campo1,campo2) para que el searcher las mande al backend;
+  // con todas marcadas no va nada (el backend busca en todas). Al cambiar vuelve a la página 1.
+  const columnasUrl = busquedaAcotada ? [...new Set(columnasBuscadas.flatMap((c) => camposBusqueda(c)))].join(',') : ''
+  useEffect(() => {
+    if (columnasUrl === getQueryParam(querys.columnas)) return
+    setQueryParam({ [querys.columnas]: columnasUrl || null, [querys.page]: null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo cuando cambia la selección
+  }, [columnasUrl])
 
   /* ------------------------- Scroll vertical (alto) ------------------------- */
   useEffect(() => {
@@ -531,125 +570,75 @@ export function DataTableTest<T>({
         </div>
         <div className="d-flex gap-2 flex-nowrap ms-auto">
           <SearchedCR onSearchChange={onSearchChange} columnasBusqueda={searchColumnsArray}/>
-          <Dropdown autoClose="outside" className=''>
-            <Dropdown.Toggle
-              as={Button}
+          {columnasBuscables.length > 0 && (
+            <DropdownCR
               id="search-columns-toggle"
-              size="sm"
-              variant={searchColumns.size > 0 ? 'primary' : 'outline-secondary'}
-              className="d-flex align-items-center gap-1 dropdown-toggle-actual"
-              style={{ fontSize: '12px' }}
+              icono={<IconCR name='filtro' size={14}/>}
+              label="Buscar en columnas"
+              contador={busquedaAcotada ? columnasBuscadas.length : 0}
+              titulo="Columnas donde buscar"
+              pie={{ label: 'Buscar en todas', onClick: () => setNoBuscarIds(new Set()) }}
             >
-              <IconCR name='filtro' size={14}/>
-              {searchColumns.size > 0 ? `Buscar en (${searchColumns.size})` : 'Buscar en columnas'}
-            </Dropdown.Toggle>
-            <Dropdown.Menu className="dropdown-menu-actual" style={{ maxHeight: 300, overflowY: 'auto', minWidth: 230 }}>
-              <Dropdown.Header>Seleccionar columnas donde buscar</Dropdown.Header>
-              {orderedColumns.map((column) => (
-                <div key={column.id} className="px-3 py-1">
-                  <Form.Check
-                    type="checkbox"
+              {columnasBuscables.map((column) => {
+                const marcada = !noBuscarIds.has(column.id)
+                return (
+                  <DropdownCheckCR
+                    key={column.id}
                     id={`search-column-check-${column.id}`}
                     label={column.header}
-                    checked={searchColumns.has(column.id)}
+                    checked={marcada}
+                    // Siempre queda al menos una columna donde buscar
+                    disabled={marcada && columnasBuscadas.length <= 1}
                     onChange={() => toggleSearchColumn(column.id)}
                   />
-                </div>
-              ))}
-              {searchColumns.size > 0 && (
-                <>
-                  <Dropdown.Divider />
-                  <div className="px-3 pb-1">
-                    <Button
-                      size="sm"
-                      variant="link"
-                      className="p-0 text-decoration-none"
-                      onClick={() => setSearchColumns(new Set())}
-                    >
-                      Buscar en todas
-                    </Button>
-                  </div>
-                </>
-              )}
-            </Dropdown.Menu>
-          </Dropdown>
+                )
+              })}
+            </DropdownCR>
+          )}
           {canFreeze && (
-            <Dropdown autoClose="outside">
-              <Dropdown.Toggle
-                as={Button}
-                id="freeze-columns-toggle"
-                size="sm"
-                variant={frozenIds.size > 0 ? 'primary' : 'outline-secondary'}
-                className="d-flex align-items-center gap-1 dropdown-toggle-actual"
-                style={{ fontSize: '12px' }}
-              >
-                <PinIcon />
-                {frozenIds.size > 0 ? `Congeladas (${frozenIds.size})` : 'Congelar columnas'}
-              </Dropdown.Toggle>
-              <Dropdown.Menu className="dropdown-menu-actual" style={{ maxHeight: 300, overflowY: 'auto', minWidth: 230 }}>
-                <Dropdown.Header>Seleccionar columnas a congelar</Dropdown.Header>
-                {visibleOrderedColumns.map((column) => (
-                  <div key={column.id} className="px-3 py-1">
-                    <Form.Check
-                      type="checkbox"
-                      id={`freeze-check-${column.id}`}
-                      label={column.header}
-                      checked={frozenIds.has(column.id)}
-                      onChange={() => toggleFrozen(column.id)}
-                    />
-                  </div>
-                ))}
-                {frozenIds.size > 0 && (
-                  <>
-                    <Dropdown.Divider />
-                    <div className="px-3 pb-1">
-                      <Button
-                        size="sm"
-                        variant="link"
-                        className="p-0 text-decoration-none"
-                        onClick={() => setFrozenIds(new Set())}
-                      >
-                        Quitar todas
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </Dropdown.Menu>
-            </Dropdown>
+            <DropdownCR
+              id="freeze-columns-toggle"
+              icono={<PinIcon />}
+              label="Congelar columnas"
+              contador={frozenIds.size}
+              titulo="Columnas a congelar"
+              pie={{ label: 'Quitar todas', onClick: () => setFrozenIds(new Set()) }}
+            >
+              {visibleOrderedColumns.map((column) => (
+                <DropdownCheckCR
+                  key={column.id}
+                  id={`freeze-check-${column.id}`}
+                  label={column.header}
+                  checked={frozenIds.has(column.id)}
+                  onChange={() => toggleFrozen(column.id)}
+                />
+              ))}
+            </DropdownCR>
           )}
           {permitirOcultarColumnas && (
-            <Dropdown autoClose="outside">
-              <Dropdown.Toggle
-                as={Button}
-                id="hide-columns-toggle"
-                size="sm"
-                variant={hiddenIds.size > 0 ? 'primary' : 'outline-secondary'}
-                className="d-flex align-items-center gap-1 dropdown-toggle-actual"
-                style={{ fontSize: '12px' }}
-              >
-                <IconCR name='eye' size={14}/>
-                {hiddenIds.size > 0 ? `Columnas (${hiddenIds.size} ocultas)` : 'Ocultar columnas'}
-              </Dropdown.Toggle>
-              <Dropdown.Menu className="dropdown-menu-actual" style={{ maxHeight: 300, overflowY: 'auto', minWidth: 230 }}>
-                <Dropdown.Header>Mostrar / ocultar columnas</Dropdown.Header>
-                {orderedColumns.map((column) => {
-                  const isVisible = !hiddenIds.has(column.id)
-                  const isOnlyVisible = isVisible && visibleOrderedColumns.length <= 1
-                  return (
-                    <div key={column.id} className="px-3 py-1">
-                      <Form.Check
-                        type="checkbox"
-                        id={`hide-check-${column.id}`}
-                        label={column.header}
-                        checked={isVisible}
-                        disabled={isOnlyVisible}
-                        onChange={() => toggleHidden(column.id)}
-                      />
-                    </div>
-                  )
-                })}
-              </Dropdown.Menu>
-            </Dropdown>
+            <DropdownCR
+              id="hide-columns-toggle"
+              icono={<IconCR name='eye' size={14}/>}
+              label={hiddenIds.size > 0 ? 'Columnas ocultas' : 'Ocultar columnas'}
+              contador={hiddenIds.size}
+              titulo="Mostrar / ocultar columnas"
+              pie={{ label: 'Mostrar todas', onClick: () => setHiddenIds(new Set()) }}
+            >
+              {orderedColumns.map((column) => {
+                const isVisible = !hiddenIds.has(column.id)
+                const isOnlyVisible = isVisible && visibleOrderedColumns.length <= 1
+                return (
+                  <DropdownCheckCR
+                    key={column.id}
+                    id={`hide-check-${column.id}`}
+                    label={column.header}
+                    checked={isVisible}
+                    disabled={isOnlyVisible}
+                    onChange={() => toggleHidden(column.id)}
+                  />
+                )
+              })}
+            </DropdownCR>
           )}
         </div>
       </div>
@@ -752,7 +741,11 @@ export function DataTableTest<T>({
                             boxShadow: isLastFrozen ? '2px 0 4px rgba(0,0,0,0.15)' : undefined,
                           }}
                         >
-                          {highlightNode(column.render(row), searchTerm)}
+                          {highlightNode(
+                            column.render(row),
+                            // Se resalta solo en las columnas donde se busca (sin columnas buscables, en todas)
+                            !columnasBuscables.length || columnasBuscadas.some((c) => c.id === column.id) ? searchTerm : ''
+                          )}
                         </td>
                       )
                     })}

@@ -23,6 +23,16 @@ body{
 @import "custom/components/DataTable";
 
 @import "custom/components/TextFields";
+@import "custom/components/ButtonCR";
+@import "custom/components/Stepper2";
+@import "custom/components/NubeCR";
+@import "custom/components/AvatarPorDefecto";
+@import "custom/components/ImageCR";
+@import "custom/components/PaginacionCR";
+@import "custom/components/DropdownCR";
+@import "custom/components/SeccionMantenimiento";
+@import "custom/components/TabsCR";
+@import "custom/components/LogoEmpresa";
 @import "custom/components/StickyOrden";
 @import "custom/components/NavBarMobile";
 @import "custom/components/TopBar";
@@ -32,10 +42,13 @@ body{
 @import "custom/components/Item1";
 @import "custom/components/LoadingOverlay";
 @import "../../pages/GestionProgramasEntrenamiento/scss/cardPrograma";
-@import "../../pages/PuntoVenta/scss/stepperCR";
 @import "../../pages/PuntoVenta/scss/tiendaMembresia";
 @import "../../pages/PuntoVenta/scss/tiendaProductos";
 @import "../../pages/PuntoVenta/scss/cardItemsVenta";
 @import "../../pages/PuntoVenta/scss/carrito";
 @import "../../pages/AgendaNutricionista/scss/agenda";
 @import "../../pages/login/scss/login";
+@import "../../pages/GestionMeta/scss/meta";
+@import "../../pages/GestionUsuarios/scss/gestionUsuarios";
+@import "../../pages/perfil/scss/itemMembresia";
+@import "../../pages/perfil/scss/cardActivoDesde";

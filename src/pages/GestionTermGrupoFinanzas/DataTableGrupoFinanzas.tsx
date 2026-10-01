@@ -19,12 +19,12 @@ export const DataTableGrupoFinanzas = ({ onOpenModalCustom, otrosBotones }: { on
         },
         {
             id: 2,
-            header: 'Nombre',
+            header: 'Nombre', campoBusqueda: 'nombre',
             render: (rowData: grupoFinanzaProps) => <span>{rowData.nombre}</span>,
         },
         {
             id: 3,
-            header: 'Descripción',
+            header: 'Descripción', campoBusqueda: 'descripcion',
             render: (rowData: grupoFinanzaProps) => <span>{rowData.descripcion}</span>,
         },
         {

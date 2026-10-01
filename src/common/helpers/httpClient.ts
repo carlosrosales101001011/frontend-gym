@@ -9,6 +9,12 @@ const ErrorCodeMessages: { [key: number]: string } = {
 
 function HttpClient() {
 	const _errorHandler = (error: AxiosError) =>{
+		// Token vencido o inválido: se cierra la sesión y se va al login (salvo en el propio login,
+		// donde un 401 solo significa credenciales incorrectas)
+		if (error.response?.status === 401 && !error.config?.url?.includes('/user/login')) {
+			localStorage.removeItem(STORAGE_KEY);
+			if (!window.location.pathname.startsWith('/login')) window.location.replace('/login');
+		}
 		return Promise.reject(
 			Object.keys(ErrorCodeMessages).includes(`${error.status}`)
 				? ErrorCodeMessages[error.status??0]

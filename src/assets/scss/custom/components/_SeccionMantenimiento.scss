@@ -1,0 +1,39 @@
+// Aviso de sección en mantenimiento (reemplaza a la página dentro del layout del módulo)
+.seccion-mantenimiento {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 60vh;
+  padding: 24px;
+  text-align: center;
+}
+
+.seccion-mantenimiento__icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(234, 179, 8, 0.15);
+
+  &,
+  * {
+    color: #eab308 !important;
+  }
+}
+
+.seccion-mantenimiento__titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.seccion-mantenimiento__texto {
+  max-width: 420px;
+  margin: 0 0 6px;
+  font-size: 14px;
+  opacity: 0.8;
+}

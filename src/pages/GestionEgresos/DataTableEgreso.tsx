@@ -29,7 +29,7 @@ export const DataTableEgreso = ({ onOpenModalCustomEgreso, otrosBotones }:Props)
             }
         },
         {
-            header: 'N° de comprobante',
+            header: 'N° de comprobante', campoBusqueda: 'n_comprobante',
             id: 1,
             sortable: false,
             render:(row:EgresosProps)=>{
@@ -53,7 +53,7 @@ export const DataTableEgreso = ({ onOpenModalCustomEgreso, otrosBotones }:Props)
             }
         },
         {
-            header: 'Fecha de comprobante',
+            header: 'Fecha de comprobante', campoBusqueda: 'fecha_comprobante',
             id: 3,
             sortable: false,
             render:(row:EgresosProps)=>{
@@ -77,7 +77,7 @@ export const DataTableEgreso = ({ onOpenModalCustomEgreso, otrosBotones }:Props)
             }
         },
         {
-            header: 'Monto Detalle',
+            header: 'Monto Detalle', campoBusqueda: 'monto_detalle',
             id: 5,
             sortable: false,
             widthEditable: true,
@@ -90,7 +90,7 @@ export const DataTableEgreso = ({ onOpenModalCustomEgreso, otrosBotones }:Props)
             }
         },
         {
-            header: 'Monto Pagado',
+            header: 'Monto Pagado', campoBusqueda: 'monto_pagos',
             id: 6,
             sortable: false,
             widthEditable: true,
@@ -115,7 +115,7 @@ export const DataTableEgreso = ({ onOpenModalCustomEgreso, otrosBotones }:Props)
             }
         },
         {
-            header: 'Observacion',
+            header: 'Observacion', campoBusqueda: 'observacion',
             id: 8,
             sortable: false,
             widthEditable: true,

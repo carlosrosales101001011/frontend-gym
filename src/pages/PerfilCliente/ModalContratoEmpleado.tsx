@@ -1,6 +1,7 @@
 import React from 'react'
 import ModalCR from '@/components/Modal/ModalCR';
-import { Tab, Tabs } from 'react-bootstrap';
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import { InfoContrato } from '@/pages/PerfilCliente/InfoContrato';
 
 type props ={
@@ -17,17 +18,17 @@ export const ModalContratoEmpleado = ({onHide, show, id}:props) => {
         </span>
       </ModalCR.Header>
       <ModalCR.Body>
-        <Tabs>
-          <Tab eventKey="info-contrato" title="Informacion del contrato">
+        <TabsCR>
+          <TabCR eventKey="info-contrato" title="Informacion del contrato">
               <InfoContrato/>
-          </Tab>
-          <Tab eventKey="jornada-contrato" title="Jornada del contrato">
+          </TabCR>
+          <TabCR eventKey="jornada-contrato" title="Jornada del contrato">
               
-          </Tab>
-          <Tab eventKey="documentos-contrato" title="Documentos">
+          </TabCR>
+          <TabCR eventKey="documentos-contrato" title="Documentos">
               
-          </Tab>
-        </Tabs>
+          </TabCR>
+        </TabsCR>
       </ModalCR.Body>
     </ModalCR>
   )

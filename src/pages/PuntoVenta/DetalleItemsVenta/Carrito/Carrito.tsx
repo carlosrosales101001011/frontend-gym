@@ -1,8 +1,10 @@
 import { Card } from "react-bootstrap"
 import { BsDashLg, BsPlusLg, BsQuestionLg, BsTrash } from "react-icons/bs"
 import { getBlobUrl } from "@/helpers/blobUrl"
+import { getFormatMoney } from "@/helpers/getFormatMoney"
 import { useVentasStore } from "../../hook/useVentasStore"
 import type { DetalleMembresiaVentaProps, DetalleProductoVentaProps } from "../../store/ventaSlice"
+import { ImageCR } from "@/components/ImageCR/ImageCR"
 
 export const formatoMoneda = new Intl.NumberFormat("es-PE", {
   style: "currency",
@@ -72,7 +74,16 @@ export const ItemMembresia = ({ membresia, onQuitar }: ItemMembresiaProps) => {
             <BsTrash />
           </button>
         </div>
+        {/* Con descuento: el precio del plan tachado, el precio final y el descuento */}
+        {membresia.montoDescuento > 0 ? (
+          <div className="text-end">
+            <div className="small text-decoration-line-through opacity-75">{getFormatMoney(membresia.montoSinDescuento)}</div>
+            <div className="fw-bolder fs-5">{getFormatMoney(membresia.montoTotal)}</div>
+            <div className="small">Desc. {getFormatMoney(membresia.montoDescuento)}</div>
+          </div>
+        ) : (
           <div className="fw-bolder fs-5">{membresia.label_precio}</div>
+        )}
       </Card.Body>
     </Card>
   )
@@ -92,7 +103,7 @@ export const ItemProductos = ({ producto, onSumar, onRestar }: ItemProductosProp
     <Card className="card-mode-actual">
       <Card.Body className="d-flex align-items-center gap-3">
         {imagen ? (
-          <img src={imagen} alt={producto.label_producto} className="tienda-producto__imagen" />
+          <ImageCR src={imagen} alt={producto.label_producto} className="tienda-producto__imagen" />
         ) : (
           <div className="tienda-producto__imagen tienda-producto__imagen--vacia">
             <BsQuestionLg />
@@ -108,7 +119,7 @@ export const ItemProductos = ({ producto, onSumar, onRestar }: ItemProductosProp
               type="button"
               className="carrito__stepper"
               onClick={onRestar}
-              disabled={producto.cantidad <= 1}
+              title={producto.cantidad <= 1 ? "Quitar producto" : "Restar uno"}
             >
               <BsDashLg />
             </button>

@@ -1,0 +1,16 @@
+// Logo de la empresa en barras (components/LogoEmpresa).
+// Píldora negra (el JPG tiene fondo negro) y recorte del margen para que el texto se lea en poco alto.
+.logo-empresa {
+  display: inline-flex;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #000;
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+}

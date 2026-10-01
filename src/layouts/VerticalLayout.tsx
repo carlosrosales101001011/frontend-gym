@@ -3,14 +3,17 @@ import { Outlet } from 'react-router-dom'
 import LeftSidebar from '@/layouts/LeftSidebar'
 import {  useState } from 'react'
 import { type SeccionType } from '@/routes/hook/useUserModuloStore'
+import { SeccionMantenimiento } from '@/components/SeccionMantenimiento/SeccionMantenimiento'
 type StateSideBar={
     isOpen: boolean;
 }
 type Props={
     misSecciones:SeccionType[];
+    /** Sección actual en mantenimiento: en lugar de la página se muestra el aviso (con el menú y el topbar) */
+    seccionEnMantenimiento?: string | null;
 }
 const SIDEBAR_BREAKPOINT = 1250
-export const VerticalLayout = ({misSecciones}:Props) => {
+export const VerticalLayout = ({misSecciones, seccionEnMantenimiento}:Props) => {
     const [isOpenSideBar, setisOpenSideBar] = useState<StateSideBar>(() => ({
         isOpen: window.innerWidth >= SIDEBAR_BREAKPOINT
     }))
@@ -30,7 +33,7 @@ export const VerticalLayout = ({misSecciones}:Props) => {
         )}
         <div className={`principal-view ${isOpenSideBar.isOpen ? 'shift' : ''}`}>
             <Topbar onOpenSideBar={onOpenSideBar}/>
-                <Outlet/>
+                {seccionEnMantenimiento ? <SeccionMantenimiento nombre={seccionEnMantenimiento} /> : <Outlet/>}
         </div>
     </div>
   )

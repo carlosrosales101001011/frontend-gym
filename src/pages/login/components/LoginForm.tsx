@@ -18,6 +18,7 @@ export const LoginForm = () => {
   return (
     <form className="login-form" onSubmit={handleSubmit(login)} noValidate>
       <div className="login-form__header">
+        <span className="login-form__eyebrow">Acceso al sistema</span>
         <h1 className="login-form__title">Bienvenido</h1>
         <p className="login-form__subtitle">Ingresa tus credenciales para acceder al sistema</p>
       </div>

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import { addMonths, format } from 'date-fns'
-import httpClient from '@/common/helpers/httpClient'
 import ModalCR from '@/components/Modal/ModalCR'
 import { ButtonCR } from '@/components/Button/ButtonCR'
 import { InputCR } from '@/components/TextFields/InputCR'
 import { InputMontoCR } from '@/components/TextFields/InputMontoCR'
 import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
 import type { OpcionesSelect } from '@/types/props'
-import type { HorariosProps, PlanProps, ProgramaProps } from '@/pages/PuntoVenta/store/ventaSlice'
+import type { PlanProps } from '@/pages/PuntoVenta/store/ventaSlice'
+import { useOpcionesVenta } from '../../hook/useOpcionesVenta'
 import type { DetalleMembresiaProps, MembresiaForm } from '../../types'
 import { aFechaISO, aNumero, formatearMoneda, redondear2 } from '../../helpers'
 
@@ -63,15 +63,16 @@ export const ModalFormMembresia = ({ show, onHide, detalle, onGuardar }: ModalFo
 const FormularioMembresia = ({ detalle, onHide, onGuardar }: Omit<ModalFormMembresiaProps, 'show'>) => {
   const [form, setForm] = useState<MembresiaForm>(() => (detalle ? aFormulario(detalle) : formularioVacio()))
   const [guardando, setGuardando] = useState(false)
+  const { obtenerProgramas, obtenerPlanesYHorarios } = useOpcionesVenta()
   const [programas, setProgramas] = useState<OpcionesSelect[]>([])
   const [planesPorPrograma, setPlanesPorPrograma] = useState<{ id_programa: number; planes: PlanProps[]; horarios: OpcionesSelect[] }>(
     { id_programa: 0, planes: [], horarios: [] }
   )
 
   useEffect(() => {
-    httpClient.get('/programa-entrenamiento')
-      .then(({ data }: { data: { lista: ProgramaProps[] } }) => setProgramas(
-        data.lista
+    obtenerProgramas()
+      .then((lista) => setProgramas(
+        lista
           .filter((p) => p.estado || p.id === detalle?.id_programa)
           .map((p) => ({ value: p.id, label: p.nombre }))
       ))
@@ -82,12 +83,7 @@ const FormularioMembresia = ({ detalle, onHide, onGuardar }: Omit<ModalFormMembr
   useEffect(() => {
     if (!id_programa) return
     const cargarPlanesYHorarios = async () => {
-      const [{ data: dataPlanes }, { data: dataHorarios }] = await Promise.all([
-        httpClient.get(`/entrenamiento-plan/id_programa/${id_programa}`),
-        httpClient.get(`/entrenamiento-horario/id_programa/${id_programa}`),
-      ])
-      const planes: PlanProps[] = dataPlanes.lista
-      const horarios: HorariosProps[] = dataHorarios.lista
+      const { planes, horarios } = await obtenerPlanesYHorarios(id_programa)
       setPlanesPorPrograma({
         id_programa,
         planes,
@@ -124,8 +120,16 @@ const FormularioMembresia = ({ detalle, onHide, onGuardar }: Omit<ModalFormMembr
   const onCambiarMonto = (campo: 'montoSinDescuento' | 'montoDescuento', valor: number) =>
     setForm((prev) => calcularTotal({ ...prev, [campo]: valor }))
 
+  // Tope de descuento del plan elegido (0 = sin límite)
+  const maxDescuento = aNumero(planes.find((p) => p.id === form.id_plan)?.max_descuento)
+  const errorDescuento = form.montoDescuento > form.montoSinDescuento
+    ? 'No puede superar el precio'
+    : maxDescuento > 0 && form.montoDescuento > maxDescuento
+      ? `Máximo ${formatearMoneda(maxDescuento)} para este plan`
+      : ''
+
   const valido = form.id_programa > 0 && form.id_plan > 0 && !!form.fecha_inicio && !!form.fecha_fin
-    && form.montoDescuento <= form.montoSinDescuento
+    && !errorDescuento
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -197,7 +201,7 @@ const FormularioMembresia = ({ detalle, onHide, onGuardar }: Omit<ModalFormMembr
             label="Descuento"
             value={form.montoDescuento}
             onChange={(valor) => onCambiarMonto('montoDescuento', valor)}
-            messageErrors={form.montoDescuento > form.montoSinDescuento ? 'No puede superar el precio' : ''}
+            messageErrors={errorDescuento}
           />
         </Col>
         <Col md={4} className="d-flex flex-column justify-content-center">

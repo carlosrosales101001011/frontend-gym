@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import type { UserProps } from '@/pages/GestionUsuarios/store/usuariosSlice';
+import type { UserProps } from '../store/usuariosSlice';
 import { DataTableTest } from '@/components/DataTableTest/DataTableTest';
 import { useAppSelector } from '@/stores/Store';
 
 type Props ={
     otrosBotones: React.ReactNode;
 }
-export const DataTableView = ({ otrosBotones}:Props) => {
+export const DataTableUsuarios = ({ otrosBotones}:Props) => {
     const [, uid_modulo, ] = location.pathname.split('/');
     const { users } = useAppSelector((state)=>state.USER)
     const columns = [
@@ -22,21 +22,21 @@ export const DataTableView = ({ otrosBotones}:Props) => {
             )
             }
         },
-        {header: 'Nombres y Apellidos',id: 1,  render: (row:UserProps)=>{
+        {header: 'Nombres y Apellidos', campoBusqueda: ['nombres', 'apellidos'],id: 1,  render: (row:UserProps)=>{
             return (
                 <>
                 {row.nombres} {row.apellidos}
                 </>
             )
         }},
-        {header: 'Correo electronico',id: 2,  render: (row:UserProps)=>{
+        {header: 'Correo electronico', campoBusqueda: 'email',id: 2,  render: (row:UserProps)=>{
             return (
                 <>
                 {row.email}
                 </>
             )
         }},
-        {header: 'Correo corporativo',id: 3,  render: (row:UserProps)=>{
+        {header: 'Correo corporativo', campoBusqueda: 'email_corporativo',id: 3,  render: (row:UserProps)=>{
             return (
                 <>
                 {row.email_corporativo}

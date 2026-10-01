@@ -19,6 +19,7 @@ const FORMATOS = {
     'DDDD dd [de] MMMM [del] yyyy': "EEEE dd 'de' MMMM 'del' yyyy",
     'DDDD dd [de] MMMM': "EEEE dd 'de' MMMM",
     'dd [de] MMMM [del] yyyy': "dd 'de' MMMM 'del' yyyy",
+    'd MMMM yyyy': 'd MMMM yyyy', // 1 agosto 2026
     'DDD dd MMM yyyy': 'EEE dd MMM yyyy',
     'dd MMM yyyy': 'dd MMM yyyy',
     'MMMM yyyy': 'MMMM yyyy',

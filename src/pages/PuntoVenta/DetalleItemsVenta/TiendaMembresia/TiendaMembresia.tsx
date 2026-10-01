@@ -9,6 +9,8 @@ import type { PlanProps, ProgramaProps } from "../../store/ventaSlice"
 import { ButtonCR } from "@/components/Button/ButtonCR"
 import { InputCR } from "@/components/TextFields/InputCR"
 import { InputSelectCR } from "@/components/TextFields/InputSelectCR"
+import { InputMontoCR } from "@/components/TextFields/InputMontoCR"
+import { calcularMontosMembresia, errorDescuentoMembresia } from "../../helpers/descuentoMembresia"
 
 type TiendaMembresiaProps = {
   onAgregar?: () => void
@@ -20,6 +22,8 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
 
   const idPlanSeleccionado = venta.detalleventa_membresias.id_plan || null
   const idHorarioSeleccionado = venta.detalleventa_membresias.id_horario || null
+  const montoDescuento = venta.detalleventa_membresias.montoDescuento
+  const errorDescuento = idPlanSeleccionado ? errorDescuentoMembresia(venta.detalleventa_membresias) : ""
   const fechaInicio = venta.detalleventa_membresias.fecha_inicio || format(new Date(), "yyyy-MM-dd")
 
   const programaSeleccionado = programas.find((programa) => programa.id === idProgramaSeleccionado)
@@ -39,8 +43,9 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
     return `${obtener("weekday")} ${obtener("day")} de ${obtener("month")} del ${obtener("year")}`
   }, [fechaInicio, planSeleccionado])
 
-  // Al cambiar plan o fecha se conserva el horario ya elegido (es del mismo programa)
-  const actualizarMembresia = (idPlan: number | null, fecha: string, idHorario = idHorarioSeleccionado) => {
+  // Al cambiar plan o fecha se conserva el horario ya elegido (es del mismo programa).
+  // El descuento se conserva al cambiar fecha u horario; al cambiar de plan vuelve a 0 (cambia su máximo)
+  const actualizarMembresia = (idPlan: number | null, fecha: string, idHorario = idHorarioSeleccionado, descuento = montoDescuento) => {
     const plan = planes.find((p) => p.id === idPlan)
     if (!idProgramaSeleccionado || !plan) return
     const fechaFinISO = format(addMonths(new Date(`${fecha}T00:00:00`), plan.nMeses), "yyyy-MM-dd")
@@ -54,7 +59,8 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
       label_nmeses: `${plan.nMeses} ${plan.nMeses === 1 ? "mes" : "meses"}`,
       label_precio: formatoMoneda.format(plan.precioTotal),
       fecha_fin: fechaFinISO,
-      montoTotal: plan.precioTotal,
+      ...calcularMontosMembresia(plan.precioTotal, descuento),
+      max_descuento_plan: Number(plan.max_descuento) || 0,
     })
   }
 
@@ -102,7 +108,7 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
             <ItemPlan
               plan={plan}
               seleccionado={plan.id === idPlanSeleccionado}
-              onSelect={() => actualizarMembresia(plan.id, fechaInicio)}
+              onSelect={() => actualizarMembresia(plan.id, fechaInicio, idHorarioSeleccionado, plan.id === idPlanSeleccionado ? montoDescuento : 0)}
             />
           </Col>
         ))}
@@ -149,7 +155,7 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
               className=""
               style={{ paddingTop: "5px", paddingBottom: "5px" }}
             >
-              {planSeleccionado ? `${planSeleccionado.nMeses * 4 * 6} Sesiones` : "Seleccionar plan"}
+              {planSeleccionado ? `${planSeleccionado.nMeses * 4 * 6} días de entrenamiento` : "Seleccionar plan"}
             </div>
           </Col>
         </Row>
@@ -169,10 +175,20 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
               </div>
             )}
           </Col>
+          {idPlanSeleccionado && (
+            <Col md={6}>
+              <InputMontoCR
+                label="Descuento (S/)"
+                value={montoDescuento}
+                onChange={(valor) => actualizarMembresia(idPlanSeleccionado, fechaInicio, idHorarioSeleccionado, valor)}
+                messageErrors={errorDescuento}
+              />
+            </Col>
+          )}
         </Row>
     </div>
     <div className="mb-3">
-        <ButtonCR label={<span className="mx-5">Agregar membresia</span>} disabled={!idPlanSeleccionado} onClick={onAgregar}/>
+        <ButtonCR label={<span className="mx-5">Agregar membresia</span>} disabled={!idPlanSeleccionado || Boolean(errorDescuento)} onClick={onAgregar}/>
     </div>
     </div>
   )
@@ -245,6 +261,9 @@ export const ItemPlan = ({ plan, seleccionado, onSelect }: ItemPlanProps) => {
           {formatoMoneda.format(plan.precioTotal)}
           <br/>
           {plan.label_tipo_tarifa}
+          {Number(plan.max_descuento) > 0 && (
+            <div className="small fw-normal">Desc. máx: {formatoMoneda.format(Number(plan.max_descuento))}</div>
+          )}
       </Card.Body>
     </Card>
   )

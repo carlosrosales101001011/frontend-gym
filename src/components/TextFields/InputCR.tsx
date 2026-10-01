@@ -51,6 +51,7 @@ const renderInput = (typeInput:HTMLInputTypeAttribute) => (
             {...props}
             onChange={onChange}
         />
+            
             <label className={`textfield-label ${messageErrors.trim().length !==0 && 'text-danger'} ${classNameLabel}`}>{label}{required && <span className="text-danger"> *</span>}</label>
         </div>
     </div>
@@ -171,13 +172,17 @@ const renderxType = (type:typeInput)=>{
     }
 }
 return (
-    <div className="input-textfield" >
+    <div className="input-textfield m-2" >
         <div >
             {renderxType(type)}
         </div>
-        <span className="text-danger fw-bold px-2 m-0" style={{fontSize: '11px'}}>
-            {messageErrors.trim().length !==0 && messageErrors }
-        </span>
+        {
+            messageErrors.trim().length !==0 && (
+                <span className="text-danger fw-bold px-2 m-0" style={{fontSize: '11px'}}>
+                    {messageErrors.trim().length !==0 && messageErrors }
+                </span>
+            )
+        }
     </div>
 )
 };

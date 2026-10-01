@@ -7,19 +7,20 @@ $sidebar-breakpoint: 1250px;
 $font-item-sidebar: 14px;
 $font-item-sidebar-level0: 12px;
 
-$mode-dark: #0a151b;
+// Modo nocturno: grises neutros casi negros (fondo < card < input < hover)
+$mode-dark: #0a0a0a;
 $bg-black: #000;
-$bg-dark: #0a151b;
+$bg-dark: #0a0a0a;
 $color-mode-dark: #000;
-$card-bg-dark: #0c1820;
+$card-bg-dark: #121212;
 $mode-light: #fff;
 $bg-light: #fff;
 $color-light: #fff;
 $card-light: #fff;
-$table-dark: #0c1820;
+$table-dark: #121212;
 $table-light: #fff;
 $border-light: #7e7e7e;
-$item-hover-dark: #1c2a33;
+$item-hover-dark: #1f1f1f;
 $item-hover-light: #eceff1;
 
 // Tema actual: se resuelve en tiempo de ejecución con variables CSS.
@@ -43,7 +44,7 @@ $card-border-actual: var(--cr-card-border);
     --cr-icons: #{$bg-light};
     --cr-select: #{$bg-black};
     --cr-item-hover: #{$item-hover-dark};
-    --cr-input-bg: #111e26;
+    --cr-input-bg: #171717;
     --cr-border: #{$border-light};
     --cr-card-border: #474747;
 }

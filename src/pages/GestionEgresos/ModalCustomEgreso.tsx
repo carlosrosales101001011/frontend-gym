@@ -5,7 +5,9 @@ import { InputCR } from '@/components/TextFields/InputCR'
 import { useForm } from '@/hook/useForm'
 import type { EgresosProps } from '@/pages/GestionEgresos/store/egresosSlice'
 import { initialStateEgreso } from '@/pages/GestionEgresos/store/egresosSlice'
-import { Col, Row, Tab, Tabs } from 'react-bootstrap'
+import { Col, Row } from 'react-bootstrap'
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
 import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
 import { AppDetalleGasto } from '@/pages/GestionEgresos/DetalleEgreso/AppDetalleGasto'
@@ -104,17 +106,17 @@ export const ModalCustomEgreso = ({ id, onHide, show }: modalCustom) => {
                 </Row>
               </form>
             </div>
-            <Tabs 
+            <TabsCR 
               defaultActiveKey="detalle-gasto"
               id="uncontrolled-tab-example"
               className="mb-3">
-            <Tab eventKey="detalle-gasto" title="Detalle de gasto">
+            <TabCR eventKey="detalle-gasto" title="Detalle de gasto">
               <AppDetalleGasto/>
-            </Tab>
-            <Tab eventKey="detalle-pagos" title="Detalle de pagos">
+            </TabCR>
+            <TabCR eventKey="detalle-pagos" title="Detalle de pagos">
               <AppDetalleGastoPago/>
-            </Tab>
-            </Tabs>
+            </TabCR>
+            </TabsCR>
         </ModalCR.Body>
         <ModalCR.Footer>
             <ButtonCR label={'Guardar Gasto'} onClick={onSubmit}/>

@@ -10,12 +10,12 @@ export const DataTableMovProductos = ({ otrosBotones }: { onOpenModalCustom: (id
     const columns = [
         {
             id: 0,
-            header: 'Producto',
+            header: 'Producto', campoBusqueda: 'label_producto',
             render: (rowData: MovProductoProps) => <span>{rowData.label_producto}</span>,
         },
         {
             id: 1,
-            header: 'Marca',
+            header: 'Marca', campoBusqueda: 'label_marca_producto',
             render: (rowData: MovProductoProps) => <span>{rowData.label_marca_producto}</span>,
         },
         {
@@ -25,7 +25,7 @@ export const DataTableMovProductos = ({ otrosBotones }: { onOpenModalCustom: (id
         },
         {
             id: 4,
-            header: 'Motivo',
+            header: 'Motivo', campoBusqueda: 'label_motivo',
             render: (rowData: MovProductoProps) => <span>{rowData.label_motivo}</span>,
         },
         {

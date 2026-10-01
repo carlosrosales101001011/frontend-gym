@@ -205,7 +205,11 @@ const ModalCRBase: React.FC<ModalCRProps> = ({
   useEffect(() => {
     if (!isVisible || !closeOnEsc) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose();
+      if (e.key !== "Escape") return;
+      // Con modales uno encima de otro, ESC solo cierra el de arriba (el último abierto)
+      const abiertos = document.querySelectorAll('[role="dialog"][aria-modal="true"]');
+      if (abiertos[abiertos.length - 1] !== dialogRef.current) return;
+      handleClose();
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);

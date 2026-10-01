@@ -1,7 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { IconName } from '@/components/Icons/IconCR';
+import { leerModuloActualGuardado } from '@/helpers/moduloActual';
 export type moduloProp = {
       id: number;
+    /** uid de modulo_x_user: con él se piden las secciones del módulo */
+    uid?: string;
     id_user: number;
     id_modulo: number;
     id_modulouser:number;
@@ -18,9 +21,24 @@ export type moduloProp = {
         id_tipo: number,
         icono?: IconName,
         label: string,
-        descripcion: string
+        descripcion: string,
+        /** Va en la URL del front: /:url_modulo/:seccion (ej. "venta") */
+        url?: string
     }
 }
+
+/** Módulo en el que está el usuario (ver hook/useModuloActual) */
+export type ModuloActualProps = {
+    /** uid de modulo_x_user: con él se piden las secciones */
+    uid_modulo: string;
+    /** id de modulo_x_user */
+    id: number;
+    url: string;
+    label: string;
+}
+/** Tipo de módulo que se muestra en el Home y en "Mis módulos" (los personales no) */
+export const ID_TIPO_MODULO_EMPRESARIAL = 2012;
+
 export type SeccionProp = {
     id_modulouser:number;
     id_seccion: number;
@@ -28,7 +46,9 @@ export type SeccionProp = {
         id: number;
         subSeccion: string;
         label: string;
-        url:string
+        url:string;
+        /** Sección en mantenimiento: se muestra un aviso en lugar de la página */
+        is_seccion_mantenimiento?: boolean
     }
 }
 export type EntidadProp = {
@@ -43,12 +63,15 @@ export type EntidadProp = {
 export type permisoState={
     modulos: moduloProp[],
     secciones: SeccionProp[],
-    entidades: EntidadProp[]
+    entidades: EntidadProp[],
+    moduloActual: ModuloActualProps | null
 }
 export const permisoInitialState: permisoState = {
     modulos: [],
     secciones: [],
     entidades: [],
+    // Se recupera de localStorage para tenerlo al recargar la página
+    moduloActual: leerModuloActualGuardado<ModuloActualProps>(),
 };
 
 export const permisoSlice = createSlice({
@@ -64,7 +87,10 @@ export const permisoSlice = createSlice({
         onSetEntidades: (state, action:PayloadAction<EntidadProp[]>)=>{
         state.entidades = action.payload
         },
+        onSetModuloActual: (state, action:PayloadAction<ModuloActualProps | null>)=>{
+        state.moduloActual = action.payload
+        },
     },
 });
 
-export const { onSetModulos, onSetSecciones, onSetEntidades } = permisoSlice.actions;
+export const { onSetModulos, onSetSecciones, onSetEntidades, onSetModuloActual } = permisoSlice.actions;

@@ -13,6 +13,7 @@ export const useCrudhook = <T,>(model: string,  action?: (payload: T[]) => Unkno
     } = useQueryParams();
     
     const querySearch = (get(querys.search)||'')
+    const queryColumnas = get(querys.columnas)
     const page = Number(get(querys.page))||1;
     const show = Number(get(querys.show))||20;
     const dispatch = useDispatch();
@@ -47,7 +48,8 @@ export const useCrudhook = <T,>(model: string,  action?: (payload: T[]) => Unkno
             
             console.log({q});
             const { data } = await httpClient.get(`${model}/search`, {
-                params: { q, show: safeShow, offset },
+                // columnas: solo si se eligieron en "Buscar en columnas" (sin ella el backend busca en todas)
+                params: { q, show: safeShow, offset, ...(queryColumnas ? { columnas: queryColumnas } : {}) },
                 signal,
             });
             console.log({data, offset, safeShow, safePage}, 'en parametros: ',{q, show, page});

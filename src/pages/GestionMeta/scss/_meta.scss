@@ -1,0 +1,30 @@
+// Estilos de GestionMeta (importado en app.scss).
+
+// Tarjeta de meta por asesor: las 3 cajas (Asesor, %, Meta) y el ícono quedan centrados en la misma línea.
+// BuscadorPersona pone su etiqueta ARRIBA de la caja (24px) e InputCR la pone flotando SOBRE el borde,
+// así que a %, Meta y el ícono se les da ese mismo espacio arriba; con la fila en align-items-center
+// los centros de todas las cajas coinciden (aunque el asesor elegido haga la caja más alta).
+$item-asesor-meta-label: 24px;
+
+.item-asesor-meta {
+  &__col {
+    position: relative;
+  }
+
+  &__con-label {
+    padding-top: $item-asesor-meta-label;
+  }
+
+  // El error del asesor no ocupa espacio: así no mueve el centrado al aparecer
+  &__error {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    font-size: 11px;
+  }
+
+  // InputCR siempre reserva una línea para el error; aquí %/Meta nunca muestran error
+  .input-textfield > span:empty {
+    display: none;
+  }
+}

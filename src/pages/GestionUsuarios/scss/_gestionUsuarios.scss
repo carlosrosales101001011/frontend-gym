@@ -1,0 +1,64 @@
+// Paso "Módulos" del modal de usuario: secciones disponibles / asignadas
+
+.secciones-usuario__titulo {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.secciones-usuario__contador {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.secciones-usuario__link {
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.secciones-usuario__scroll {
+  overflow-y: auto;
+  max-height: 420px;
+  padding-right: 0.25rem;
+}
+
+.secciones-usuario__grupo + .secciones-usuario__grupo {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid $card-border-actual;
+}
+
+.secciones-usuario__grupo-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.secciones-usuario__fila {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+
+  text-align: left;
+  border: 1px solid $card-border-actual;
+  border-radius: 0.375rem;
+  background-color: $input-bg-actual;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: $item-hover-actual;
+    border-color: $primary;
+  }
+}
+
+.secciones-usuario__signo {
+  width: 1rem;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+.secciones-usuario__vacio {
+  font-size: 13px;
+  opacity: 0.7;
+}

@@ -43,16 +43,22 @@ const GestionAlmacen = lazy(() => import('@/pages/GestionAlmacen'));
 const GestionPromociones = lazy(() => import('@/pages/GestionPromociones'));
 const GestionProgramasEntrenamiento = lazy(()=>import('@/pages/GestionProgramasEntrenamiento'))
 const SemanasDeProgramasEntrenamiento = lazy(() => import('@/pages/GestionPromociones'));
-const ReporteVentas = lazy(() => import('@/pages/DataVentas'));
+const Ventas = lazy(() => import('@/pages/DataVentas'));
 const SeguimientoMembresia = lazy(() => import('@/pages/SeguimientoMembresia'));
 const AgendaNutricionista = lazy(() => import('@/pages/AgendaNutricionista'));
 const ExtensionRegalos = lazy(() => import('@/pages/GestionExtensionRegalos'));
+const GestionPlanesEntrenamiento = lazy(() => import('@/pages/GestionPlanesEntrenamiento'));
+const GestionMetas = lazy(() => import('@/pages/GestionMeta'));
+const ReporteMetas = lazy(() => import('@/pages/ReporteMeta'));
+const ReporteVentas = lazy(() => import('@/pages/ReporteVentas'));
+const ModulosxUsuario = lazy(() => import('@/pages/GestionModuloxUsuario'));
+const GestionAsistencias = lazy(() => import('@/pages/GestionAsistencias'));
 // const InformacionEmpresa = lazy(() => import('@/pages/InformacionEmpresa'));
 export const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/home" replace />} />
-      <Route path=":uid_mod/*" element={<ProtectedRoutes/>}>
+      <Route path=":url_modulo/*" element={<ProtectedRoutes/>}>
             {/* INVENTARIO */}
             <Route path="punto-venta" element={<PuntoVenta/>}/>
             <Route path="gestion-proveedores" element={<GestionProveedores/>}/>
@@ -65,7 +71,6 @@ export const AppRoutes = () => {
             <Route path="gestion-promociones" element={<GestionPromociones/>}/>
             {/*  */}
             <Route path="gestion-terminologia" element={<GestionTerminologias/>}/>
-            <Route path="gestion-usuario" element={<GestionUsuario/>}/>
             <Route path="gestion-gasto" element={<GestionEgresos/>}/>
             <Route path="flujo-caja" element={<FlujoCaja/>}/>
             <Route path="gestion-ingreso" element={<GestionIngresos/>}/>
@@ -82,13 +87,23 @@ export const AppRoutes = () => {
             <Route path="realizar-compra" element={<Compras/>}/>
             <Route path="gestion-programas" element={<GestionProgramasEntrenamiento/>}/>
             <Route path="gestion-semanas-programas" element={<SemanasDeProgramasEntrenamiento/>}/>
-            <Route path="reporte-ventas" element={<ReporteVentas/>}/>
+            <Route path="ventas" element={<Ventas/>}/>
             <Route path="seguimiento-membresia" element={<SeguimientoMembresia/>}/>
             <Route path="agenda-nutricionista" element={<AgendaNutricionista/>}/>
             <Route path="extension-regalos" element={<ExtensionRegalos/>}/>
-            <Route element={<ProfileGuard gestion="gestion-cliente"/>}>
+            <Route path="programa-planes" element={<GestionPlanesEntrenamiento/>}/>
+            <Route path="gestion-metas" element={<GestionMetas/>}/>
+            <Route path="reporte-meta" element={<ReporteMetas/>}/>
+            <Route path="reporte-venta" element={<ReporteVentas/>}/>
+            <Route path="modulo-x-user" element={<ModulosxUsuario/>}/>
+            <Route path="asistencia" element={<GestionAsistencias/>}/>
+            <Route element={<ProfileGuard gestion="gestion-usuario"/>}>
+              <Route path="gestion-usuario" element={<GestionUsuario/>}/>
+              <Route path="perfil-usuario/:uid_user" element={<Perfil/>}/>
+            </Route>
+            <Route element={<ProfileGuard gestion="gestion-clientes"/>}>
               <Route path="gestion-clientes" element={<GestionClientes/>}/>
-              <Route path="perfil-cliente/:uid_cliente" element={<Perfil/>}/>
+              <Route path="perfil-cliente/:uid_person" element={<Perfil/>}/>
             </Route>
             <Route element={<ProfileGuard gestion="gestion-empleados"/>}>
                 <Route path="gestion-empleados" element={<GestionColaboradores/>}/>

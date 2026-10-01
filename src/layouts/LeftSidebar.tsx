@@ -1,6 +1,6 @@
 import { capitalizar } from "@/helpers/capitalize";
 import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 type Props = {
   items: MenuItemType[];
@@ -21,6 +21,9 @@ export type MenuItemType = {
 
 const LeftSidebar: React.FC<Props> = ({ items }) => {
   const urlPath = location.pathname;
+  // Los enlaces usan la url del módulo de la URL (/:url_modulo/:seccion)
+  const { url_modulo } = useParams();
+  const rutaSeccion = (item: MenuItemType) => `/${url_modulo}/${item.seccion.url}`;
 
   // AGRUPAR POR SUBSECTION
   const groupedItems = useMemo(() => {
@@ -54,9 +57,9 @@ const LeftSidebar: React.FC<Props> = ({ items }) => {
               {sections.map(item => (
                   <Link
                     key={`${item.id_modulouser}-${item.id_seccion}-${item.seccion.id}`}
-                    to={`/${item.id_modulouser}/${item.seccion.url}`}
-                    reloadDocument={`/${item.id_modulouser}/${item.seccion.url}`===urlPath ? false : true}
-                    className={`text-white fw-bold sidebar-link ${`/${item.id_modulouser}/${item.seccion.url}`===urlPath ? 'sidebar-link-focus' : ''} `}
+                    to={rutaSeccion(item)}
+                    reloadDocument={rutaSeccion(item)===urlPath ? false : true}
+                    className={`text-white fw-bold sidebar-link ${rutaSeccion(item)===urlPath ? 'sidebar-link-focus' : ''} `}
                     style={{textDecoration: 'none'}}
                   >
                     {capitalizar(item.seccion.label)}

@@ -1,5 +1,11 @@
-import { Tab, Tabs } from 'react-bootstrap'
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import { useSearchParams } from 'react-router-dom';
+import { TabComentarios } from './Tabs/TabComentarios/TabComentarios';
+import { TabContactoEmergencia } from './Tabs/TabContactoEmergencia/TabContactoEmergencia';
+import { TabDatosPersonales } from '../PerfilCliente/TabDatosPersonales';
+import { TabMembresia } from './Tabs/TabMembresia/TabMembresia';
+import { TabVentas } from './Tabs/TabVentas/TabVentas';
 
 export const CardContenedor = () => {
       const [searchParams, setSearchParams] = useSearchParams();
@@ -17,25 +23,30 @@ export const CardContenedor = () => {
 
   return (
     <div>
-      <Tabs
+      <TabsCR
         defaultActiveKey="profile"
         id="uncontrolled-tab-example"
         activeKey={activeTab}
         onSelect={handleSelect}
       >
-        <Tab eventKey="datos-personales" title="Datos personales">
-        </Tab>
-        <Tab eventKey="membresia" title="Membresias">
-        </Tab>
-        <Tab eventKey="acceso-sistema" title="Ventas">
-        </Tab>
-        <Tab eventKey="archivos" title="Archivos">
-        </Tab>
-        <Tab eventKey="comentarios" title="Comentarios">
-        </Tab>
-        <Tab eventKey="contacto-emergencia" title="Contactos de emergencia">
-        </Tab>
-      </Tabs>
+        <TabCR eventKey="datos-personales" title="Datos personales">
+          <TabDatosPersonales activo={activeTab === 'datos-personales'}/>
+        </TabCR>
+        <TabCR eventKey="membresia" title="Membresias">
+          <TabMembresia activo={activeTab === 'membresia'}/>
+        </TabCR>
+        <TabCR eventKey="ventas" title="Ventas">
+          <TabVentas activo={activeTab === 'ventas'}/>
+        </TabCR>
+        <TabCR eventKey="archivos" title="Archivos">
+        </TabCR>
+        <TabCR eventKey="comentarios" title="Comentarios">
+          <TabComentarios/>
+        </TabCR>
+        <TabCR eventKey="contacto-emergencia" title="Contactos de emergencia">
+          <TabContactoEmergencia/>
+        </TabCR>
+      </TabsCR>
     </div>
   )
 }

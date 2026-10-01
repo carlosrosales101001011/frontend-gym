@@ -6,6 +6,7 @@ import { getBlobUrl } from "@/helpers/blobUrl"
 import { useVentasStore } from "../../hook/useVentasStore"
 import type { ProductoProps } from "../../store/ventaSlice"
 import { InputSearcherCR } from "@/components/TextFields/InputSearcherCR"
+import { ImageCR } from "@/components/ImageCR/ImageCR"
 
 const TODAS_LAS_CATEGORIAS = "Todos"
 
@@ -103,14 +104,14 @@ export const ItemProducto = ({ producto, cantidad, onSumar, onRestar }: ItemProd
 
   return (
     <Card
-      className={classNames("h-100 tienda-producto__item", {
+      className={classNames("card-mode-actual h-100 tienda-producto__item", {
         "tienda-producto__item--seleccionado": cantidad > 0,
       })}
     >
       <span className="tienda-producto__stock">Stock: {stockDisponible}</span>
       <Card.Body className="d-flex align-items-center gap-3">
         {imagen ? (
-          <img src={imagen} alt={producto.nombre} className="tienda-producto__imagen" />
+          <ImageCR src={imagen} alt={producto.nombre} className="tienda-producto__imagen" />
         ) : (
           <div className="tienda-producto__imagen tienda-producto__imagen--vacia">
             <BsQuestionLg />
@@ -118,11 +119,11 @@ export const ItemProducto = ({ producto, cantidad, onSumar, onRestar }: ItemProd
         )}
         <div className="flex-grow-1 overflow-hidden" style={{ minWidth: 0 }}>
           <Card.Text className="small mb-1">
-            <span className="fw-bolder text-black">
+            <span className="fw-bolder">
               {formatoMoneda.format(producto.precio_venta_actual ?? 0)}
             </span>
             <br/>
-            <span className="text-black text-truncate d-block" title={producto.nombre}>
+            <span className="text-truncate d-block" title={producto.nombre}>
               {producto.nombre}
             </span>
             {detalle && (

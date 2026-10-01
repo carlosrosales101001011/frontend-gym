@@ -41,7 +41,7 @@ export const DataTableCuentasFinanciera = ({ onOpenModalCustom, otrosBotones }: 
               }
           },
           {
-              header: 'Banco',
+              header: 'Banco', campoBusqueda: 'label_banco',
               id: 2,
               sortable: false,
               render:(row:CuentaFinancieraProps)=>{
@@ -53,7 +53,7 @@ export const DataTableCuentasFinanciera = ({ onOpenModalCustom, otrosBotones }: 
               }
           },
           {
-              header: 'Número de cuenta',
+              header: 'Número de cuenta', campoBusqueda: 'n_cuenta',
               id: 3,
               sortable: false,
               render:(row:CuentaFinancieraProps)=>{
@@ -65,7 +65,7 @@ export const DataTableCuentasFinanciera = ({ onOpenModalCustom, otrosBotones }: 
               }
           },
           {
-              header: 'CCI',
+              header: 'CCI', campoBusqueda: 'cci',
               id: 4,
               sortable: false,
               render:(row:CuentaFinancieraProps)=>{
@@ -77,7 +77,7 @@ export const DataTableCuentasFinanciera = ({ onOpenModalCustom, otrosBotones }: 
               }
           },
           {
-              header: 'Titular',
+              header: 'Titular', campoBusqueda: 'titular',
               id: 5,
               sortable: false,
               render:(row:CuentaFinancieraProps)=>{
@@ -101,7 +101,7 @@ export const DataTableCuentasFinanciera = ({ onOpenModalCustom, otrosBotones }: 
               }
           },
           {
-              header: 'Código de moneda',
+              header: 'Código de moneda', campoBusqueda: 'label_codigo_moneda',
               id: 7,
               sortable: false,
               render:(row:CuentaFinancieraProps)=>{
@@ -113,7 +113,7 @@ export const DataTableCuentasFinanciera = ({ onOpenModalCustom, otrosBotones }: 
               }
           },
           {
-              header: 'Descripción',
+              header: 'Descripción', campoBusqueda: 'descripcion',
               id: 8,
               sortable: false,
               render:(row:CuentaFinancieraProps)=>{

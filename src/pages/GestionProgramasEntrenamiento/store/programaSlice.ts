@@ -44,6 +44,8 @@ export type PlanesProps={
     label_tipo_tarifa: string,
     citas_nutricion_regalo: number,
     dias_congelamiento_regalo: number,
+    /** Monto máximo de descuento al vender el plan (0 = sin límite) */
+    max_descuento: number,
     estado: boolean
 }
 export type EmpleadoProps = {
@@ -103,6 +105,7 @@ const initialPlanes: PlanesProps = {
     label_tipo_tarifa: '',
     citas_nutricion_regalo: 0,
     dias_congelamiento_regalo: 0,
+    max_descuento: 0,
     estado: true
 }
 const initialHorarios: HorarioProps = {

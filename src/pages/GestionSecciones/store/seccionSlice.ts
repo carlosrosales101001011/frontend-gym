@@ -6,6 +6,8 @@ export type SeccionProps = {
   url: string,
   icon: string,
   id_children_seccion: number,
+  /** La sección está en mantenimiento */
+  is_seccion_mantenimiento: boolean,
 };
 export type SeccionesState={
     secciones:SeccionProps[],
@@ -19,6 +21,7 @@ const initialSeccion={
   url: '',
   icon: '',
   id_children_seccion: 0,
+  is_seccion_mantenimiento: false,
 }
 export const initialStateSeccion: SeccionesState = {
   seccion: initialSeccion,

@@ -14,14 +14,14 @@ import {
   type ProgramaBaseBackend,
 } from "./store/programaSlice"
 import type { SucursalProps } from "@/pages/GestionSucursal/store/sucursalSlice"
-import { sincronizarColeccion } from "./helpers/sincronizarColeccion"
+import { sincronizarColeccion } from '@/helpers/sincronizarColeccion'
 
 type ListaConTotal<T> = { lista: T[], total: number }
 type ProgramaCreadoResponse = { ok: boolean, msg: string, id: number, uid_avatar: string }
 
 type CategoriaProgramaBackend = { id: number, id_programa: number, id_categoria: number, label_categoria: string }
 type SucursalProgramaBackend = { id: number, id_programa: number, id_sucursal: number, label_sucursal: string }
-type PlanProgramaBackend = { id: number, id_programa: number, nMeses: number, precioTotal: number, id_tipo_tarifa: number, label_tipo_tarifa: string, citas_nutricion_regalo: number, dias_congelamiento_regalo: number, estado: boolean }
+type PlanProgramaBackend = { id: number, id_programa: number, nMeses: number, precioTotal: number, id_tipo_tarifa: number, label_tipo_tarifa: string, citas_nutricion_regalo: number, dias_congelamiento_regalo: number, max_descuento: number | string, estado: boolean }
 type HorarioProgramaBackend = {
   id: number, id_programa: number, horarioInicio: string, horarioFin: string, id_empl: number, label_empl: string,
   is_lunes: boolean, is_martes: boolean, is_miercoles: boolean, is_jueves: boolean, is_viernes: boolean, is_sabado: boolean, is_domingo: boolean,
@@ -105,6 +105,8 @@ export const useProgramaEntrenamientoStore = () => {
                 label_tipo_tarifa: item.label_tipo_tarifa,
                 citas_nutricion_regalo: item.citas_nutricion_regalo,
                 dias_congelamiento_regalo: item.dias_congelamiento_regalo,
+                // decimal: el backend puede devolverlo como string
+                max_descuento: Number(item.max_descuento) || 0,
                 estado: item.estado,
             })),
             horarios: horarios.lista.map((item) => ({
@@ -175,8 +177,8 @@ export const useProgramaEntrenamientoStore = () => {
                 eliminar: (id) => eliminarSucursal(id),
             }),
             sincronizarColeccion(originales.planes, producto.planes, {
-                crear: (item) => crearPlan({ id_programa, nMeses: item.nMeses, precioTotal: item.precioTotal, id_tipo_tarifa: item.id_tipo_tarifa, citas_nutricion_regalo: item.citas_nutricion_regalo, dias_congelamiento_regalo: item.dias_congelamiento_regalo, estado: item.estado }),
-                actualizar: (id, item) => actualizarPlan({ id_programa, nMeses: item.nMeses, precioTotal: item.precioTotal, id_tipo_tarifa: item.id_tipo_tarifa, citas_nutricion_regalo: item.citas_nutricion_regalo, dias_congelamiento_regalo: item.dias_congelamiento_regalo, estado: item.estado }, id, ''),
+                crear: (item) => crearPlan({ id_programa, nMeses: item.nMeses, precioTotal: item.precioTotal, id_tipo_tarifa: item.id_tipo_tarifa, citas_nutricion_regalo: item.citas_nutricion_regalo, dias_congelamiento_regalo: item.dias_congelamiento_regalo, max_descuento: item.max_descuento, estado: item.estado }),
+                actualizar: (id, item) => actualizarPlan({ id_programa, nMeses: item.nMeses, precioTotal: item.precioTotal, id_tipo_tarifa: item.id_tipo_tarifa, citas_nutricion_regalo: item.citas_nutricion_regalo, dias_congelamiento_regalo: item.dias_congelamiento_regalo, max_descuento: item.max_descuento, estado: item.estado }, id, ''),
                 eliminar: (id) => eliminarPlan(id),
             }),
             sincronizarColeccion(originales.horarios, producto.horarios, {

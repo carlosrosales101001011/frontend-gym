@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { AjusteFoto } from '@/components/Avatar/encuadreFoto';
 
 //id_tipo: 1, EL ID EMPLEADO
 export type ColaboradorProps = {
@@ -20,6 +21,11 @@ export type ColaboradorProps = {
   direccion: string;
   uid_comentario:string;
   uid_contactoEmergencia:string;
+  /** Foto de la persona (ruta en el blob storage); vacía si no tiene */
+  uid_avatar?: string;
+  url_avatar?: string;
+  /** Foto vigente en blob_storage con su encuadre (solo lectura: se guarda con PATCH /blob-storage/id/:id) */
+  avatar?: ({ id: number } & AjusteFoto) | null;
 };
 export type ColaboradorState={
     colaborador: ColaboradorProps,

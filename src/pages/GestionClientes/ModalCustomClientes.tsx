@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Col, Row, Tab, Tabs } from 'react-bootstrap'
+import { Col, Row } from 'react-bootstrap'
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import ModalCR from '@/components/Modal/ModalCR'
 import { InputCR } from '@/components/TextFields/InputCR'
 import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
@@ -9,9 +11,10 @@ import { initialStateClientes, type ClienteProps } from '@/pages/GestionClientes
 import { ButtonCR } from '@/components/Button/ButtonCR'
 import { useClientesStore } from '@/pages/GestionClientes/useClientesStore'
 import { removeNull } from '@/helpers/removeNull'
-import { ImageDropZone, type formProp } from '@/components/ImageDropZone/ImageDropZone'
+import { quitarCamposAvatar } from '@/helpers/quitarCamposAvatar'
+import { SelectorFoto } from '@/components/Avatar/SelectorFoto'
 import { getBlobUrl } from '@/helpers/blobUrl'
-import httpClient from '@/common/helpers/httpClient'
+import type { AjusteFoto } from '@/components/Avatar/encuadreFoto'
 
 type props = {
   show: boolean;
@@ -19,7 +22,7 @@ type props = {
   id: number;
 }
 export const ModalCustomClientes = ({show, onHide, id}:props) => {
-    const { post, patch, obtenerxID, dataxID } = useClientesStore()
+    const { post, patch, obtenerxID, dataxID, subirAvatar, guardarAjusteAvatar, eliminarAvatar } = useClientesStore()
     const { data:dataGenero, cargar:cargarGenero } = useTerminologiaPersona('GeneroPersona');
     const { data:dataEstadoCivil, cargar:cargarEstadoCivil } = useTerminologiaPersona('EstadoCivilPersona');
     const { data:dataTipoDocumento, cargar:cargarTipoDocumento } = useTerminologiaPersona('TipoDeDocumentoPersona');
@@ -29,15 +32,29 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
     const { register, formState: { errors }, handleSubmit, reset } = useForm<ClienteProps>({mode: "onTouched", defaultValues: initialStateClientes.cliente})
     const [avatarKey, setAvatarKey] = useState(`${show}-${id}`)
     const [avatarFile, setAvatarFile] = useState<File | null>(null)
-    const avatarPreview = id !== 0 ? (getBlobUrl(dataxID?.url_avatar) ?? null) : null
+    // "Eliminar foto" sobre la foto ya guardada: se quita al guardar el cliente
+    const [quitarFotoGuardada, setQuitarFotoGuardada] = useState(false)
+    // Encuadre elegido en "Ajustar foto" y todavía sin guardar (se guarda con el cliente)
+    const [ajusteFoto, setAjusteFoto] = useState<AjusteFoto | null>(null)
+    const avatarPreview = id !== 0 && !quitarFotoGuardada ? (getBlobUrl(dataxID?.url_avatar) ?? null) : null
     // resetea el archivo elegido cuando el modal se abre para otro cliente (o de nuevo), sin usar un efecto
     const currentAvatarKey = `${show}-${id}`
     if (avatarKey !== currentAvatarKey) {
       setAvatarKey(currentAvatarKey)
       setAvatarFile(null)
+      setQuitarFotoGuardada(false)
+      setAjusteFoto(null)
     }
-    const onAvatarChange = (event: formProp) => {
-      setAvatarFile(event.value.file)
+    const onElegirFoto = (archivo: File) => {
+      setAvatarFile(archivo)
+      setQuitarFotoGuardada(false)
+      setAjusteFoto(null) // una foto nueva empieza centrada
+    }
+    /** Quita la foto elegida; si no había una elegida, marca la guardada para quitarla al guardar */
+    const onEliminarFoto = () => {
+      if (avatarFile) setAvatarFile(null)
+      else setQuitarFotoGuardada(true)
+      setAjusteFoto(null)
     }
     useEffect(() => {
       if (show) {
@@ -66,8 +83,9 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
       }
     }, [dataxID, id]);
     const onSubmit = async (data:ClienteProps)=>{
+      // la foto se guarda aparte: sus campos (url_avatar, encuadre...) no van en el cliente
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const {id:idData, uid: uuid, url_avatar: _urlAvatarForm, ...rest} = removeNull(data);
+      const {id:idData, uid: uuid, ...rest} = removeNull(quitarCamposAvatar(data));
       // los campos label_* son de solo lectura (calculados por el backend a partir de los id_*), nunca se reenvían
       const val = Object.fromEntries(
         Object.entries(rest).filter(([key]) => !key.startsWith('label_'))
@@ -87,9 +105,12 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
         await post(payload)
       }
       if (avatarFile && nuevoUidAvatar) {
-        const formData = new FormData()
-        formData.append('file', avatarFile)
-        await httpClient.post(`/persona/avatar/${nuevoUidAvatar}`, formData)
+        const idBlob = await subirAvatar(nuevoUidAvatar, avatarFile)
+        if (ajusteFoto && idBlob) await guardarAjusteAvatar(idBlob, ajusteFoto)
+      } else if (ajusteFoto && !quitarFotoGuardada && dataxID?.avatar?.id) {
+        await guardarAjusteAvatar(dataxID.avatar.id, ajusteFoto)
+      } else if (quitarFotoGuardada && uidAvatarActual) {
+        await eliminarAvatar(uidAvatarActual)
       }
       onCancelar()
     }
@@ -108,8 +129,15 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <Row>
                 <Col lg={4}>
-                  <div className='d-flex justify-content-center'>
-                    <ImageDropZone name='avatar' initialSrc={avatarPreview} onChange={onAvatarChange} heightZone={340} widthZone={300}/>
+                  <div className='d-flex justify-content-center pt-3'>
+                    <SelectorFoto
+                      src={avatarPreview}
+                      archivo={avatarFile}
+                      ajuste={ajusteFoto ?? (avatarFile ? null : dataxID?.avatar)}
+                      onChange={onElegirFoto}
+                      onAjustar={setAjusteFoto}
+                      onEliminar={onEliminarFoto}
+                    />
                   </div>
                 </Col>
                 <Col lg={8}>
@@ -193,13 +221,13 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
                   </Row>
                 </Col>
                 <Col lg={12}>
-                <Tabs>
-                      <Tab title='Contacto de emergencia'>
+                <TabsCR>
+                      <TabCR title='Contacto de emergencia'>
                         
-                      </Tab>
-                      <Tab title='Primer comentario'>
-                      </Tab>
-                </Tabs>
+                      </TabCR>
+                      <TabCR title='Primer comentario'>
+                      </TabCR>
+                </TabsCR>
                 </Col>
               </Row>
             </form>

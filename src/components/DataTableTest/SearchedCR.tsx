@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { querys } from '@/types/parametros'
 import { useQueryParams } from '@/hook/useQueryParams'
-import { InputCR } from '@/components/TextFields/InputCR'
+import IconCR from '@/components/Icons/IconCR'
 type prop={
     onSearchChange?: (value: string, e: React.ChangeEvent<HTMLInputElement>) => void
     /** Columnas (strings) en las que se debe buscar. Vacío = buscar en todas */
     columnasBusqueda?: string[]
 }
+/** Buscador de DataTableTest: guarda el texto en la URL (?search=) y vuelve a la página 1. Estilos en _DropdownCR.scss */
 export const SearchedCR = ({onSearchChange, columnasBusqueda}:prop) => {
     const [search, setSearch] = useState('')
     const { set, get } = useQueryParams();
@@ -26,12 +27,27 @@ export const SearchedCR = ({onSearchChange, columnasBusqueda}:prop) => {
         },
         [set, onSearchChange, columnasBusqueda]
     )
+    const borrar = () => {
+        setSearch('')
+        set({[querys.search]: null, [querys.page]: null})
+    }
   return (
-    <InputCR
-        label="Buscar..."
-        value={search}
-        onChange={handleSearchChange}
-        style={{ maxWidth: 220 }}
-    />
+    <div className="buscador-tabla">
+        <span className="buscador-tabla__icono"><IconCR name="search" size={15} /></span>
+        <input
+            type="search"
+            className="buscador-tabla__input"
+            placeholder={columnasBusqueda?.length ? `Buscar en ${columnasBusqueda.length} columna${columnasBusqueda.length > 1 ? 's' : ''}...` : 'Buscar...'}
+            value={search}
+            onChange={handleSearchChange}
+            onKeyDown={(e) => { if (e.key === 'Escape' && search) borrar() }}
+            aria-label="Buscar en la tabla"
+        />
+        {search && (
+            <button type="button" className="buscador-tabla__borrar" onClick={borrar} aria-label="Borrar búsqueda" title="Borrar">
+                <IconCR name="times" size={11} />
+            </button>
+        )}
+    </div>
   )
 }

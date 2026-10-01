@@ -26,7 +26,10 @@ import { GrSystem } from "react-icons/gr";
 import { TiShoppingBag } from "react-icons/ti";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
+import { MdOutlineBarChart, MdOutlineDarkMode, MdOutlineLightMode, MdOutlineNotifications, MdOutlineTableChart, MdPowerSettingsNew } from "react-icons/md";
+import { PiCirclesFourFill } from "react-icons/pi";
+import { MdWifi, MdWifi2Bar, MdWifiOff } from "react-icons/md";
+import { MdZoomIn, MdZoomOut, MdRotateLeft, MdRotateRight } from "react-icons/md";
 
 export type IconName =
   | "user"
@@ -72,7 +75,19 @@ export type IconName =
   | 'question'
   | 'sun'
   | 'moon'
-  | 'lock';
+  | 'modulos'
+  | 'power'
+  | 'notificaciones'
+  | 'grafica'
+  | 'tabla'
+  | 'lock'
+  | 'wifi'
+  | 'wifiLento'
+  | 'wifiOff'
+  | 'zoomIn'
+  | 'zoomOut'
+  | 'rotateLeft'
+  | 'rotateRight';
 
 const icons: Record<IconName, IconType> = {
   user: FaUser,
@@ -118,7 +133,19 @@ const icons: Record<IconName, IconType> = {
   question: FaQuestion,
   sun: MdOutlineLightMode,
   moon: MdOutlineDarkMode,
-  lock: FaLock
+  modulos: PiCirclesFourFill,
+  power: MdPowerSettingsNew,
+  notificaciones: MdOutlineNotifications,
+  grafica: MdOutlineBarChart,
+  tabla: MdOutlineTableChart,
+  lock: FaLock,
+  wifi: MdWifi,
+  wifiLento: MdWifi2Bar,
+  wifiOff: MdWifiOff,
+  zoomIn: MdZoomIn,
+  zoomOut: MdZoomOut,
+  rotateLeft: MdRotateLeft,
+  rotateRight: MdRotateRight,
 };
 
 type Props = {

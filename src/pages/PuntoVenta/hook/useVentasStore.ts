@@ -6,6 +6,7 @@ import { onSetDataOpcionesSucursales, onSetClienteSeleccionado, onSetAsesorSelec
 import { useAppSelector } from "@/stores/Store";
 import { useDispatch } from "react-redux";
 import type { ItemResultado } from "@/components/ModalSearching/ModalSearching";
+import { errorDescuentoMembresia } from "../helpers/descuentoMembresia";
 
 const DURACION_MINIMA_LOADING_MS = 1500
 
@@ -132,6 +133,12 @@ export const useVentasStore = () => {
           return
         }
 
+        const errorDescuento = venta.detalleventa_membresias.id_programa ? errorDescuentoMembresia(venta.detalleventa_membresias) : ''
+        if (errorDescuento) {
+          await Swal.fire({ icon: 'warning', title: 'Descuento de la membresía', text: errorDescuento })
+          return
+        }
+
         setLoadingVenta(true)
         const inicio = Date.now()
         try {
@@ -140,7 +147,7 @@ export const useVentasStore = () => {
           const id_venta = dataVenta?.data?.id
 
           if (detalleventa_membresias.id_programa) {
-            const { label_horario, label_nmeses, label_precio, label_programa, ...membresiaData } = detalleventa_membresias
+            const { label_horario, label_nmeses, label_precio, label_programa, max_descuento_plan, ...membresiaData } = detalleventa_membresias
             // El backend crea el membresia-seguimiento de la venta al registrar la membresía.
             await postDetalleVentaMembresia({ ...membresiaData, id_venta })
           }

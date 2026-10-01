@@ -5,6 +5,10 @@ import type { ClienteProps } from "@/pages/GestionClientes/store/clientesSlice"
 import { DataTableTest } from "@/components/DataTableTest/DataTableTest";
 // import IconCR from "@/components/Icons/IconCR";
 import { Link, useLocation } from "react-router-dom";
+import { capitalizeWords } from "@/helpers/strings";
+import { getBlobUrl } from "@/helpers/blobUrl";
+import { AvatarCirculo } from "@/components/Avatar/AvatarCirculo";
+import { ajusteAvatarUltimo } from "@/components/Avatar/encuadreFoto";
 
 type Props = {
     otrosBotones?: React.ReactNode
@@ -37,33 +41,36 @@ export const DataTableClientes = ({otrosBotones, onOpenModalCustom}:Props) => {
         }
     },
     {
-        header: 'Nombres y Apellidos',
+        header: 'Nombres y Apellidos', campoBusqueda: ['nombres', 'apellido_paterno', 'apellido_materno'],
         id: 1,
         sortable: false,
         render:(row:ClienteProps)=>{
             return (
-                <div className="">
-                    {row.nombres} {row.apellido_paterno} {row.apellido_materno}
+                <div className="d-flex align-items-center gap-2">
+                    <AvatarCirculo
+                        src={getBlobUrl(row.url_avatar_ultimo)}
+                        alt={row.nombres}
+                        ajuste={ajusteAvatarUltimo(row)}
+                    />
+                    {capitalizeWords(`${row.nombres} ${row.apellido_paterno} ${row.apellido_materno}`)}
                 </div>
             )
         }
     },
     {
-        header: 'Tipo/N° Documento',
+        header: 'Tipo/N° Documento', campoBusqueda: ['label_tipo_documento', 'numero_documento'],
         id: 2,
         sortable: false,
         render:(row:ClienteProps)=>{
             return (
-                <>
-                    {row.label_tipo_documento}
-                    <br/>
-                    {row.numero_documento}
-                </>
+                <div className="">
+                    {row.label_tipo_documento}: {row.numero_documento}
+                </div>
             )
         }
     },
     {
-        header: 'Email personal',
+        header: 'Email personal', campoBusqueda: 'email_personal',
         id: 3,
         sortable: false,
         render:(row:ClienteProps)=>{
@@ -75,7 +82,7 @@ export const DataTableClientes = ({otrosBotones, onOpenModalCustom}:Props) => {
         }
     },
     {
-        header: 'Telefono',
+        header: 'Telefono', campoBusqueda: 'telefono',
         id: 4,
         sortable: false,
         render:(row:ClienteProps)=>{

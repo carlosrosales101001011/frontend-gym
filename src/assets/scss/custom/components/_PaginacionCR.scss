@@ -1,0 +1,103 @@
+// PaginacionCR: pie de las tablas (components/Paginacion/PaginacionCR.tsx). Colores del tema actual.
+.paginacion-cr {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 10px 16px;
+  border-top: 1px solid $card-border-actual;
+  font-size: 13px;
+
+  &__info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+    opacity: 0.9;
+  }
+
+  &__por-pagina {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+
+  &__select {
+    height: 30px;
+    padding: 0 26px 0 10px;
+    border: 1px solid $card-border-actual;
+    border-radius: 8px;
+    color: $color-actual;
+    background-color: $input-bg-actual;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: var(--bs-primary);
+    }
+  }
+
+  &__paginas {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid $card-border-actual;
+    border-radius: 8px;
+    color: $color-actual;
+    background-color: transparent;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover:not(:disabled):not(.paginacion-cr__boton--actual) {
+      background-color: $item-hover-actual;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--bs-primary);
+      outline-offset: 1px;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    // Página actual: color primario con texto blanco (el * global pinta todo con el color del tema)
+    &--actual {
+      border-color: var(--bs-primary);
+      background-color: var(--bs-primary);
+      color: #fff !important;
+      font-weight: 700;
+      cursor: default;
+    }
+  }
+
+  &__salto {
+    min-width: 24px;
+    text-align: center;
+    opacity: 0.6;
+  }
+
+  // En pantallas chicas: la barra de páginas arriba y centrada
+  @media (max-width: 576px) {
+    flex-direction: column-reverse;
+    padding: 10px;
+
+    &__info {
+      justify-content: center;
+    }
+  }
+}

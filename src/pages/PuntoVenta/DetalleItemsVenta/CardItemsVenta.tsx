@@ -1,5 +1,5 @@
-import { Tab } from '@/components/Tabs/Tab'
-import { Tabs } from '@/components/Tabs/Tabs'
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import { Card  } from 'react-bootstrap'
 import { TiendaMembresia } from './TiendaMembresia/TiendaMembresia'
 import { TiendaProductos } from './TiendaProductos/TiendaProductos'
@@ -11,15 +11,14 @@ export const CardItemsVenta = () => {
         <Card.Title className='fs-5 fw-bolder'>
           Agregar items
         </Card.Title>
-        <Tabs defaultValue={'membresia'} defaultActiveKey="items-add" classNameActive="bg-primary"
-            classNameInactivos="bg-gray" >
-          <Tab eventKey="membresia" title={<div className='px-4'>Membresia</div>}>
+        <TabsCR defaultActiveKey="membresia" variant="pildora">
+          <TabCR eventKey="membresia" title={<div className='px-4'>Membresia</div>}>
             <TiendaMembresia />
-          </Tab>
-          <Tab eventKey="productos" title={<div className='px-4'>Productos</div>}>
+          </TabCR>
+          <TabCR eventKey="productos" title={<div className='px-4'>Productos</div>}>
             <TiendaProductos/>
-          </Tab>
-        </Tabs>
+          </TabCR>
+        </TabsCR>
       </Card.Body>
     </Card>
   )

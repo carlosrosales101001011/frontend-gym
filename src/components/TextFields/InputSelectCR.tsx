@@ -58,28 +58,28 @@ const hasValue = selectedOption !== undefined;
     } as unknown as React.ChangeEvent<HTMLSelectElement>);
   }
   }
-const OPTION_HEIGHT = 21; // 17px minHeight + 2px + 2px de padding vertical
+const OPTION_HEIGHT = 32; // 30px minHeight + 2px de separación entre opciones
 const VISIBLE_OPTIONS = 5;
 // Sin colores acá: los colores viven en _TextFields.scss, tomados de _variables-custom.scss.
 // `unstyled` (ver <Select>) apaga los estilos inline de react-select para que mande el CSS.
 const customStyles: StylesConfig<SelectOption, false> = {
   option: (provided) => ({
     ...provided,
-    padding: '2px 10px', // Reduce el padding vertical
-    minHeight: '17px',   // Altura mínima de la opción
+    padding: '6px 10px',
+    minHeight: '30px',
     display: 'flex',
     alignItems: 'center',
-    fontSize: '12px',
+    fontSize: '13px',
   }),
     control: (provided) => ({
     ...provided,
     minHeight: 32,
-    height: 22,
+    height: 32,
   }),
   valueContainer: (provided) => ({
     ...provided,
     height: 32,
-    padding: '0 6px',
+    padding: '0 10px',
   }),
   indicatorsContainer: (provided) => ({
     ...provided,
@@ -100,10 +100,11 @@ const customStyles: StylesConfig<SelectOption, false> = {
 };
 
   return (
-    <div className="input-textfield">
-      <div className="textfield-filled inputselect-model-actual">
+    <div className="input-textfield m-2">
+      {/* Estados para el CSS (_TextFields.scss): foco pinta borde/etiqueta primario, error en rojo */}
+      <div className={`textfield-filled inputselect ${isFocused ? 'inputselect--focus' : ''} ${hasError ? 'inputselect--error' : ''}`}>
         <Select
-          className="inputselect-model-actual border-o"
+          className="inputselect__select"
           unstyled
           styles={customStyles}
           onFocus={handleFocus}
@@ -116,6 +117,7 @@ const customStyles: StylesConfig<SelectOption, false> = {
           placeholder=''
           autoFocus={autoFocus}
           maxMenuHeight={OPTION_HEIGHT * VISIBLE_OPTIONS}
+          noOptionsMessage={() => 'Sin opciones'}
           menuPortalTarget={document.body}
           menuPosition="fixed"
         />
@@ -129,9 +131,13 @@ const customStyles: StylesConfig<SelectOption, false> = {
           {label}{required && <span className="text-danger"> *</span>}
         </label>
       </div>
-      <span className="text-danger fw-bold px-2 m-0" style={{fontSize: '11px'}}>
-        {messageErrors.trim().length !==0 && messageErrors }
-      </span>
+      {
+        messageErrors.trim().length !==0 && (
+          <span className="text-danger fw-bold px-2 m-0" style={{fontSize: '11px'}}>
+            {messageErrors.trim().length !==0 && messageErrors }
+          </span>
+        )
+      }
     </div>
   );
 };

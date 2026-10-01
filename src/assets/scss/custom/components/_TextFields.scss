@@ -23,21 +23,40 @@
           outline: none;
           transition: all 0.2s ease;
         }
-        // El <Select> de InputSelectCR usa la prop `unstyled`, así que todo su
-        // aspecto (colores, bordes, etc.) sale de estas clases react-select__*,
-        // conectadas a las variables de _variables-custom.scss.
-        .react-select__control{
+        // El <Select> de InputSelectCR usa la prop `unstyled`, así que todo su aspecto sale
+        // de estas clases react-select__* (colores del tema en _variables-custom.scss).
+        // Borde suave igual al de InputCR; foco/hover con el color primario; error en rojo.
+        .react-select__control {
           width: 100%;
           min-width: 0;
-          border: $border-light .3px solid !important;
-          border-radius: 6px;
-          background-color: $card-actual !important;
+          border: 1px solid $border-actual;
+          border-radius: 8px;
+          background-color: $input-bg-actual;
           font-size: 13px;
+          cursor: pointer;
           outline: none;
-          transition: all 0.2s ease;
+          transition: border-color .15s ease, box-shadow .15s ease;
+
+          &:hover {
+            border-color: rgba($primary, .55);
+          }
 
           &--is-focused {
-            border-color: #1976d2 !important;
+            border-color: $primary;
+            box-shadow: 0 0 0 3px rgba($primary, .15);
+          }
+
+          // La flecha gira cuando el menú está abierto
+          &--menu-is-open .react-select__dropdown-indicator svg {
+            transform: rotate(180deg);
+          }
+        }
+
+        .inputselect--error .react-select__control {
+          border-color: $danger;
+
+          &--is-focused {
+            box-shadow: 0 0 0 3px rgba($danger, .15);
           }
         }
 
@@ -50,35 +69,82 @@
           color: $color-actual !important;
         }
 
+        .react-select__single-value {
+          font-weight: 500;
+        }
+
         .react-select__placeholder {
-          color: $border-light;
+          color: $border-actual;
         }
 
         .react-select__indicator-separator {
-          background-color: $border-light;
+          display: none;
         }
 
         .react-select__dropdown-indicator,
         .react-select__clear-indicator {
+          padding: 0 8px;
           color: $color-actual;
+          opacity: .45;
+          transition: opacity .15s ease, color .15s ease;
+
+          svg {
+            transition: transform .2s ease;
+          }
         }
 
+        .react-select__control:hover .react-select__dropdown-indicator,
+        .react-select__control--is-focused .react-select__dropdown-indicator {
+          color: $primary;
+          opacity: 1;
+        }
+
+        // Menú (va en un portal, fuera del form): tarjeta flotante con sombra
         .react-select__menu {
+          margin-top: 6px;
+          padding: 4px;
+          overflow: hidden;
+          border: 1px solid $card-border-actual;
+          border-radius: 10px;
           background-color: $card-actual;
-          border: $border-light .3px solid;
+          box-shadow: 0 12px 32px rgba(0, 0, 0, .18);
+          animation: inputselect-menu-in .12s ease-out;
+        }
+
+        .react-select__menu-list {
+          padding: 0;
+          scrollbar-width: thin;
+          scrollbar-color: $border-actual transparent;
         }
 
         .react-select__option {
-          background-color: $card-actual;
+          margin-bottom: 2px;
+          border-radius: 6px;
+          background-color: transparent;
           color: $color-actual;
+          cursor: pointer;
+          transition: background-color .1s ease;
 
           &--is-focused {
-            background-color: $select-actual;
+            background-color: $item-hover-actual;
           }
 
           &--is-selected {
-            background-color: $select-actual;
+            background-color: rgba($primary, .12);
+            color: $primary !important;
+            font-weight: 600;
           }
+        }
+
+        .react-select__menu-notice {
+          padding: 8px 10px;
+          font-size: 12px;
+          opacity: .6;
+        }
+
+        @keyframes inputselect-menu-in {
+          from { opacity: 0; transform: translateY(-4px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         // .textfield-input:hover {
         //   background: #e9ecef;
@@ -163,19 +229,37 @@
 }
 
 
-.label-select-focus{
-  position: 'relative' !important;
-  top: -12px !important;
-  font-size: 13px !important;
-  background-color: $card-actual !important;
-  color: $color-actual !important;
+// Etiqueta de InputSelectCR: dentro del campo si está vacío, flotando sobre el borde con valor/foco.
+// Su fondo es mitad transparente y mitad color del campo: se "corta" el borde sin dejar
+// un parche de color sobre la card o la página (funciona sobre cualquier fondo).
+.inputselect .textfield-label {
+  left: 8px;
   padding: 0 4px;
+  color: $color-actual;
+  opacity: .6;
 }
 
-.label-select-blur{
-  position: 'relative' !important;
-  top: 7px !important;
-  font-size: 15px !important;
-  background: transparent !important;
-  color: $color-actual !important;
+.inputselect .label-select-blur {
+  top: 7px;
+  font-size: 13px;
+  background: transparent;
+}
+
+.inputselect .label-select-focus {
+  top: -9px;
+  height: auto;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  background: linear-gradient(to bottom, transparent 50%, $input-bg-actual 50%);
+  opacity: .8;
+}
+
+.inputselect--focus .label-select-focus {
+  color: $primary;
+  opacity: 1;
+}
+
+.inputselect--error .textfield-label {
+  opacity: 1;
 }

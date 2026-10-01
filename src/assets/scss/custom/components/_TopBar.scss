@@ -31,6 +31,50 @@
     }
   }
 
+  // Botón "Mis módulos": pastilla con el color primario; en mobile solo queda el ícono
+  &__modulos {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid rgba($primary, .35);
+    border-radius: 999px;
+    background-color: rgba($primary, .1);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease;
+
+    &,
+    & * {
+      color: $primary !important;
+    }
+
+    &:hover {
+      background-color: $primary;
+      border-color: $primary;
+
+      &,
+      & * {
+        color: #fff !important;
+      }
+    }
+
+    @include media-breakpoint-down(sm) {
+      width: 32px;
+      padding: 0;
+      justify-content: center;
+    }
+  }
+
+  &__modulos-texto {
+    font-size: 13px;
+
+    @include media-breakpoint-down(sm) {
+      display: none;
+    }
+  }
+
   // &__search {
   //   padding: 4px 18px;
   //   border-radius: 15px;
@@ -41,4 +85,94 @@
   //     border-color: #999;
   //   }
   // }
+}
+
+// Contenido de la nube "Mis módulos": módulos del usuario en 2 columnas
+.mis-modulos__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mis-modulos__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  text-align: left;
+  border: 1px solid $card-border-actual;
+  border-radius: 10px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $item-hover-actual;
+    border-color: $primary;
+  }
+}
+
+.mis-modulos__icono {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+
+  * {
+    color: inherit !important;
+  }
+}
+
+.mis-modulos__label {
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mis-modulos__home {
+  font-size: 12px;
+  text-decoration: none;
+}
+
+// Indicador de conexión (wifi): verde = estable, amarillo = lenta, rojo = sin conexión
+.topbar__conexion {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.5rem;
+  cursor: default;
+
+  // También a los hijos del svg: el `*` de app.scss pintaría el <path> con el color del tema
+  &--buena,
+  &--buena * {
+    color: #22c55e !important;
+  }
+
+  &--lenta,
+  &--lenta * {
+    color: #eab308 !important;
+  }
+
+  &--sin-conexion,
+  &--sin-conexion * {
+    color: $primary !important;
+  }
+}
+
+// Nombre del módulo en el Topbar y su loading pequeño mientras carga
+.topbar__modulo {
+  font-weight: 600;
+}
+
+.topbar__modulo-cargando {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-width: 0.15em;
+  opacity: 0.7;
 }

@@ -16,12 +16,12 @@ export const DataTableAlmacen = ({ onOpenModalCustom, otrosBotones }: { onOpenMo
         },
         {
             id: 1,
-            header: 'Código',
+            header: 'Código', campoBusqueda: 'codigo',
             render: (rowData: AlmacenProps) => <span>{rowData.codigo}</span>,
         },
         {
             id: 2,
-            header: 'Nombre',
+            header: 'Nombre', campoBusqueda: 'nombre',
             render: (rowData: AlmacenProps) => <span>{rowData.nombre}</span>,
         },
         {
@@ -31,12 +31,12 @@ export const DataTableAlmacen = ({ onOpenModalCustom, otrosBotones }: { onOpenMo
         },
         {
             id: 5,
-            header: 'Dirección',
+            header: 'Dirección', campoBusqueda: 'direccion',
             render: (rowData: AlmacenProps) => <span>{rowData.direccion}</span>,
         },
         {
             id: 6,
-            header: 'Sucursal',
+            header: 'Sucursal', campoBusqueda: 'label_sucursal',
             render: (rowData: AlmacenProps) => <span>{rowData.label_sucursal}</span>,
         },
         {

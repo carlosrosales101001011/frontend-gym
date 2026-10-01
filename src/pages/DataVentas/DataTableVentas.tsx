@@ -16,6 +16,7 @@ export const DataTableVentas = () => {
     const [isOpenModalInfoVentas, setisOpenModalInfoVentas] = useState({id: 0, show: false})
     const {  get } = useQueryParams();
     const querySearch = (get(querys.search)||'')
+    const queryColumnas = get(querys.columnas)
     const page = Number(get(querys.page))
     const show = Number(get(querys.show))
     const onOpenModalInfoVentas = (id:number)=>{
@@ -30,7 +31,7 @@ export const DataTableVentas = () => {
         if (e.name !== 'CanceledError') console.error(e);
         });
         return () => ctrl.abort();
-    }, [querySearch, page, show])
+    }, [querySearch, queryColumnas, page, show])
     
         const columns = [
             {
@@ -40,27 +41,27 @@ export const DataTableVentas = () => {
             },
             {
                 id: 1,
-                header: <div style={{width: '150px'}}>Nombres y apellidos<br/> del Asesor / Vendedor</div>,
+                header: <div style={{width: '150px'}}>Nombres y apellidos<br/> del Asesor / Vendedor</div>, campoBusqueda: 'label_nombres_apellidos_empl',
                 render: (rowData: DataVentaProps) => <span className="">{capitalizeWords(rowData.label_nombres_apellidos_empl)}</span>,
             },
             {
                 id: 2,
-                header: <>Nombres y apellidos<br/> del Cliente</>,
+                header: <>Nombres y apellidos<br/> del Cliente</>, campoBusqueda: 'label_nombres_apellidos_cli',
                 render: (rowData: DataVentaProps) => <span>{capitalizeWords(rowData.label_nombres_apellidos_cli)}</span>,
             },
             {
                 id: 3,
-                header: 'Origen',
+                header: 'Origen', campoBusqueda: 'label_origen',
                 render: (rowData: DataVentaProps) => <span>{rowData.label_origen}</span>,
             },
             {
                 id: 4,
-                header: 'Tipo de comprobante',
+                header: 'Tipo de comprobante', campoBusqueda: 'label_tipo_comprobante',
                 render: (rowData: DataVentaProps) => <span>{rowData.label_tipo_comprobante}</span>,
             },
             {
                 id: 5,
-                header: 'N° de comprobante',
+                header: 'N° de comprobante', campoBusqueda: 'n_comprobante',
                 render: (rowData: DataVentaProps) => <span>{rowData.n_comprobante}</span>,
             },
             {
@@ -75,7 +76,7 @@ export const DataTableVentas = () => {
             },
             {
                 id: 8,
-                header: 'Observacion',
+                header: 'Observacion', campoBusqueda: 'observacion',
                 render: (rowData: DataVentaProps) => <span>{rowData.observacion}</span>,
             },
             {

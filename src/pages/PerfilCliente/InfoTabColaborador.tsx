@@ -1,4 +1,5 @@
-import { Tab, Tabs } from 'react-bootstrap'
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import { TabDatosPersonales } from '@/pages/PerfilCliente/TabDatosPersonales'
 import { TabArchivos } from '@/pages/PerfilCliente/TabArchivos'
 import { TabComentarios } from '@/pages/PerfilCliente/TabComentarios'
@@ -21,30 +22,30 @@ export const InfoTabColaborador = () => {
     };
 
   return (
-    <Tabs
+    <TabsCR
         defaultActiveKey="profile"
         id="uncontrolled-tab-example"
         activeKey={activeTab}
         onSelect={handleSelect}
     >
-      <Tab eventKey="datos-personales" title="Datos personales">
+      <TabCR eventKey="datos-personales" title="Datos personales">
           <TabDatosPersonales/>
-      </Tab>
-      <Tab eventKey="membresia" title="Membresias">
+      </TabCR>
+      <TabCR eventKey="membresia" title="Membresias">
         <TabArchivos/>
-      </Tab>
-      <Tab eventKey="acceso-sistema" title="Ventas">
+      </TabCR>
+      <TabCR eventKey="acceso-sistema" title="Ventas">
         <AppAccesoSistema/>
-      </Tab>
-      <Tab eventKey="archivos" title="Archivos">
+      </TabCR>
+      <TabCR eventKey="archivos" title="Archivos">
         <TabArchivos/>
-      </Tab>
-      <Tab eventKey="comentarios" title="Comentarios">
+      </TabCR>
+      <TabCR eventKey="comentarios" title="Comentarios">
         <TabComentarios/>
-      </Tab>
-      <Tab eventKey="contacto-emergencia" title="Contactos de emergencia">
+      </TabCR>
+      <TabCR eventKey="contacto-emergencia" title="Contactos de emergencia">
         <TabContactoEmergencia/>
-      </Tab>
-    </Tabs>
+      </TabCR>
+    </TabsCR>
   )
 }

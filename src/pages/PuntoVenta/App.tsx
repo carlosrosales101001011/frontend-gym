@@ -1,6 +1,6 @@
 import { PageBreadCumb } from '@/components/PageBreadCumb/PageBreadCumb'
 import React, { useState } from 'react'
-import StepperCR, { type StepperItem } from './components/StepperCR';
+import { Stepper2 } from '@/components/Stepper/Stepper2';
 import { DetalleVentaApp } from './DetalleVenta/DetalleVentaApp';
 import { ButtonCR } from '@/components/Button/ButtonCR';
 import { DetalleItemsVentaApp } from './DetalleItemsVenta/DetalleItemsVentaApp';
@@ -14,21 +14,15 @@ export const App = () => {
     const [activeStep, setActiveStep] =
         useState(0);
 
-    const steps: StepperItem[] = [
+    const steps = [
         {
-            id: "detail",
             title: "Detalle de la venta",
-            subtitle: "Asesor, cliente y datos generales",
         },
         {
-            id: "items",
-            title: "Agregar ítems",
-            subtitle: "Membresías y productos",
+            title: "Membresías y productos",
         },
         {
-            id: "payment",
             title: "Pago",
-            subtitle: "Forma de pago y monto",
         },
         // {
         //     id: "confirmation",
@@ -56,14 +50,16 @@ export const App = () => {
         <div className="page-with-sticky-footer">
           <Loading show={loadingVenta}/>
           <PageBreadCumb title='Nueva venta'/>
-            <StepperCR
-                steps={steps}
-                activeStep={activeStep}
-                onStepChange={(index) => {
-                    setActiveStep(index);
-                }}
-                onlyPreviousClickable
-            />
+            {/* Mismo stepper que "Agregar usuario"; solo se puede volver a pasos anteriores */}
+            <div className="px-4 pt-3 pb-2">
+                <Stepper2
+                    steps={steps}
+                    orientation="horizontal"
+                    currentStep={activeStep}
+                    onChangeStep={setActiveStep}
+                    soloAnterioresClickeables
+                />
+            </div>
                 <div className="flex-grow-1 d-flex flex-column p-2" style={{ minHeight: 10}}>
                     {activeStep === 0 && (
                         <div className="h-100 overflow-y-auto overflow-x-hidden">

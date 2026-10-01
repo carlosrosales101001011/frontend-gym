@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { Button, Dropdown } from "react-bootstrap";
 import IconCR, { type IconName } from "@/components/Icons/IconCR";
+import { ImageCR } from "@/components/ImageCR/ImageCR"
 
 export interface ProgramCardProps {
   id: number;
@@ -62,7 +63,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
       {/* Imagen + estado + menú */}
       <div className="program-card__media">
         {imagen
-          ? <img src={imagen} alt={nombre} className="program-card__img" />
+          ? <ImageCR src={imagen} alt={nombre} className="program-card__img" classNameContenedor="d-block w-100 h-100 overflow-hidden" />
           : (
             <div className="program-card__img program-card__img--vacia">
               <IconCR name="no-icon" size={36} />

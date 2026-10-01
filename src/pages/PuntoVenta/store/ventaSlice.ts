@@ -28,7 +28,13 @@ export type DetalleMembresiaVentaProps = {
   label_nmeses: string;
   label_precio: string;
   fecha_fin: string;
+  /** Precio del plan − descuento */
   montoTotal: number;
+  montoDescuento: number;
+  /** Precio del plan */
+  montoSinDescuento: number;
+  /** Descuento máximo del plan (0 = sin límite); solo para validar, no se envía */
+  max_descuento_plan: number;
 }
 
 export type DetalleProductoVentaProps = {
@@ -78,6 +84,8 @@ export type PlanProps = {
   precioTotal: number;
   id_tipo_tarifa: number;
   label_tipo_tarifa: string;
+  /** Monto máximo de descuento al vender el plan (0 = sin límite). Decimal: puede llegar como string */
+  max_descuento?: number | string;
   estado: boolean;
 }
 
@@ -165,7 +173,10 @@ const initialDetalleMembresia: DetalleMembresiaVentaProps = {
   label_nmeses: '',
   label_precio: '',
   fecha_fin: '',
-  montoTotal: 0
+  montoTotal: 0,
+  montoDescuento: 0,
+  montoSinDescuento: 0,
+  max_descuento_plan: 0,
 }
 
 export const initialVenta: VentaProps = {
@@ -275,12 +286,16 @@ export const ventaSlice = createSlice({
         item.montoTotal = item.cantidad * Number(item.precio_unitario_producto);
       }
     },
+    /** Resta 1 a la cantidad; si llega a 0, el producto se quita de la venta */
     onRestarProductoVenta: (state, action: PayloadAction<number>) => {
       const item = state.venta.detalleventa_productos.find((producto) => producto.id_producto === action.payload);
-      if (item) {
-        item.cantidad = Math.max(1, item.cantidad - 1);
-        item.montoTotal = item.cantidad * Number(item.precio_unitario_producto);
+      if (!item) return;
+      if (item.cantidad <= 1) {
+        state.venta.detalleventa_productos = state.venta.detalleventa_productos.filter((producto) => producto.id_producto !== action.payload);
+        return;
       }
+      item.cantidad -= 1;
+      item.montoTotal = item.cantidad * Number(item.precio_unitario_producto);
     },
     onQuitarProductoVenta: (state, action: PayloadAction<number>) => {
       state.venta.detalleventa_productos = state.venta.detalleventa_productos.filter((producto) => producto.id_producto !== action.payload);

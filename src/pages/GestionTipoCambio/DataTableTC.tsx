@@ -32,7 +32,7 @@ export const DataTableTC = ({ onOpenModalCustom, otrosBotones}: Props) => {
               }
           },
           {
-              header: 'Moneda Origen',
+              header: 'Moneda Origen', campoBusqueda: 'label_codigo_monedaOrigen',
               id: 1,
               sortable: false,
               render:(row:TCProps)=>{
@@ -44,7 +44,7 @@ export const DataTableTC = ({ onOpenModalCustom, otrosBotones}: Props) => {
               }
           },
           {
-              header: 'Moneda Destino',
+              header: 'Moneda Destino', campoBusqueda: 'label_codigo_monedaDestino',
               id: 2,
               sortable: false,
               render:(row:TCProps)=>{
@@ -56,7 +56,7 @@ export const DataTableTC = ({ onOpenModalCustom, otrosBotones}: Props) => {
               }
           },
           {
-              header: 'Fecha',
+              header: 'Fecha', campoBusqueda: 'fecha',
               id: 3,
               sortable: false,
               render:(row:TCProps)=>{
@@ -68,7 +68,7 @@ export const DataTableTC = ({ onOpenModalCustom, otrosBotones}: Props) => {
               }
           },
           {
-              header: 'Venta',
+              header: 'Venta', campoBusqueda: 'venta',
               id: 4,
               sortable: false,
               render:(row:TCProps)=>{
@@ -80,7 +80,7 @@ export const DataTableTC = ({ onOpenModalCustom, otrosBotones}: Props) => {
               }
           },
           {
-              header: 'Compra',
+              header: 'Compra', campoBusqueda: 'compra',
               id: 5,
               sortable: false,
               render:(row:TCProps)=>{

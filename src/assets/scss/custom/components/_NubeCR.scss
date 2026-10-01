@@ -1,0 +1,70 @@
+// NubeCR: panel flotante bajo su trigger, con flecha que apunta al botón
+.nube-cr {
+  position: relative;
+  display: inline-flex;
+}
+
+.nube-cr__panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  z-index: 1050;
+  max-width: calc(100vw - 16px);
+  border-radius: 14px !important;
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.45);
+  animation: nube-cr-aparecer 0.15s ease-out;
+
+  &--fin {
+    right: 0;
+  }
+
+  &--inicio {
+    left: 0;
+  }
+
+  // Flecha hacia el trigger
+  &::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    width: 12px;
+    height: 12px;
+    background-color: $card-actual;
+    border-left: 1px solid $card-border-actual;
+    border-top: 1px solid $card-border-actual;
+    transform: rotate(45deg);
+  }
+
+  &--fin::before {
+    right: 22px;
+  }
+
+  &--inicio::before {
+    left: 22px;
+  }
+}
+
+.nube-cr__titulo {
+  padding: 12px 16px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 1px solid $card-border-actual;
+}
+
+.nube-cr__contenido {
+  position: relative; // para el LoadingOverlay interno
+  min-height: 90px;
+  max-height: 60vh;
+  padding: 12px;
+  border-radius: 0 0 14px 14px;
+}
+
+@keyframes nube-cr-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

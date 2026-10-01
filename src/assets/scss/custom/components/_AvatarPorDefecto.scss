@@ -1,0 +1,130 @@
+// Avatar sin foto: fondo suave y silueta un tono más fuerte, según el tema
+.avatar-por-defecto {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.avatar-por-defecto__fondo {
+  fill: #e5e7eb;
+}
+
+.avatar-por-defecto__silueta {
+  fill: #9ca3af;
+}
+
+:root:not([data-theme="light"]) {
+  .avatar-por-defecto__fondo {
+    fill: #262626;
+  }
+
+  .avatar-por-defecto__silueta {
+    fill: #525252;
+  }
+}
+
+// Avatar con foto o silueta: al pasar el mouse o enfocarlo se oscurece y muestra "Cargar / Actualizar foto"
+.avatar-foto {
+  position: relative;
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    .avatar-foto__sombra {
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+
+  &--cargando {
+    cursor: progress;
+
+    .avatar-foto__sombra {
+      opacity: 1;
+    }
+  }
+}
+
+// Foto con encuadre (x, y, zoom): la imagen se agranda y se mueve dentro del cuadrado
+.foto-encuadrada {
+  position: relative;
+  overflow: hidden;
+
+  img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width: none;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+.avatar-foto__sombra {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  background-color: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  &,
+  * {
+    color: #fff !important;
+  }
+}
+
+// Foto en grande del ModalCustomAvatar
+.modal-avatar__foto {
+  display: flex;
+  justify-content: center;
+}
+
+// Visor de "Ajustar foto": la foto se arrastra debajo de una máscara circular
+.ajustar-foto__visor {
+  position: relative;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: #000;
+  cursor: grab;
+  touch-action: none; // el arrastre con el dedo no hace scroll de la página
+  user-select: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width: none;
+    pointer-events: none;
+  }
+}
+
+.ajustar-foto__mascara {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+}

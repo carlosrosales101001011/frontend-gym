@@ -1,49 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { OpcionesSelect } from '@/types/props';
 
-export type SeccionxModuloProps = {
-  id: number;
-  id_modulo?:number;
-  label: string;
-  sections: SeccionesProps[]
-}
-export type SeccionesEntidadProps = {
-  id?: number;
-  id_modulo:number;
-  label?: string;
-  entities?: EntidadProps[]
-}
-export type SeccionesProps = {
-  id: number;
-  label: string;
-}
-export type EntidadProps = {
-  id: number;
-  id_entidad:number;
-  id_user:number;
-  id_estado_CREATE: number;
-  id_estado_READ: number;
-  id_estado_UPDATE: number;
-  id_estado_DELETE: number;
-  id_estado_EXPORT?: number;
-  id_estado_IMPORT?: number;
-  id_seccion: number;
-  is_fijado: boolean;
-  description:string;
-  title:string;
-  entidad: {
-    valor: string;
-  }
-}
-export type ModuloProps = {
-  id: number;
-  is_fijado: boolean;
-  title: string;
-  descripcion: string;
-  modulo: {
-    label: string;
-    descripcion: string;
-  }
-}
 export type UserProps = {
   id?:number;
   uuid: string;
@@ -60,34 +17,46 @@ export type UserProps = {
   id_userParent:number;
   fecha_creacion: Date;
 };
-export type UserState={
-    users:UserProps[],
-    entidades: SeccionesEntidadProps[],
-    secciones: SeccionesProps[],
-    user: UserProps,
-    modulos: ModuloProps[];
-    seccionesxModulo: SeccionxModuloProps[];
 
+/** Sección que quien registra puede asignar (sale de sus propios módulos) */
+export type SeccionDisponibleProps = {
+  id_seccion: number;
+  id_modulo: number;
+  label: string;
+  /** Entidades de la sección (sus permisos CRUD se eligen en el paso "Entidades") */
+  ids_entidad: number[];
 }
-export type Entidades= EntidadProps[];
 
-export const initialEntidad={
-  id_entidad: 0, 
-  id_estado_CREATE: 15,
-  id_estado_DELETE: 15,
-  id_estado_READ: 15,
-  id_estado_UPDATE: 15,
-  description: '',
-  id_seccion: 0,
-  is_fijado: false,
-  entidad: {
-    valor: ''
-  },
-  id: 0,
-  id_user: 0,
-  title: ''
+export type ModuloDisponibleProps = {
+  id_modulo: number;
+  label: string;
+  secciones: SeccionDisponibleProps[];
 }
-const initialUser={
+
+/** Permisos CRUD de un usuario sobre una entidad (entidad_x_user) */
+export type PermisoEntidadProps = {
+  id_entidad: number;
+  label_entidad: string;
+  id_estado_CREATE: number;
+  id_estado_READ: number;
+  id_estado_UPDATE: number;
+  id_estado_DELETE: number;
+}
+
+export type UserState = {
+  users: UserProps[],
+  /** Datos del paso "Información" del usuario que se está registrando */
+  user: UserProps,
+  /** Secciones elegidas en el paso "Módulos" */
+  idsSeccionAsignadas: number[],
+  /** Módulos y secciones de quien registra: solo puede asignar lo que él tiene */
+  modulosDisponibles: ModuloDisponibleProps[],
+  /** Permisos de quien registra: solo puede otorgar las acciones que tiene autorizadas */
+  permisosCreador: PermisoEntidadProps[],
+  opcionesEmpleados: OpcionesSelect[],
+}
+
+export const initialUser: UserProps = {
     id: 0,
     uuid: '',
     nombres: '',
@@ -106,41 +75,35 @@ const initialUser={
 export const initialStateUser: UserState = {
   users: [],
   user: initialUser,
-  entidades: [],
-  modulos: [],
-  secciones: [],
-  seccionesxModulo: []
+  idsSeccionAsignadas: [],
+  modulosDisponibles: [],
+  permisosCreador: [],
+  opcionesEmpleados: [],
 };
 
 export const usuariosSlice = createSlice({
   name: "USER",
   initialState: initialStateUser,
   reducers: {
-    // CREATE
-    addUser: (state, action: PayloadAction<UserProps>) => {
+    onSetUser: (state, action: PayloadAction<UserProps>) => {
       state.user = action.payload;
     },
-    addSeccionesxEntidad: (state, action: PayloadAction<SeccionesEntidadProps[]>) => {
-      state.entidades = action.payload;
+    onSetSeccionesAsignadas: (state, action: PayloadAction<number[]>) => {
+      state.idsSeccionAsignadas = action.payload;
     },
-    addSecciones: (state, action: PayloadAction<SeccionesProps[]>) => {
-      state.secciones = action.payload;
+    onSetModulosDisponibles: (state, action: PayloadAction<ModuloDisponibleProps[]>) => {
+      state.modulosDisponibles = action.payload;
     },
-    updateOneEntidad: (state, action:PayloadAction<Partial<EntidadProps> & { id: number }>)=>{
-      
-      const entidad = state.entidades.find(
-        u => u.id === action.payload.id
-      );
-      if (entidad) {
-        Object.assign(entidad, action.payload);
-      }
+    onSetPermisosCreador: (state, action: PayloadAction<PermisoEntidadProps[]>) => {
+      state.permisosCreador = action.payload;
     },
-    
-    onSetDataModulos: (state, action: PayloadAction<ModuloProps[]>) => {
-      state.modulos = action.payload;
+    onSetOpcionesEmpleados: (state, action: PayloadAction<OpcionesSelect[]>) => {
+      state.opcionesEmpleados = action.payload;
     },
-    addSeccionesxModulo: (state, action: PayloadAction<SeccionxModuloProps[]>) => {
-      state.seccionesxModulo = action.payload;
+    /** Limpia el registro en curso (al guardar o cerrar el modal) */
+    onResetRegistro: (state) => {
+      state.user = initialUser;
+      state.idsSeccionAsignadas = [];
     },
     onSetDataUsers:(state, action: PayloadAction<UserProps[]>)=>{
       state.users = action.payload;
@@ -148,5 +111,12 @@ export const usuariosSlice = createSlice({
   },
 });
 
-
-export const { addUser, onSetDataUsers, updateOneEntidad, onSetDataModulos, addSecciones, addSeccionesxModulo, addSeccionesxEntidad } = usuariosSlice.actions;
+export const {
+  onSetUser,
+  onSetSeccionesAsignadas,
+  onSetModulosDisponibles,
+  onSetPermisosCreador,
+  onSetOpcionesEmpleados,
+  onResetRegistro,
+  onSetDataUsers,
+} = usuariosSlice.actions;

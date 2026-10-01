@@ -11,30 +11,36 @@ import type { RootState } from '@/stores/Store';
 import { useParams } from 'react-router-dom';
 import { ButtonCR } from '@/components/Button/ButtonCR'
 import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
-export const TabDatosPersonales = () => {
-  const { uid_cliente } = useParams<{ uid_cliente: string }>();
-  const { obtenerDataColaboradorxUID, loading, patchColaborador,  } = usePerfilColaboradorStore()
+type TabDatosPersonalesProps = {
+  /** Si el tab está a la vista: cada vez que se activa se vuelven a pedir los datos (por defecto siempre) */
+  activo?: boolean
+}
+export const TabDatosPersonales = ({ activo = true }: TabDatosPersonalesProps) => {
+  // El perfil de cliente usa :uid_person; se mantiene :uid_cliente por la pantalla anterior de PerfilCliente
+  const { uid_person, uid_cliente } = useParams<{ uid_person: string, uid_cliente: string }>();
+  const uid = uid_person ?? uid_cliente ?? '';
+  const { obtenerDataColaboradorxUID, loading, actualizarDatosPersonales } = usePerfilColaboradorStore()
   const {colaborador} = useSelector((state: RootState)=>state.PERFIL_COLABORADOR)
   const { register, formState: { errors }, reset, getValues} = useForm<ColaboradorProps>({mode: "all",defaultValues: colaborador })
   const { data:dataGeneroPersona, cargar:cargarGeneroPersona } = useTerminologiaPersona('GeneroPersona');
   const { data:dataEstadoCivilPersona, cargar:cargarEstadoCivilPersona } = useTerminologiaPersona('EstadoCivilPersona');
   const { data:dataTipoDeDocumentoPersona, cargar:cargarTipoDeDocumentoPersona } = useTerminologiaPersona('TipoDeDocumentoPersona');
   useEffect(() => {
-    obtenerDataColaboradorxUID(uid_cliente||'')
+    if (!activo || !uid) return
+    obtenerDataColaboradorxUID(uid)
     cargarGeneroPersona()
     cargarEstadoCivilPersona()
     cargarTipoDeDocumentoPersona()
-  }, [uid_cliente])
+  }, [activo, uid])
   useEffect(() => {
     if (colaborador) {
       reset(colaborador);
     }
   }, [colaborador]);
   if (loading)return( <>LOADING</>)
+  // El hook envía solo los campos del formulario y recarga con el uid de la URL
   const onSubmitActualizar = ()=>{
-    const { id, uuid, ...v } = getValues()
-    console.log({id, uuid});
-    patchColaborador(colaborador.id, colaborador.uuid, v as ColaboradorProps)
+    actualizarDatosPersonales(colaborador.id, uid, getValues() as Partial<ColaboradorProps>)
   }
     return (
     <div>

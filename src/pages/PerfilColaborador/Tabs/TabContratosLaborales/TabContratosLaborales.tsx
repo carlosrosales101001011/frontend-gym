@@ -24,6 +24,7 @@ export const TabContratosLaborales = () => {
 
   const { get } = useQueryParams()
   const querySearch = get(querys.search) || ''
+  const queryColumnas = get(querys.columnas)
   const page = Number(get(querys.page))
   const show = Number(get(querys.show))
   useEffect(() => {
@@ -33,7 +34,7 @@ export const TabContratosLaborales = () => {
       if (e.name !== 'CanceledError') console.error(e)
     })
     return () => ctrl.abort()
-  }, [uid_empleado, querySearch, page, show])
+  }, [uid_empleado, querySearch, queryColumnas, page, show])
 
   return (
     <>

@@ -1,0 +1,218 @@
+// DropdownCR: botón + menú desplegable con opciones (components/DropdownCR/DropdownCR.tsx). Colores del tema actual.
+.dropdown-cr {
+  display: inline-flex;
+
+  &__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid $card-border-actual;
+    border-radius: 8px;
+    color: $color-actual;
+    background-color: $card-actual;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      background-color: $item-hover-actual;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--bs-primary);
+      outline-offset: 1px;
+    }
+
+    // Menú abierto: la flecha gira
+    &[aria-expanded="true"] {
+      border-color: var(--bs-primary);
+
+      .dropdown-cr__chevron {
+        transform: rotate(180deg);
+      }
+    }
+
+    // Con opciones elegidas: borde primario
+    &--activo {
+      border-color: var(--bs-primary);
+    }
+  }
+
+  &__icono {
+    display: inline-flex;
+    opacity: 0.85;
+  }
+
+  &__contador {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background-color: var(--bs-primary);
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  &__chevron {
+    opacity: 0.7;
+    transition: transform 0.15s ease;
+  }
+
+  &__menu {
+    min-width: 240px;
+    padding: 6px;
+    border: 1px solid $card-border-actual;
+    border-radius: 10px;
+    background-color: $card-actual;
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.45);
+  }
+
+  &__titulo {
+    padding: 6px 8px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  &__opciones {
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  &__opcion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 7px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $item-hover-actual;
+    }
+
+    &--deshabilitada {
+      opacity: 0.45;
+      cursor: not-allowed;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
+  }
+
+  &__check {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--bs-primary);
+    cursor: inherit;
+  }
+
+  &__opcion-texto {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__pie {
+    margin-top: 6px;
+    padding: 6px 2px 0;
+    border-top: 1px solid $card-border-actual;
+  }
+
+  &__pie-boton {
+    width: 100%;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 6px;
+    color: var(--bs-primary) !important;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+
+    &:hover {
+      background-color: $item-hover-actual;
+    }
+  }
+}
+
+// Buscador de la tabla (DataTableTest/SearchedCR): ícono a la izquierda, borrar a la derecha
+.buscador-tabla {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 240px;
+  max-width: 100%;
+  height: 32px;
+  border: 1px solid $card-border-actual;
+  border-radius: 8px;
+  background-color: $input-bg-actual;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.2);
+  }
+
+  &__icono {
+    display: inline-flex;
+    padding: 0 6px 0 10px;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0 4px;
+    border: none;
+    outline: none;
+    color: $color-actual;
+    background: transparent;
+    font-size: 13px;
+
+    &::placeholder {
+      color: $color-actual;
+      opacity: 0.5;
+    }
+
+    // Sin la X nativa del navegador (se usa la nuestra)
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+
+  &__borrar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    opacity: 0.6;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $item-hover-actual;
+      opacity: 1;
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
-import { DataTableSeguimiento, diasVencidos } from "./DataTableSeguimiento"
+import { DataTableSeguimiento } from "./DataTableSeguimiento"
+import { diasVencidos } from "@/helpers/diasMembresia"
 import { useSeguimientoMembresiaStore } from "./useSeguimientoMembresiaStore"
 import { useEffect, useMemo } from "react"
 import { Col, Row } from "react-bootstrap"

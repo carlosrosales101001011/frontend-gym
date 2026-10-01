@@ -20,6 +20,7 @@ export const App = () => {
   
     const {  get } = useQueryParams();
     const querySearch = (get(querys.search)||'')
+    const queryColumnas = get(querys.columnas)
     const page = Number(get(querys.page))
     const show = Number(get(querys.show))
     useEffect(() => {
@@ -28,7 +29,7 @@ export const App = () => {
         if (e.name !== 'CanceledError') console.error(e);
       });
       return () => ctrl.abort();
-    }, [querySearch, page, show])
+    }, [querySearch, queryColumnas, page, show])
   return (
     <div>
       <PageBreadCumb title={'Gestion de cuentas financieras'}/>

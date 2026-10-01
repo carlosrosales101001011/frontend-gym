@@ -4,7 +4,7 @@ import { useCrudhook } from "@/hook/usecrudhook"
 import { useAppSelector } from "@/stores/Store"
 import { onSetDataExtRegalos, type ExtRegaloProps } from "@/pages/GestionExtensionRegalos/store/extRegaloSlice"
 import { useSeguimientoMembresiaStore } from "@/pages/SeguimientoMembresia/useSeguimientoMembresiaStore"
-import { diasVencidos } from "@/pages/SeguimientoMembresia/DataTableSeguimiento"
+import { diasVencidos } from "@/helpers/diasMembresia"
 import type { SeguimientoMembresiaProps } from "@/pages/SeguimientoMembresia/store/seguimientoMembresiaSlice"
 
 const mensajeError = (error: unknown) =>

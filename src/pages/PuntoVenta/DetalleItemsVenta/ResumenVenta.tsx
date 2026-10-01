@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Card } from 'react-bootstrap'
+import { BsPlusLg } from 'react-icons/bs'
 import { Carrito, formatoMoneda } from './Carrito/Carrito'
 import { useVentasStore } from '../hook/useVentasStore'
-import { ButtonCR } from '@/components/Button/ButtonCR'
 import { ModalCustomMembresia } from './ModalCustomMembresia'
 import { ModalCustomProductos } from './ModalCustomProductos'
 
@@ -22,17 +22,20 @@ export const ResumenVenta = () => {
               <Card.Title style={{fontSize: '17px'}} className='fw-bolder'>
                   Resumen de la venta
               </Card.Title>
-            <div className="d-flex gap-2 mt-3 mb-2">
-              <ButtonCR
-                label='Agregar membresía'
-                className='rounded-pill'
-                onClick={() => setShowModalMembresia(true)}
-              />
-              <ButtonCR
-                label='Agregar productos'
-                className='rounded-pill'
-                onClick={() => setShowModalProductos(true)}
-              />
+            {/* Mismo estilo que "Agregar pago" */}
+            <div className="d-flex gap-2 mt-1 mb-1">
+              <Card role="button" tabIndex={0} className="add-item-card flex-fill " onClick={() => setShowModalMembresia(true)}>
+                <span className="d-flex align-items-center gap-2">
+                  <BsPlusLg size={18} />
+                  <span>Agregar membresía</span>
+                </span>
+              </Card>
+              <Card role="button" tabIndex={0} className="add-item-card flex-fill" onClick={() => setShowModalProductos(true)}>
+                <span className="d-flex align-items-center gap-2">
+                  <BsPlusLg size={18} />
+                  <span>Agregar productos</span>
+                </span>
+              </Card>
             </div>
             <Carrito/>
           </Card.Body>

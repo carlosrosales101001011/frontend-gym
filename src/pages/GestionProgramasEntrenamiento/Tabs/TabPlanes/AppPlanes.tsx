@@ -1,6 +1,7 @@
 import { Card, Col, Row } from 'react-bootstrap'
 import { BsPlusLg, BsTrash } from 'react-icons/bs'
 import { InputCR } from '@/components/TextFields/InputCR'
+import { InputMontoCR } from '@/components/TextFields/InputMontoCR'
 import { useAppDispatch, useAppSelector } from '@/stores/Store'
 import { onAddPlan, onRemovePlan, onUpdatePlan, type PlanesProps } from '@/pages/GestionProgramasEntrenamiento/store/programaSlice'
 import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
@@ -71,6 +72,14 @@ export const AppPlanes = () => {
                   />
                   <label className="form-check-label" htmlFor={`plan-estado-${index}`}>Activo</label>
                 </div>
+              </Col>
+              <Col lg={5}>
+                <InputMontoCR
+                  label='Descuento máximo (S/)'
+                  value={plan.max_descuento}
+                  onChange={(valor) => handleChange(index, 'max_descuento', valor)}
+                />
+                <span className="small opacity-75">0 = sin límite</span>
               </Col>
             </Row>
             <div className='mb-4 fs-4'>Regalos</div>

@@ -16,12 +16,12 @@ export const DataTableSucursal = ({ onOpenModalCustom, otrosBotones }: { onOpenM
         },
         {
             id: 1,
-            header: 'Código',
+            header: 'Código', campoBusqueda: 'codigo',
             render: (rowData: SucursalProps) => <span>{rowData.codigo}</span>,
         },
         {
             id: 2,
-            header: 'Nombre',
+            header: 'Nombre', campoBusqueda: 'nombre',
             render: (rowData: SucursalProps) => <span>{rowData.nombre}</span>,
         },
         {
@@ -31,7 +31,7 @@ export const DataTableSucursal = ({ onOpenModalCustom, otrosBotones }: { onOpenM
         },
         {
             id: 5,
-            header: 'Dirección',
+            header: 'Dirección', campoBusqueda: 'direccion',
             render: (rowData: SucursalProps) => <span>{rowData.direccion}</span>,
         },
         {
@@ -41,17 +41,17 @@ export const DataTableSucursal = ({ onOpenModalCustom, otrosBotones }: { onOpenM
         },
         {
             id: 7,
-            header: 'Teléfono',
+            header: 'Teléfono', campoBusqueda: 'telefono',
             render: (rowData: SucursalProps) => <span>{rowData.telefono}</span>,
         },
         {
             id: 8,
-            header: 'Email',
+            header: 'Email', campoBusqueda: 'email',
             render: (rowData: SucursalProps) => <span>{rowData.email}</span>,
         },
         {
             id: 9,
-            header: 'Responsable',
+            header: 'Responsable', campoBusqueda: 'label_responsable',
             render: (rowData: SucursalProps) => <span>{rowData.label_responsable}</span>,
         },
         {

@@ -1,4 +1,5 @@
-import { Tab, Tabs } from 'react-bootstrap'
+import { TabsCR } from '@/components/Tabs/TabsCR'
+import { TabCR } from '@/components/Tabs/TabCR'
 import { useSearchParams } from 'react-router-dom'
 import { TabComentarios } from '@/pages/PerfilColaborador/Tabs/TabComentarios/TabComentarios'
 import { TabArchivos } from '@/pages/PerfilColaborador/Tabs/TabArchivos/TabArchivos'
@@ -21,31 +22,31 @@ export const InfoTabColaborador = () => {
     };
 
   return (
-    <Tabs
+    <TabsCR
         defaultActiveKey="profile"
         id="uncontrolled-tab-example"
         className="mb-3 card-mode-actual"
         activeKey={activeTab}
         onSelect={handleSelect}
     >
-      <Tab eventKey="datos-personales" title="Datos personales">
+      <TabCR eventKey="datos-personales" title="Datos personales">
         <TabDatosPersonales/>
-      </Tab>
-      <Tab eventKey="datos-laborales" title="Contratos laborales">
+      </TabCR>
+      <TabCR eventKey="datos-laborales" title="Contratos laborales">
         <TabContratosLaborales/>
-      </Tab>
-      <Tab eventKey="archivos" title="Archivos">
+      </TabCR>
+      <TabCR eventKey="archivos" title="Archivos">
         <TabArchivos/>
-      </Tab>
-      <Tab eventKey="comentarios" title="Comentarios">
+      </TabCR>
+      <TabCR eventKey="comentarios" title="Comentarios">
         <TabComentarios/>
-      </Tab>
-      <Tab eventKey="contacto-emergencia" title="Contactos de emergencia">
+      </TabCR>
+      <TabCR eventKey="contacto-emergencia" title="Contactos de emergencia">
         <TabContactoEmergencia/>
-      </Tab>
-      <Tab eventKey="acceso-sistema" title="Acceso al sistema">
+      </TabCR>
+      <TabCR eventKey="acceso-sistema" title="Acceso al sistema">
         <TabArchivos/>
-      </Tab>
-    </Tabs>
+      </TabCR>
+    </TabsCR>
   )
 }

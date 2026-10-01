@@ -3,6 +3,7 @@ import ModalCR from '../Modal/ModalCR';
 import { InputSearcherCR } from '../TextFields/InputSearcherCR';
 import { ItemSearching } from './ItemSearching';
 import { useDebounce } from '@/hook/useDebounce';
+import type { AjusteFoto } from '../Avatar/encuadreFoto';
 
 export type ItemResultado = {
     id: number;
@@ -11,6 +12,8 @@ export type ItemResultado = {
     email_personal: string;
     dni: string;
     avatar?: string;
+    /** Encuadre de la foto (x, y, zoom); sin él se muestra centrada */
+    ajusteAvatar?: AjusteFoto | null;
 }
 
 type ModalSearchingProps = {
@@ -77,6 +80,7 @@ export const ModalSearching = ({isOpen, onHide, id, labelInput='Buscar por nombr
                             nombre={item.nombre}
                             dni={item.dni}
                             avatar={item.avatar}
+                            ajusteAvatar={item.ajusteAvatar}
                             email={item.email_personal}
                             telefono={item.telefono}
                             onClick={onSelectItem}

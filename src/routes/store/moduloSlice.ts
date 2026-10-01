@@ -19,7 +19,8 @@ export type moduloProps = {
     id_tipo: number,
     icono?: IconName,
     label: string,
-    descripcion: string
+    descripcion: string,
+    url?: string
   }
 };
 export type moduloState={

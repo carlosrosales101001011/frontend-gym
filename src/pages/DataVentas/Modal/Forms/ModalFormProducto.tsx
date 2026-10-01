@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
-import httpClient from '@/common/helpers/httpClient'
 import ModalCR from '@/components/Modal/ModalCR'
 import { ButtonCR } from '@/components/Button/ButtonCR'
 import { InputMontoCR } from '@/components/TextFields/InputMontoCR'
@@ -8,6 +7,7 @@ import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
 import type { ProductoProps } from '@/pages/PuntoVenta/store/ventaSlice'
 import type { DetalleProductoProps, ProductoForm } from '../../types'
 import { aNumero, formatearMoneda, redondear2 } from '../../helpers'
+import { useOpcionesVenta } from '../../hook/useOpcionesVenta'
 
 const formularioVacio: ProductoForm = {
   id_producto: 0,
@@ -54,10 +54,11 @@ const FormularioProducto = ({ detalle, onHide, onGuardar }: Omit<ModalFormProduc
   const [form, setForm] = useState<ProductoForm>(() => (detalle ? aFormulario(detalle) : formularioVacio))
   const [guardando, setGuardando] = useState(false)
   const [productos, setProductos] = useState<ProductoProps[]>([])
+  const { obtenerProductos } = useOpcionesVenta()
 
   useEffect(() => {
-    httpClient.get('/producto')
-      .then(({ data }: { data: { lista: ProductoProps[] } }) => setProductos(data.lista))
+    obtenerProductos()
+      .then(setProductos)
       .catch(console.error)
   }, [])
 

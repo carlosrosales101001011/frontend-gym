@@ -15,22 +15,22 @@ export const DataTableModulos = ({ onOpenModalCustom, otrosBotones }: { onOpenMo
         },
         {
             id: 1,
-            header: 'Icono',
+            header: 'Icono', campoBusqueda: 'icono',
             render: (rowData: ModuloProps) => <span>{rowData.icono}</span>,
         },
         {
             id: 2,
-            header: 'Nombre',
+            header: 'Nombre', campoBusqueda: 'label',
             render: (rowData: ModuloProps) => <span>{rowData.label}</span>,
         },
         {
             id: 3,
-            header: 'Descripción',
+            header: 'Descripción', campoBusqueda: 'descripcion',
             render: (rowData: ModuloProps) => <span>{rowData.descripcion}</span>,
         },
         {
             id: 4,
-            header: 'Url',
+            header: 'Url', campoBusqueda: 'url',
             render: (rowData: ModuloProps) => <span>{rowData.url}</span>,
         },
         {
