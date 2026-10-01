@@ -93,7 +93,7 @@ export const AppRoutes = () => {
             <Route path="extension-regalos" element={<ExtensionRegalos/>}/>
             <Route path="programa-planes" element={<GestionPlanesEntrenamiento/>}/>
             <Route path="gestion-metas" element={<GestionMetas/>}/>
-            <Route path="reporte-meta" element={<ReporteMetas/>}/>
+            <Route path="reporte-metas" element={<ReporteMetas/>}/>
             <Route path="reporte-venta" element={<ReporteVentas/>}/>
             <Route path="modulo-x-user" element={<ModulosxUsuario/>}/>
             <Route path="asistencia" element={<GestionAsistencias/>}/>

@@ -9,7 +9,7 @@ import { BuscadorPersona } from '@/components/BuscadorPersona/BuscadorPersona'
 const ID_TIPO_COLABORADOR = 1
 const ID_TIPO_CLIENTE = 2
 
-type CampoEditable = 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'n_comprobante' | 'observacion'
+type CampoEditable = 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'id_tipo_cli' | 'n_comprobante' | 'observacion'
 
 const CampoInfo = ({ label, valor, onDoubleClick }: { label: string, valor: string, onDoubleClick: () => void }) => (
   <div className="mb-2" onDoubleClick={onDoubleClick} style={{ cursor: 'pointer' }}>
@@ -21,17 +21,20 @@ const CampoInfo = ({ label, valor, onDoubleClick }: { label: string, valor: stri
 export const InformacionCliente = () => {
   const { cargar: cargarComprobantes, data: dataComprobantes } = useTerminologiaPersona('tipoComprobantes')
   const { cargar: cargarOrigenVenta, data: dataOrigenVenta } = useTerminologiaPersona('origenVenta')
+  const { cargar: cargarTipoCliente, data: dataTipoCliente } = useTerminologiaPersona('tipoClienteVenta')
   const { venta, sucursales, clienteSeleccionado, onSelectCliente, asesorSeleccionado, onSelectAsesor, onActualizarVenta } = useVentasStore()
   const [campoEditando, setCampoEditando] = useState<CampoEditable | null>(null)
 
   useEffect(() => {
     cargarComprobantes()
     cargarOrigenVenta()
+    cargarTipoCliente()
   }, [])
 
   const labelOrigen = dataOrigenVenta.find((opcion) => opcion.value === venta.id_origen)?.label ?? ''
   const labelSucursal = sucursales.find((opcion) => opcion.value === venta.id_sucursal)?.label ?? ''
   const labelComprobante = dataComprobantes.find((opcion) => opcion.value === venta.id_tipo_comprobante)?.label ?? ''
+  const labelTipoCliente = dataTipoCliente.find((opcion) => opcion.value === venta.id_tipo_cli)?.label ?? ''
 
   const cerrarEdicion = () => setCampoEditando(null)
 
@@ -64,6 +67,20 @@ export const InformacionCliente = () => {
         </div>
 
         <Row>
+          <Col lg={12}>
+            {campoEditando === 'id_tipo_cli' ? (
+              <InputSelectCR
+                options={dataTipoCliente}
+                label='Tipo de cliente'
+                defaultValue={String(venta.id_tipo_cli)}
+                onChange={(e) => onActualizarVenta('id_tipo_cli', Number(e.target.value))}
+                autoFocus
+                onBlur={cerrarEdicion}
+              />
+            ) : (
+              <CampoInfo label="Tipo de cliente" valor={labelTipoCliente} onDoubleClick={() => setCampoEditando('id_tipo_cli')} />
+            )}
+          </Col>
           <Col lg={6}>
             {campoEditando === 'id_origen' ? (
               <InputSelectCR

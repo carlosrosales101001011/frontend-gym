@@ -13,10 +13,12 @@ const ID_TIPO_CLIENTE = 2
 export const DetalleVentaApp = () => {
   const { cargar: cargarComprobantes, data: dataComprobantes } = useTerminologiaPersona('tipoComprobantes')
   const { cargar: cargarOrigenVenta, data: dataOrigenVenta } = useTerminologiaPersona('origenVenta')
+  const { cargar: cargarTipoCliente, data: dataTipoCliente } = useTerminologiaPersona('tipoClienteVenta')
   const { obtenerOpSucursales, sucursales, venta, clienteSeleccionado, onSelectCliente, asesorSeleccionado, onSelectAsesor, onActualizarVenta } = useVentasStore()
   useMemo(() => {
     cargarComprobantes()
     cargarOrigenVenta()
+    cargarTipoCliente()
     obtenerOpSucursales()
   }, [])
 
@@ -45,6 +47,16 @@ export const DetalleVentaApp = () => {
                   value={clienteSeleccionado}
                   onSelect={onSelectCliente}
                   required
+                />
+              </div>
+            </Col>
+            <Col lg={12}>
+              <div className="mt-3">
+                <InputSelectCR
+                  options={dataTipoCliente}
+                  label='Tipo de cliente'
+                  defaultValue={String(venta.id_tipo_cli)}
+                  onChange={(e) => onActualizarVenta('id_tipo_cli', Number(e.target.value))}
                 />
               </div>
             </Col>

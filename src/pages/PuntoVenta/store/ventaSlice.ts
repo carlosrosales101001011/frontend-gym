@@ -55,6 +55,8 @@ export type DetallePagoVentaProps = {
 
 export type VentaProps ={
   id_cli: number;
+  /** Tipo de cliente (terminología venta/cliente/tipo); 0 = sin elegir */
+  id_tipo_cli: number;
   id_empl: number;
   id_tipo_comprobante: number;
   n_comprobante: string;
@@ -183,6 +185,7 @@ export const initialVenta: VentaProps = {
   id_cli: 0,
   id_empl: 0,
   id_tipo_comprobante: 0,
+  id_tipo_cli: 0,
   n_comprobante: '',
   id_origen: 0,
   id_sucursal: 0,
@@ -228,7 +231,7 @@ export const ventaSlice = createSlice({
       state.asesorSeleccionado = action.payload;
       state.venta.id_empl = action.payload?.id ?? 0;
     },
-    onActualizarVentaCampo: (state, action: PayloadAction<{ name: 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'n_comprobante' | 'observacion', value: string | number }>) => {
+    onActualizarVentaCampo: (state, action: PayloadAction<{ name: 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'id_tipo_cli' | 'n_comprobante' | 'observacion', value: string | number }>) => {
       const { name, value } = action.payload;
       (state.venta[name] as string | number) = value;
     },

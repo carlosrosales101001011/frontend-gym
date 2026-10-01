@@ -82,7 +82,7 @@ export const useVentasStore = () => {
       const onSelectAsesor = (asesor: ItemResultado | null) => {
         dispatch(onSetAsesorSeleccionado(asesor))
       }
-      const onActualizarVenta = (name: 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'n_comprobante' | 'observacion', value: VentaProps[typeof name]) => {
+      const onActualizarVenta = (name: 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'id_tipo_cli' | 'n_comprobante' | 'observacion', value: VentaProps[typeof name]) => {
         dispatch(onActualizarVentaCampo({ name, value }))
       }
       const onSelectPrograma = (id_programa: number) => {
@@ -142,8 +142,9 @@ export const useVentasStore = () => {
         setLoadingVenta(true)
         const inicio = Date.now()
         try {
-          const { detalleventa_membresias, detalleventa_productos, detalleventa_pagos, montoTotal, ...ventaData } = venta
-          const dataVenta = await postVenta(ventaData)
+          const { detalleventa_membresias, detalleventa_productos, detalleventa_pagos, montoTotal, id_tipo_cli, ...ventaData } = venta
+          // El tipo de cliente es opcional: sin elegir no se envía
+          const dataVenta = await postVenta({ ...ventaData, ...(id_tipo_cli ? { id_tipo_cli } : {}) })
           const id_venta = dataVenta?.data?.id
 
           if (detalleventa_membresias.id_programa) {
