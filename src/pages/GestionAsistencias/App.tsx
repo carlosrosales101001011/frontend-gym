@@ -38,7 +38,7 @@ export const App = () => {
       )}
       <DataTableAsistencias
         otrosBotones={<ButtonCR label={'Registrar asistencia'} onClick={() => onOpenModalCustom(0)} icon={<IconCR name='plus' size={14}/>}/>}
-        onOpenModalCustom={onOpenModalCustom}
+        // onOpenModalCustom={onOpenModalCustom}
       />
     </div>
   )

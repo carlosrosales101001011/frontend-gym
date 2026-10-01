@@ -1,17 +1,16 @@
 import { DataTableTest } from "@/components/DataTableTest/DataTableTest"
-import IconCR from "@/components/Icons/IconCR"
 import { formatDate } from "@/helpers/FormatDate"
 import type { AsistenciaProps } from "../store/asistenciasSlice"
 import { useAsistenciasStore } from "../hook/useAsistenciasStore"
 
 type DataTableAsistenciasProps = {
-  onOpenModalCustom: (id: number) => void
+  onOpenModalCustom?: (id: number) => void
   otrosBotones: React.ReactNode
 }
 
 /** Listado de asistencias (la más reciente primero, lo ordena el backend) */
-export const DataTableAsistencias = ({ onOpenModalCustom, otrosBotones }: DataTableAsistenciasProps) => {
-  const { asistencias, eliminarAsistencia } = useAsistenciasStore()
+export const DataTableAsistencias = ({  otrosBotones }: DataTableAsistenciasProps) => {
+  const { asistencias } = useAsistenciasStore()
 
   const columns = [
     {
