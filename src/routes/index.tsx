@@ -31,7 +31,7 @@ const GestionTerminologiaFinanzas = lazy(() => import('@/pages/GestionTerminolog
 // TODO: PERFILES
 const Perfil = lazy(() => import('@/pages/perfil'));
 const PerfilColaborador = lazy(() => import('@/pages/PerfilColaborador/Index'));
-const PerfilCliente = lazy(() => import('@/pages/PerfilCliente/Index'));
+// const PerfilCliente = lazy(() => import('@/pages/PerfilCliente/Index'));
 //TODO: CONFIGURACIONES APROXI
 const GestionModulos = lazy(() => import('@/pages/GestionModulos'));
 const GestionSecciones = lazy(() => import('@/pages/GestionSecciones'));
