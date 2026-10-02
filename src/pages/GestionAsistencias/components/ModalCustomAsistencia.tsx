@@ -10,6 +10,10 @@ import { ButtonCR } from "@/components/Button/ButtonCR";
 import { BuscadorPersona } from "@/components/BuscadorPersona/BuscadorPersona";
 import type { ItemResultado } from "@/components/ModalSearching/ModalSearching";
 import { useAsistenciasStore } from "../hook/useAsistenciasStore";
+import { useMembresiaActual } from "../hook/useMembresiaActual";
+import { CardMembresiaAsistencia } from "./CardMembresiaAsistencia";
+
+const ID_TIPO_COLABORADOR = 1
 
 /** Tipo de evento de una asistencia registrada a mano (terminología persona/asistencia/tipo) */
 const TIPO_EVENTO_MANUAL = 'manual'
@@ -42,6 +46,9 @@ export const ModalCustomAsistencia = ({ id, show, onHide }: ModalCustomAsistenci
   // Al registrar corre el reloj; al editar se muestra la fecha guardada
   const ahora = useFechaActual(!esEdicion)
   const fechaMostrada = asistencia ? new Date(asistencia.fecha_registro) : ahora
+  // Membresía (programa, plan y si está pagada) solo para clientes: los colaboradores no tienen
+  const esColaborador = persona?.idTipo === ID_TIPO_COLABORADOR
+  const { membresia, cargando: cargandoMembresia } = useMembresiaActual(esColaborador ? undefined : persona?.id)
 
   useEffect(() => {
     cargarTiposEvento()
@@ -96,6 +103,11 @@ export const ModalCustomAsistencia = ({ id, show, onHide }: ModalCustomAsistenci
               />
               {errorPersona && <span className="text-danger fw-bold px-2" style={{ fontSize: '11px' }}>{errorPersona}</span>}
             </Col>
+            {persona && !esColaborador && (
+              <Col lg={12}>
+                <CardMembresiaAsistencia membresia={membresia} cargando={cargandoMembresia} />
+              </Col>
+            )}
             <Col lg={12}>
               {/* Solo informativo: la fecha la pone el backend */}
               <InputCR label='Fecha y hora' value={formatDate(fechaMostrada, 'yyyy-mm-dd', 'dd/mm/yyyy hh:mm')} readOnly disabled />

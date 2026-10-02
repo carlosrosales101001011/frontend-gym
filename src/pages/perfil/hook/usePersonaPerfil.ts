@@ -13,6 +13,8 @@ export type PersonaPerfilProps = {
   email_personal: string
   telefono: string
   uid_avatar?: string
+  /** Ubicación de sus comentarios (comentario.uid_location) */
+  uid_comentario?: string
   url_avatar?: string
   /** Url de la última imagen del avatar en blob_storage ('' si se quitó la foto) */
   url_avatar_ultimo?: string

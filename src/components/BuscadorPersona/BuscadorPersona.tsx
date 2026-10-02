@@ -36,6 +36,7 @@ export const BuscadorPersona = ({ idTipo, label, placeholder = 'Buscar por nombr
     ajusteAvatar: ajusteAvatarUltimo(persona),
     email_personal: persona.email_personal,
     telefono: persona.telefono,
+    idTipo: persona.id_tipo,
   })), [personas, idTipo])
 
   const onSelectPersona = (id: number) => {

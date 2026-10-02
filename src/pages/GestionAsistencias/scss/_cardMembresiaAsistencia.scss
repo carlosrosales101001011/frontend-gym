@@ -1,0 +1,64 @@
+// Membresía del cliente en "Registrar asistencia" (CardMembresiaAsistencia): verde pagada, rojo falta pagar
+.card-membresia-asistencia {
+  padding: 10px 12px;
+  border: 1px solid $card-border-actual;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background-color: $card-actual;
+  font-size: 13px;
+
+  &__programa {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  &__plan {
+    opacity: 0.8;
+  }
+
+  &__estado {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    svg {
+      color: #fff;
+    }
+  }
+
+  &__pie {
+    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.75;
+  }
+
+  &--pagada {
+    border-color: #198754;
+    background-color: rgba(25, 135, 84, 0.12);
+
+    .card-membresia-asistencia__estado {
+      background-color: #198754;
+    }
+  }
+
+  &--deuda {
+    border-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.12);
+
+    .card-membresia-asistencia__estado {
+      background-color: #dc3545;
+    }
+  }
+
+  &--sin {
+    opacity: 0.7;
+    font-style: italic;
+  }
+}

@@ -30,6 +30,7 @@ import { MdOutlineBarChart, MdOutlineDarkMode, MdOutlineLightMode, MdOutlineNoti
 import { PiCirclesFourFill } from "react-icons/pi";
 import { MdWifi, MdWifi2Bar, MdWifiOff } from "react-icons/md";
 import { MdZoomIn, MdZoomOut, MdRotateLeft, MdRotateRight } from "react-icons/md";
+import { MdCardMembership, MdOutlineFolder, MdOutlineComment, MdOutlineContactPhone } from "react-icons/md";
 
 export type IconName =
   | "user"
@@ -87,7 +88,11 @@ export type IconName =
   | 'zoomIn'
   | 'zoomOut'
   | 'rotateLeft'
-  | 'rotateRight';
+  | 'rotateRight'
+  | 'membresia'
+  | 'carpeta'
+  | 'comentarios'
+  | 'contactoTelefono';
 
 const icons: Record<IconName, IconType> = {
   user: FaUser,
@@ -146,6 +151,10 @@ const icons: Record<IconName, IconType> = {
   zoomOut: MdZoomOut,
   rotateLeft: MdRotateLeft,
   rotateRight: MdRotateRight,
+  membresia: MdCardMembership,
+  carpeta: MdOutlineFolder,
+  comentarios: MdOutlineComment,
+  contactoTelefono: MdOutlineContactPhone,
 };
 
 type Props = {

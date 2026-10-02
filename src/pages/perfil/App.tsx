@@ -1,22 +1,20 @@
 import { CardContenedor } from "./CardContenedor"
 import { CardInfo } from "./CardInfo"
 
+/** Perfil del cliente: info a la izquierda y pestañas a la derecha; en celular, uno debajo del otro (_perfilLayout.scss) */
 export const App = () => {
   return (
-    <div>
-    <div className="view-h-100 d-flex">
-      <div className="p-3" style={{height: '100%', width: '380px'}} >
-        <div className='d-flex flex-column card p-3 card-mode-actual' style={{height: '100%'}}>
+    <div className="view-h-100 perfil-layout">
+      <div className="perfil-layout__info p-3">
+        <div className='d-flex flex-column card p-3 card-mode-actual h-100'>
           <CardInfo/>
         </div>
       </div>
-      <div className=" p-3" style={{height: '100%', width: '100%'}} >
-        <div className='d-flex flex-column card p-3 card-mode-actual'  style={{height: '100%'}}>
-            <CardContenedor/>
+      <div className="perfil-layout__contenedor p-3">
+        <div className='d-flex flex-column card p-3 card-mode-actual h-100'>
+          <CardContenedor/>
         </div>
       </div>
-    </div>
-          
     </div>
   )
 }

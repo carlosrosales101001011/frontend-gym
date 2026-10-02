@@ -7,12 +7,24 @@ import { initialComentario, type ComentarioProps } from '@/components/Comentario
 import { InputCR } from '@/components/TextFields/InputCR';
 import type { RootState } from '@/stores/Store';
 import { useSelector } from 'react-redux';
+import { useSesionStore } from '@/hook/useSesionStore';
+import { AvatarCirculo } from '@/components/Avatar/AvatarCirculo';
+import { ajusteAvatarUltimo } from '@/components/Avatar/encuadreFoto';
+import { getBlobUrl } from '@/helpers/blobUrl';
+
+/** Tamaño de las fotos de los comentarios (px) */
+const TAMANO_AVATAR = 55
 type props = {
     uid_location: string;
 }
 export const ContainerComentarios = ({uid_location}:props) => {
     const { obtenerComentariosxUIDLOCATION, postComentario, loading, patchComentario } = useComentarioStore()
     const { comentarios } = useSelector((state: RootState)=>state.COMENTARIO)
+    // Quien comenta es el usuario logueado: su nombre y su foto van junto al formulario
+    const { usuario, nombreUsuario, obtenerUsuarioSesion } = useSesionStore()
+    useEffect(() => {
+      if (!usuario) obtenerUsuarioSesion()
+    }, [])
     const [editingId, setEditingId] = useState<number | null>(null)
     const { register, formState: { errors }, handleSubmit, getValues, reset}  = useForm<ComentarioProps>({mode: 'onSubmit', defaultValues: initialComentario})
     useEffect(() => {
@@ -34,14 +46,15 @@ export const ContainerComentarios = ({uid_location}:props) => {
   return (
     <div>
       <div className="d-flex flex-row" style={{width: '100%'}}>
-        <div className="">
-            <span className="w-50 rounded-5">
-                <img className="" style={{width: '55px', borderRadius: '50%'}}  src="https://archivosluroga.blob.core.windows.net/avatarclientes/AVATAR-1769827631140.PNG"></img>
-            </span>
-        </div>
+        <AvatarCirculo
+          src={getBlobUrl(usuario?.avatar?.url_avatar_ultimo)}
+          alt={nombreUsuario}
+          ajuste={ajusteAvatarUltimo(usuario?.avatar)}
+          tamano={TAMANO_AVATAR}
+        />
         <div className="mx-2 w-100">
           <span style={{fontSize: '15px'}}>
-              Carlos Rosales Morales
+              {nombreUsuario}
           </span>
           <div className='mt-3'>
             <form onSubmit={handleSubmit(onSubmitComentario)}>
@@ -65,7 +78,10 @@ export const ContainerComentarios = ({uid_location}:props) => {
                 <AppComentario  
     isEditing={editingId === m.id}
     onOpenEdit={() => setEditingId(m.id)}
-    onCloseEdit={() => setEditingId(null)} id={m.id} onUpdated={onUpdateComentario} comentario={m.comentario} fecha_created={m.fecha_created} fecha_update={m.fecha_updated} nombre_usuario={m.usuario.nombres} />
+    onCloseEdit={() => setEditingId(null)} id={m.id} onUpdated={onUpdateComentario} comentario={m.comentario} fecha_created={m.fecha_created} fecha_update={m.fecha_updated}
+    nombre_usuario={`${m.usuario?.nombres ?? ''} ${m.usuario?.apellidos ?? ''}`.trim()}
+    avatar={getBlobUrl(m.avatar_usuario?.url_avatar_ultimo)}
+    ajusteAvatar={ajusteAvatarUltimo(m.avatar_usuario)} />
               )
             })
           }

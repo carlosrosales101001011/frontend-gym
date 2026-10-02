@@ -10,7 +10,7 @@ import { Col, Row } from "react-bootstrap";
 import { InputCR } from "@/components/TextFields/InputCR";
 import { InputSelectCR } from "@/components/TextFields/InputSelectCR";
 import { ButtonCR } from "@/components/Button/ButtonCR";
-import { quitarCamposAvatar } from '@/helpers/quitarCamposAvatar'
+import { quitarCamposSoloLectura } from '@/helpers/quitarCamposSoloLectura'
 
 export const TabDatosPersonales = () => {
   const { uid_colaborador } = useParams<{ uid_colaborador: string }>();
@@ -33,8 +33,8 @@ export const TabDatosPersonales = () => {
   }, [colaborador]);
   if (loading)return( <>LOADING</>)
   const onSubmitActualizar = ()=>{
-    // La foto no va en el formulario: sus campos (url_avatar, encuadre...) no están en el DTO de persona
-    const { id, uuid, ...v } = quitarCamposAvatar(getValues())
+    // La foto no va en el formulario: sus campos (url_avatar, encuadre...) y uid_comentario no están en el DTO de persona
+    const { id, uuid, ...v } = quitarCamposSoloLectura(getValues())
     console.log({id, uuid});
     patchColaborador(colaborador.id, colaborador.uuid, v as ColaboradorProps)
   }

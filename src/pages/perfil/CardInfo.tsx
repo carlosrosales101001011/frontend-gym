@@ -33,22 +33,38 @@ export const CardInfo = () => {
     : ''
 
   return (
-    <div className='d-flex flex-column position-relative' style={{ minHeight: '200px' }}>
+    <div className='card-info d-flex flex-column position-relative' style={{ minHeight: '200px' }}>
       {/* Topbar: "Clientes > Nombres Apellidos" (y el título de la pestaña del navegador) */}
       <PageBreadCumb title={nombreCompleto} />
       {/* Solo la primera vez cubre la tarjeta; al refrescar tras cambiar la foto se mantiene a la vista */}
       <LoadingOverlay show={cargando && !persona} interno texto='Cargando cliente' />
       {persona && (
         <>
-          <AvatarFoto
-            src={getBlobUrl(persona.url_avatar_ultimo)}
-            alt={nombreCompleto}
-            ajuste={ajusteAvatarUltimo(persona)}
-            tamano={100}
-            className='mx-auto mb-3'
-            cargando={subiendo}
-            onClick={() => setShowModalAvatar(true)}
-          />
+          {/* Cabecera: en celular es una fila (foto | nombre, email, teléfono); en escritorio, una columna centrada */}
+          <div className='card-info__cabecera'>
+            <AvatarFoto
+              src={getBlobUrl(persona.url_avatar_ultimo)}
+              alt={nombreCompleto}
+              ajuste={ajusteAvatarUltimo(persona)}
+              tamano={100}
+              className='card-info__foto'
+              cargando={subiendo}
+              onClick={() => setShowModalAvatar(true)}
+            />
+            <div className='card-info__datos'>
+              <span className='card-info__nombre color-mode-actual'>{nombreCompleto}</span>
+              <div className='card-info__contacto'>
+                <div className='card-info__campo'>
+                  <span className='card-info__etiqueta'>Email:</span>
+                  <span className='text-break'>{persona.email_personal?.trim() || <span className='opacity-75'>Sin email</span>}</span>
+                </div>
+                <div className='card-info__campo'>
+                  <span className='card-info__etiqueta'>Teléfono:</span>
+                  <span className='text-break'>{persona.telefono?.trim() || <span className='opacity-75'>Sin teléfono</span>}</span>
+                </div>
+              </div>
+            </div>
+          </div>
           <ModalCustomAvatar
             show={showModalAvatar}
             onHide={() => setShowModalAvatar(false)}
@@ -59,19 +75,8 @@ export const CardInfo = () => {
             onActualizar={async (archivo) => alTerminar(await subirFoto(persona, archivo))}
             onEliminar={async () => alTerminar(await eliminarFoto(persona))}
           />
-          <div className='my-1 text-center'>
-            <span className='fs-4 color-mode-actual'>{nombreCompleto}</span>
-          </div>
-          <div className='mt-2'>
+          <div className='card-info__activo'>
             <CardActivoDesde/>
-          </div>
-          <div className='my-3'>
-            <div className='fw-bold'>Email:</div>
-            <span className='text-break'>{persona.email_personal?.trim() || <span className='opacity-75'>Sin email</span>}</span>
-          </div>
-          <div className='my-3'>
-            <div className='fw-bold'>Telefono:</div>
-            <span className='text-break'>{persona.telefono?.trim() || <span className='opacity-75'>Sin teléfono</span>}</span>
           </div>
         </>
       )}

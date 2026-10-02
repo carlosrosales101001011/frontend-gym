@@ -7,6 +7,8 @@ import {  type ComentarioProps } from "@/components/Comentario/comentarioSlice";
 import { useComentarioStore } from "@/components/Comentario/useComentarioStore";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/Store";
+import { AvatarCirculo } from "@/components/Avatar/AvatarCirculo";
+import type { AjusteFoto } from "@/components/Avatar/encuadreFoto";
 type props = {
     nombre_usuario: string;
     fecha_update: string;
@@ -17,8 +19,11 @@ type props = {
     onOpenEdit: () => void;      // 👈 viene del padre
     onCloseEdit: () => void;     // 👈 viene del padre
     onUpdated: (comentario:string, id:number)=>void;
+    /** Foto del autor (url completa) y su encuadre; sin foto se muestra la silueta */
+    avatar?: string;
+    ajusteAvatar?: AjusteFoto | null;
 }
-export const AppComentario = ({nombre_usuario, fecha_update, fecha_created, comentario, id, onUpdated, isEditing, onOpenEdit, onCloseEdit}:props) => {
+export const AppComentario = ({nombre_usuario, fecha_update, fecha_created, comentario, id, onUpdated, isEditing, onOpenEdit, onCloseEdit, avatar, ajusteAvatar}:props) => {
     const { obtenerComentarioxID } = useComentarioStore()
     const { comentario:comentarioxID } = useSelector((state: RootState)=>state.COMENTARIO)
     useEffect(() => {
@@ -39,11 +44,7 @@ export const AppComentario = ({nombre_usuario, fecha_update, fecha_created, come
     }
   return (
     <div className="d-flex flex-row w-100" style={{width: '100%'}}>
-        <div className="">
-            <span className="w-50 rounded-5">
-                <img className="" style={{width: '55px', borderRadius: '50%'}}  src="https://archivosluroga.blob.core.windows.net/avatarclientes/AVATAR-1769827631140.PNG"></img>
-            </span>
-        </div>
+        <AvatarCirculo src={avatar} alt={nombre_usuario} ajuste={ajusteAvatar} tamano={55} />
         <div className="mx-2 w-100">
             <div className="fw-bold">
                 <span style={{fontSize: '15px'}}>

@@ -15,6 +15,8 @@ export type ItemResultado = {
     avatar?: string;
     /** Encuadre de la foto (x, y, zoom); sin él se muestra centrada */
     ajusteAvatar?: AjusteFoto | null;
+    /** Tipo de persona (1 colaborador, 2 cliente), si se conoce */
+    idTipo?: number;
 }
 
 type ModalSearchingProps = {

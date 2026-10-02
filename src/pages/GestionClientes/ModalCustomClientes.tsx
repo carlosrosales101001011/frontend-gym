@@ -11,7 +11,7 @@ import { initialStateClientes, type ClienteProps } from '@/pages/GestionClientes
 import { ButtonCR } from '@/components/Button/ButtonCR'
 import { useClientesStore } from '@/pages/GestionClientes/useClientesStore'
 import { removeNull } from '@/helpers/removeNull'
-import { quitarCamposAvatar } from '@/helpers/quitarCamposAvatar'
+import { quitarCamposSoloLectura } from '@/helpers/quitarCamposSoloLectura'
 import { SelectorFoto } from '@/components/Avatar/SelectorFoto'
 import { getBlobUrl } from '@/helpers/blobUrl'
 import type { AjusteFoto } from '@/components/Avatar/encuadreFoto'
@@ -83,9 +83,9 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
       }
     }, [dataxID, id]);
     const onSubmit = async (data:ClienteProps)=>{
-      // la foto se guarda aparte: sus campos (url_avatar, encuadre...) no van en el cliente
+      // la foto se guarda aparte: sus campos (url_avatar, encuadre...) y uid_comentario no van en el cliente
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const {id:idData, uid: uuid, ...rest} = removeNull(quitarCamposAvatar(data));
+      const {id:idData, uid: uuid, ...rest} = removeNull(quitarCamposSoloLectura(data));
       // los campos label_* son de solo lectura (calculados por el backend a partir de los id_*), nunca se reenvían
       const val = Object.fromEntries(
         Object.entries(rest).filter(([key]) => !key.startsWith('label_'))

@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { AvatarPersonaProps } from "@/stores/sesion/sesionSlice";
 
 export type ComentarioProps = {
   id: number;
@@ -12,6 +13,8 @@ export type ComentarioProps = {
     nombres: string;
     apellidos: string;
   }
+  /** Foto del autor (la de su colaborador); null si no tiene */
+  avatar_usuario?: AvatarPersonaProps | null;
 }
 export type ComentarioState={
     comentarios:ComentarioProps[],
