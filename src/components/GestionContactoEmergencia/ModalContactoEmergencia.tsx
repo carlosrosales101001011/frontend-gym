@@ -1,69 +1,71 @@
-import React, { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Col, Row } from 'react-bootstrap'
 import ModalCR from '@/components/Modal/ModalCR'
 import { InputCR } from '@/components/TextFields/InputCR'
-import { useContactoEmergenciaStore } from '@/components/GestionContactoEmergencia/useContactoEmergenciaStore'
-import { useForm } from '@/hook/useForm'
-import { initialContactoEmergencia, type ContactoEmergenciaProps } from '@/components/GestionContactoEmergencia/contactoEmergenciaSlice'
-import { ButtonCR } from '@/components/Button/ButtonCR'
-import { Col, Row } from 'react-bootstrap'
 import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
+import { ButtonCR } from '@/components/Button/ButtonCR'
+import { useForm } from '@/hook/useForm'
 import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
-import { useSelector } from 'react-redux'
-import type { RootState } from '@/stores/Store'
-type props ={
-    show: boolean;
-    onHide: ()=>void;
-    id:number;
-    uid_location: string;
+import { initialContactoEmergencia, type ContactoEmergenciaProps } from '@/components/GestionContactoEmergencia/contactoEmergenciaSlice'
+import type { ContactoEmergenciaForm } from '@/components/GestionContactoEmergencia/useContactoEmergenciaStore'
+
+type props = {
+    onHide: () => void;
+    /** Contacto a editar; null = agregar uno nuevo */
+    contacto: ContactoEmergenciaProps | null;
+    /**
+     * Guarda el contacto (con API o solo en memoria, lo decide AppContactoEmergencia).
+     * labelCargo: nombre del parentesco elegido, para mostrarlo sin pedirlo al backend. Devuelve true si se guardó.
+     */
+    onGuardar: (datos: ContactoEmergenciaForm, labelCargo: string) => Promise<boolean>;
 }
-export const ModalContactoEmergencia = ({show, onHide, id, uid_location}:props) => {
-    const { obtenerContactoEmergenciaxID, postContactoEmergencia, patchContactoEmergencia } = useContactoEmergenciaStore(uid_location)
-    const { data:dataParientes, cargar:cargarParientes } = useTerminologiaPersona('parientes');
-    const { contactoEmergencia } = useSelector((state: RootState)=>state.CONTACTO_EMERGENCIA)
+
+/**
+ * Agregar / editar un contacto de emergencia. Se monta al abrirse (ver AppContactoEmergencia):
+ * el formulario arranca vacío o con el contacto a editar.
+ */
+export const ModalContactoEmergencia = ({ onHide, contacto, onGuardar }: props) => {
+    const { data: dataParientes, cargar: cargarParientes } = useTerminologiaPersona('parientes')
+    const [guardando, setGuardando] = useState(false)
+    const { register, handleSubmit, formState: { errors } } = useForm<ContactoEmergenciaProps>({
+        defaultValues: contacto ?? initialContactoEmergencia,
+        mode: 'onChange',
+    })
+
     useEffect(() => {
-        if (id!==0) {
-            obtenerContactoEmergenciaxID(id)
-        }
-    }, [id])
-    const { getValues, register, reset, handleSubmit, formState: {errors} } = useForm({defaultValues: initialContactoEmergencia, mode: 'onChange'})
-    useEffect(() => {
-        if (show) {
-            cargarParientes()
-        }
-    }, [show])
-    useEffect(() => {
-        if (id === 0) {
-            reset(initialContactoEmergencia);
-        } else {
-            reset(contactoEmergencia);
-        }
-    }, [contactoEmergencia, id])
-    const onSubmit = ()=>{
-        const { id:idm, tipoPariente, ...val } = getValues()
-        console.log({idm, tipoPariente});
-        if(id===0){
-            postContactoEmergencia(val as ContactoEmergenciaProps)
-        }else{
-            patchContactoEmergencia(id, val as ContactoEmergenciaProps)
-        }
-        cancelar()
+        cargarParientes()
+    }, [])
+
+    // Solo los campos que acepta el backend (lo demás que trae, como label_cargo o uid_location, da 400)
+    const onSubmit = async (valores: ContactoEmergenciaProps) => {
+        const id_cargo = Number(valores.id_cargo)
+        setGuardando(true)
+        const guardado = await onGuardar({
+            nombres: valores.nombres,
+            apellido_paterno: valores.apellido_paterno,
+            apellido_materno: valores.apellido_materno,
+            telefono: valores.telefono,
+            email: valores.email,
+            observacion: valores.observacion,
+            id_cargo,
+        }, dataParientes.find((opcion) => opcion.value === id_cargo)?.label ?? '')
+        setGuardando(false)
+        if (guardado) onHide()
     }
-    const cancelar = ()=>{
-        reset(initialContactoEmergencia);
-        onHide()
-    }
+
   return (
-    <ModalCR onHide={cancelar} show={show}>
+    <ModalCR onHide={onHide} show>
         <ModalCR.Header>
-            Agregar contacto de emergencia
+            {contacto ? 'Editar contacto de emergencia' : 'Agregar contacto de emergencia'}
         </ModalCR.Header>
         <ModalCR.Body>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Row>
+                <Row className='g-2'>
                     <Col lg={12}>
                     <InputSelectCR {...register("id_cargo", {
-                        required: "Este campo es obligatorio"
-                        })} label='Parientes' options={dataParientes}/>
+                        setValueAs: Number,
+                        min: { value: 1, message: "Elige el parentesco" },
+                        })} label='Parentesco' options={dataParientes} defaultValue={String(contacto?.id_cargo ?? 0)} messageErrors={errors.id_cargo?.message}/>
                     </Col>
                     <Col lg={12}>
                     <InputCR {...register("nombres", {
@@ -79,7 +81,7 @@ export const ModalContactoEmergencia = ({show, onHide, id, uid_location}:props) 
                     <Col lg={6}>
                     <InputCR {...register("telefono", {
                         required: "Este campo es obligatorio"
-                        })} label='Telefono' type='normal' messageErrors={errors.telefono?.message}/>
+                        })} label='Teléfono' type='normal' messageErrors={errors.telefono?.message}/>
                     </Col>
                     <Col lg={6}>
                     <InputCR {...register("email", {
@@ -89,11 +91,13 @@ export const ModalContactoEmergencia = ({show, onHide, id, uid_location}:props) 
                     <Col lg={12}>
                     <InputCR {...register("observacion", {
                         required: "Este campo es obligatorio"
-                        })} label='Observacion' type='text-area' messageErrors={errors.email?.message}/>
+                        })} label='Observación' type='text-area' messageErrors={errors.observacion?.message}/>
                     </Col>
                 </Row>
-                <ButtonCR label={'Guardar'} type='submit'/>
-                <ButtonCR label={'Cancelar'} variant='danger' onClick={()=>cancelar()}/>
+                <div className='d-flex align-items-center mt-3'>
+                    <ButtonCR label={guardando ? 'Guardando...' : 'Guardar'} type='submit' disabled={guardando}/>
+                    <ButtonCR label={'Cancelar'} variant='link' onClick={onHide} disabled={guardando}/>
+                </div>
             </form>
         </ModalCR.Body>
     </ModalCR>

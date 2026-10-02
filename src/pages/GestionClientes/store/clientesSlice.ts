@@ -15,6 +15,8 @@ export type ClienteProps = {
   id_estado: number;
   id_tipo: number;
   uid_avatar?: string;
+  /** Ubicación de sus contactos de emergencia (lo crea el backend) */
+  uid_contactoEmergencia?: string;
   url_avatar?: string;
   /** Url de la última imagen del avatar en blob_storage ('' si se quitó la foto) */
   url_avatar_ultimo?: string;

@@ -43,7 +43,7 @@ export const CardContenedor = () => {
           <TabComentarios activo={activeTab === 'comentarios'}/>
         </TabCR>
         <TabCR eventKey="contacto-emergencia" title={<TituloTab icono="contactoTelefono" texto="Emergencia" />}>
-          <TabContactoEmergencia/>
+          <TabContactoEmergencia activo={activeTab === 'contacto-emergencia'}/>
         </TabCR>
       </TabsCR>
     </div>

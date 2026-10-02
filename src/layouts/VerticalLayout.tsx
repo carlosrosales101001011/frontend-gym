@@ -32,7 +32,7 @@ export const VerticalLayout = ({misSecciones, seccionEnMantenimiento}:Props) => 
             <div className="sidebar-overlay" onClick={onCloseSideBar}/>
         )}
         <div className={`principal-view ${isOpenSideBar.isOpen ? 'shift' : ''}`}>
-            <Topbar onOpenSideBar={onOpenSideBar}/>
+            <Topbar onOpenSideBar={onOpenSideBar} isOpenSideBar={isOpenSideBar.isOpen}/>
                 {seccionEnMantenimiento ? <SeccionMantenimiento nombre={seccionEnMantenimiento} /> : <Outlet/>}
         </div>
     </div>

@@ -2,6 +2,7 @@ import httpClient from "@/common/helpers/httpClient"
 import { useCrudhook } from "@/hook/usecrudhook"
 import { useBlobStorage } from "@/hook/useBlobStorage"
 import type { AjusteFoto } from "@/components/Avatar/encuadreFoto"
+import type { ContactoEmergenciaForm } from "@/components/GestionContactoEmergencia/useContactoEmergenciaStore"
 import { onSetDataClientes, type ClienteProps } from "@/pages/GestionClientes/store/clientesSlice"
 
 export const useClientesStore = () => {
@@ -26,8 +27,20 @@ export const useClientesStore = () => {
       await httpClient.delete(`/persona/avatar/${uid_avatar}`)
     }
 
+    /** Guarda los contactos de emergencia de una persona recién creada (uid_location = su uid_contactoEmergencia) */
+    const guardarContactosEmergencia = async (uid_contactoEmergencia: string, contactos: ContactoEmergenciaForm[]) => {
+      await Promise.all(contactos.map((contacto) => httpClient.post(`/contacto-emergencia/${uid_contactoEmergencia}`, contacto)))
+    }
+
+    /** Guarda el primer comentario de una persona recién creada (uid_location = su uid_comentario); el autor sale del token */
+    const guardarPrimerComentario = async (uid_comentario: string, comentario: string) => {
+      await httpClient.post('/comentario', { uid_location: uid_comentario, comentario })
+    }
+
   return {
     remove,
+    guardarContactosEmergencia,
+    guardarPrimerComentario,
     obtenerxID,
     dataxID,
     patch,

@@ -1,6 +1,6 @@
 /**
  * Campos de la persona que manda el backend pero no están en su DTO: los de la foto (los maneja él al
- * subir, ajustar o quitar la foto) y uid_comentario (lo crea al registrar la persona).
+ * subir, ajustar o quitar la foto), uid_comentario y uid_contactoEmergencia (los crea al registrar la persona).
  * Reenviarlos en un PATCH/POST de persona da 400 (forbidNonWhitelisted).
  */
 export const CAMPOS_PERSONA_SOLO_LECTURA = [
@@ -11,6 +11,7 @@ export const CAMPOS_PERSONA_SOLO_LECTURA = [
   'avatar_zoom_ultimo',
   'avatar',
   'uid_comentario',
+  'uid_contactoEmergencia',
 ] as const
 
 type CampoSoloLectura = typeof CAMPOS_PERSONA_SOLO_LECTURA[number]

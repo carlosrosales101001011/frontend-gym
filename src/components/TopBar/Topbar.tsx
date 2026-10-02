@@ -7,8 +7,10 @@ import { IconosTopbar } from '@/components/TopBar/IconosTopbar';
 import { NombreModulo } from '@/components/TopBar/NombreModulo';
 type props = {
 onOpenSideBar:()=>void;
+/** Con el sidebar abierto el logo va en el sidebar; cerrado, aquí */
+isOpenSideBar?: boolean;
 }
-export const Topbar = ({onOpenSideBar}:props) => {
+export const Topbar = ({onOpenSideBar, isOpenSideBar = false}:props) => {
   const title = useTitleStore((state) => state.title);
   return (
     <header className="sticky-top-bar topbar">
@@ -17,7 +19,7 @@ export const Topbar = ({onOpenSideBar}:props) => {
         <button className="topbar__icon" onClick={()=>onOpenSideBar()}>
             <IconCR name='barburger' />
         </button>
-        <LogoEmpresa alto={32} />
+        {!isOpenSideBar && <LogoEmpresa alto={32} />}
         <NombreModulo /> {'>'} {title}
       </div>
       {/* RIGHT */}

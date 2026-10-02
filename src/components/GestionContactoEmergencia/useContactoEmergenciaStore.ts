@@ -2,6 +2,11 @@ import httpClient from '@/common/helpers/httpClient';
 import type { RootState } from '@/stores/Store';
 import { addContactoEmergencia, onSetDataContactosEmergencia, type ContactoEmergenciaProps } from '@/components/GestionContactoEmergencia/contactoEmergenciaSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
+import { mensajeError } from '@/helpers/mensajeError';
+
+/** Lo que se envía al guardar un contacto (campos del DTO del backend) */
+export type ContactoEmergenciaForm = Pick<ContactoEmergenciaProps, 'nombres' | 'apellido_paterno' | 'apellido_materno' | 'telefono' | 'email' | 'observacion' | 'id_cargo'>
 
 export const useContactoEmergenciaStore = (uid_location:string) => {
   const dispatch = useDispatch()
@@ -19,20 +24,26 @@ export const useContactoEmergenciaStore = (uid_location:string) => {
       console.log(error);
     }
   }
-  const postContactoEmergencia = async(formState:ContactoEmergenciaProps)=>{
+  /** Agrega el contacto y refresca la lista. Devuelve true si se guardó; si falla, avisa con el motivo */
+  const postContactoEmergencia = async(formState:ContactoEmergenciaForm)=>{
     try {
-      await httpClient.post(`/contacto-emergencia/${uid_location}`, {...formState})
+      await httpClient.post(`/contacto-emergencia/${uid_location}`, formState)
+      await obtenerContactosEmergencia()
+      return true
     } catch (error) {
-      console.log(error);
+      await Swal.fire({ icon: 'error', title: 'No se pudo agregar el contacto', html: mensajeError(error) })
+      return false
     }
   }
-  const patchContactoEmergencia = async(id:number, formState:ContactoEmergenciaProps)=>{
+  /** Edita el contacto y refresca la lista. Devuelve true si se guardó; si falla, avisa con el motivo */
+  const patchContactoEmergencia = async(id:number, formState:ContactoEmergenciaForm)=>{
     try {
-      await httpClient.patch(`/contacto-emergencia/id/${id}`, {...formState})
+      await httpClient.patch(`/contacto-emergencia/id/${id}`, formState)
+      await obtenerContactosEmergencia()
+      return true
     } catch (error) {
-      console.log(error);
-    } finally{
-      obtenerContactosEmergencia()
+      await Swal.fire({ icon: 'error', title: 'No se pudo editar el contacto', html: mensajeError(error) })
+      return false
     }
   }
   const obtenerContactoEmergenciaxID = async(id:number)=>{
@@ -43,11 +54,20 @@ export const useContactoEmergenciaStore = (uid_location:string) => {
       console.log(error);
     }
   }
+  /** Pide confirmación y da de baja el contacto. Si falla, avisa con el motivo */
   const deleteContactoEmergenciaxID = async(id:number)=>{
+    const { isConfirmed } = await Swal.fire({
+      icon: 'warning',
+      title: '¿Eliminar el contacto?',
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+    })
+    if (!isConfirmed) return
     try {
-      await httpClient.patch(`/contacto-emergencia/delete/id/${id}`)
+      await httpClient.delete(`/contacto-emergencia/id/${id}`)
     } catch (error) {
-      console.log(error);
+      await Swal.fire({ icon: 'error', title: 'No se pudo eliminar el contacto', html: mensajeError(error) })
     }finally{
       obtenerContactosEmergencia()
     }

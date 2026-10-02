@@ -15,6 +15,10 @@ import { quitarCamposSoloLectura } from '@/helpers/quitarCamposSoloLectura'
 import { SelectorFoto } from '@/components/Avatar/SelectorFoto'
 import { getBlobUrl } from '@/helpers/blobUrl'
 import type { AjusteFoto } from '@/components/Avatar/encuadreFoto'
+import Swal from 'sweetalert2'
+import { mensajeError } from '@/helpers/mensajeError'
+import { AppContactoEmergencia } from '@/components/GestionContactoEmergencia/AppContactoEmergencia'
+import type { ContactoEmergenciaForm } from '@/components/GestionContactoEmergencia/useContactoEmergenciaStore'
 
 type props = {
   show: boolean;
@@ -22,7 +26,7 @@ type props = {
   id: number;
 }
 export const ModalCustomClientes = ({show, onHide, id}:props) => {
-    const { post, patch, obtenerxID, dataxID, subirAvatar, guardarAjusteAvatar, eliminarAvatar } = useClientesStore()
+    const { post, patch, obtenerxID, dataxID, subirAvatar, guardarAjusteAvatar, eliminarAvatar, guardarContactosEmergencia, guardarPrimerComentario } = useClientesStore()
     const { data:dataGenero, cargar:cargarGenero } = useTerminologiaPersona('GeneroPersona');
     const { data:dataEstadoCivil, cargar:cargarEstadoCivil } = useTerminologiaPersona('EstadoCivilPersona');
     const { data:dataTipoDocumento, cargar:cargarTipoDocumento } = useTerminologiaPersona('TipoDeDocumentoPersona');
@@ -36,6 +40,10 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
     const [quitarFotoGuardada, setQuitarFotoGuardada] = useState(false)
     // Encuadre elegido en "Ajustar foto" y todavía sin guardar (se guarda con el cliente)
     const [ajusteFoto, setAjusteFoto] = useState<AjusteFoto | null>(null)
+    // Cliente nuevo: contactos de emergencia en memoria, se guardan después de crear al cliente
+    const [contactosEmergencia, setContactosEmergencia] = useState<ContactoEmergenciaForm[]>([])
+    // Cliente nuevo: primer comentario (opcional), se guarda después de crear al cliente
+    const [primerComentario, setPrimerComentario] = useState('')
     const avatarPreview = id !== 0 && !quitarFotoGuardada ? (getBlobUrl(dataxID?.url_avatar) ?? null) : null
     // resetea el archivo elegido cuando el modal se abre para otro cliente (o de nuevo), sin usar un efecto
     const currentAvatarKey = `${show}-${id}`
@@ -44,6 +52,8 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
       setAvatarFile(null)
       setQuitarFotoGuardada(false)
       setAjusteFoto(null)
+      setContactosEmergencia([])
+      setPrimerComentario('')
     }
     const onElegirFoto = (archivo: File) => {
       setAvatarFile(archivo)
@@ -102,7 +112,25 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
       if (id!==0) {
         await patch(payload, id, uuid)
       }else{
-        await post(payload)
+        const respuesta = await post(payload)
+        const uidContactos: string | undefined = respuesta?.data?.uid_contactoEmergencia
+        const uidComentario: string | undefined = respuesta?.data?.uid_comentario
+        const comentario = primerComentario.trim()
+        // El cliente ya quedó creado: si falla lo relacionado, se avisa para agregarlo desde su perfil
+        if (uidContactos && contactosEmergencia.length > 0) {
+          try {
+            await guardarContactosEmergencia(uidContactos, contactosEmergencia)
+          } catch (error) {
+            await Swal.fire({ icon: 'warning', title: 'Cliente creado, pero no se guardaron sus contactos de emergencia', html: mensajeError(error) })
+          }
+        }
+        if (uidComentario && comentario) {
+          try {
+            await guardarPrimerComentario(uidComentario, comentario)
+          } catch (error) {
+            await Swal.fire({ icon: 'warning', title: 'Cliente creado, pero no se guardó el primer comentario', html: mensajeError(error) })
+          }
+        }
       }
       if (avatarFile && nuevoUidAvatar) {
         const idBlob = await subirAvatar(nuevoUidAvatar, avatarFile)
@@ -220,17 +248,35 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
                     </Col>
                   </Row>
                 </Col>
-                <Col lg={12}>
-                <TabsCR>
-                      <TabCR title='Contacto de emergencia'>
-                        
-                      </TabCR>
-                      <TabCR title='Primer comentario'>
-                      </TabCR>
-                </TabsCR>
-                </Col>
               </Row>
             </form>
+            {/* Fuera del <form>: Enter en el buscador o guardar un contacto no deben enviar el cliente */}
+            <TabsCR>
+                  <TabCR title='Contacto de emergencia'>
+                    {id === 0 ? (
+                      // Cliente nuevo: todavía no existe; los contactos se guardan al crear al cliente
+                      <AppContactoEmergencia key={avatarKey} UsarApiPOST={false} onChange={setContactosEmergencia} />
+                    ) : dataxID?.uid_contactoEmergencia ? (
+                      <AppContactoEmergencia key={dataxID.uid_contactoEmergencia} uid_location={dataxID.uid_contactoEmergencia} />
+                    ) : null}
+                  </TabCR>
+                  <TabCR title='Primer comentario'>
+                    {id === 0 ? (
+                      // Se guarda como comentario del cliente al crearlo (si se escribe algo)
+                      <div className='mt-2'>
+                        <InputCR
+                          type='text-area'
+                          label='Primer comentario (opcional)'
+                          value={primerComentario}
+                          maxLength={450}
+                          onChange={(e) => setPrimerComentario(e.target.value)}
+                        />
+                      </div>
+                    ) : (
+                      <p className='small opacity-75 mt-2 mb-0'>Los comentarios del cliente se ven y agregan en su perfil.</p>
+                    )}
+                  </TabCR>
+            </TabsCR>
       </ModalCR.Body>
     </ModalCR>
   )

@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { ContainerComentarios } from '@/components/Comentario/ContainerComentarios'
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
-import { usePersonaPerfil } from '../../hook/usePersonaPerfil'
+import { useUidPersonaPerfil } from '../../hook/useUidPersonaPerfil'
 
 type TabComentariosProps = {
   /** Se recarga cada vez que se activa la pestaña */
@@ -11,19 +9,7 @@ type TabComentariosProps = {
 
 /** Comentarios del cliente: ContainerComentarios los obtiene y agrega con el uid_comentario de la persona */
 export const TabComentarios = ({ activo }: TabComentariosProps) => {
-  const { uid_person } = useParams<{ uid_person: string }>()
-  const { obtenerPersona } = usePersonaPerfil()
-  // undefined = cargando; '' = la persona no tiene uid_comentario
-  const [uidComentario, setUidComentario] = useState<string | undefined>(undefined)
-
-  useEffect(() => {
-    if (!activo || !uid_person) return
-    let vigente = true
-    obtenerPersona(uid_person)
-      .then((persona) => { if (vigente) setUidComentario(persona?.uid_comentario ?? '') })
-      .catch(() => { if (vigente) setUidComentario('') })
-    return () => { vigente = false }
-  }, [activo, uid_person])
+  const uidComentario = useUidPersonaPerfil('uid_comentario', activo)
 
   if (!activo) return null
   if (uidComentario === undefined) {

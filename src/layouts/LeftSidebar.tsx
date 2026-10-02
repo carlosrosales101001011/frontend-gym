@@ -1,6 +1,7 @@
 import { capitalizar } from "@/helpers/capitalize";
 import React, { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
+import { LogoEmpresa } from "@/components/LogoEmpresa/LogoEmpresa";
 
 type Props = {
   items: MenuItemType[];
@@ -41,6 +42,10 @@ const LeftSidebar: React.FC<Props> = ({ items }) => {
   }, [items]);
   return (
     <aside className="w-100 h-100">
+      {/* Con el sidebar abierto el logo va aquí; cerrado, en el topbar */}
+      <div className="sidebar__logo">
+        <LogoEmpresa alto={40} />
+      </div>
       {Object.entries(groupedItems).map(([subSeccion, sections]) => {
         return (
           <div key={subSeccion}>

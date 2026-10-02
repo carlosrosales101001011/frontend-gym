@@ -28,6 +28,13 @@
     background-color: rgba(0, 0, 0, 0.203);
   }
 
+  // Logo arriba del menú (solo con el sidebar abierto; cerrado va en el topbar)
+  .sidebar__logo {
+    display: flex;
+    justify-content: center;
+    padding: 6px 0 4px;
+  }
+
   @media (max-width: #{$sidebar-breakpoint - 1px}) {
     z-index: 1055;
   }

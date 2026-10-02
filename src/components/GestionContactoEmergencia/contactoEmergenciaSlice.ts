@@ -9,7 +9,10 @@ export type ContactoEmergenciaProps = {
   telefono: string;
   email: string;
   observacion: string;
-  tipoPariente: {
+  /** Parentesco (terminología de id_cargo); lo llena el backend */
+  label_cargo?: string;
+  /** Relación que el backend no siempre trae: usar label_cargo */
+  tipoPariente?: {
     valor: string;
   }
 }
