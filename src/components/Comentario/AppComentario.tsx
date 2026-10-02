@@ -19,11 +19,13 @@ type props = {
     onOpenEdit: () => void;      // 👈 viene del padre
     onCloseEdit: () => void;     // 👈 viene del padre
     onUpdated: (comentario:string, id:number)=>void;
+    /** Sin onEliminar (no es su autor ni super usuario) no se muestran los íconos de editar y eliminar */
+    onEliminar?: (id:number)=>void;
     /** Foto del autor (url completa) y su encuadre; sin foto se muestra la silueta */
     avatar?: string;
     ajusteAvatar?: AjusteFoto | null;
 }
-export const AppComentario = ({nombre_usuario, fecha_update, fecha_created, comentario, id, onUpdated, isEditing, onOpenEdit, onCloseEdit, avatar, ajusteAvatar}:props) => {
+export const AppComentario = ({nombre_usuario, fecha_update, fecha_created, comentario, id, onUpdated, isEditing, onOpenEdit, onCloseEdit, avatar, ajusteAvatar, onEliminar}:props) => {
     const { obtenerComentarioxID } = useComentarioStore()
     const { comentario:comentarioxID } = useSelector((state: RootState)=>state.COMENTARIO)
     useEffect(() => {
@@ -56,12 +58,14 @@ export const AppComentario = ({nombre_usuario, fecha_update, fecha_created, come
                     {fecha_created}
                 </span>
                 {
-                    !isEditing && (
+                    !isEditing && onEliminar && (
                         <span>
                             <span onClick={onOpenEdit}>
                                 <IconCR name="edit" size={12} className=" mx-1" />
                             </span>
-                            <IconCR name="trash" size={12} className=" mx-1"/>
+                            <span onClick={() => onEliminar(id)} title="Eliminar" style={{ cursor: 'pointer' }}>
+                                <IconCR name="trash" size={12} className=" mx-1"/>
+                            </span>
                         </span>
                     )
                 }

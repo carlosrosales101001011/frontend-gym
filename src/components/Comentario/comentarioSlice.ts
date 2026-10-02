@@ -9,6 +9,9 @@ export type ComentarioProps = {
     nombre_usuario: string;
     fecha_updated: string;
     fecha_created: string;
+  /** Fechas que devuelve el backend (CreateDateColumn / UpdateDateColumn) */
+  createdAt?: string;
+  updatedAt?: string;
   usuario: {
     nombres: string;
     apellidos: string;

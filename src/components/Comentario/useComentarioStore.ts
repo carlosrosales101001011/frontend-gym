@@ -2,6 +2,8 @@ import { useDispatch } from "react-redux";
 import { addComentario, onSetDataComentarios } from "@/components/Comentario/comentarioSlice";
 import httpClient from "@/common/helpers/httpClient";
 import { useState } from "react";
+import Swal from "sweetalert2";
+import { mensajeError } from "@/helpers/mensajeError";
 
 export const useComentarioStore = () => {
     const dispatch = useDispatch()
@@ -19,21 +21,43 @@ export const useComentarioStore = () => {
             setloading(false)
         }
     }
-    const postComentario = async(formState:{id_user:number, comentario:string, uid_location:string}, uid_location:string)=>{
+    /** Publica el comentario (el autor sale del token). Devuelve true si se guardó; si falla, avisa con el motivo */
+    const postComentario = async(formState:{comentario:string, uid_location:string}, uid_location:string)=>{
         try {
             await httpClient.post(`/comentario`, formState)
+            return true
         } catch (error) {
-            console.log(error);
+            await Swal.fire({ icon: 'error', title: 'No se pudo publicar el comentario', html: mensajeError(error) })
+            return false
         }finally{
             obtenerComentariosxUIDLOCATION(uid_location)
         }
     }
+    /** Edita el texto (solo su autor o un super usuario). Si falla, avisa con el motivo */
     const patchComentario = async(comentario:string, uid_location:string, id:number)=>{
         try {
-            await httpClient.patch(`/comentario/${id}`, {comentario})
+            await httpClient.patch(`/comentario/${id}`, {comentario: comentario.trim()})
         } catch (error) {
-            console.log(error);
+            await Swal.fire({ icon: 'error', title: 'No se pudo editar el comentario', html: mensajeError(error) })
         }finally{
+            obtenerComentariosxUIDLOCATION(uid_location)
+        }
+    }
+    /** Pide confirmación y da de baja el comentario (solo su autor o un super usuario). Si falla, avisa con el motivo */
+    const eliminarComentario = async(id:number, uid_location:string)=>{
+        const { isConfirmed } = await Swal.fire({
+            icon: 'warning',
+            title: '¿Eliminar el comentario?',
+            showCancelButton: true,
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar',
+        })
+        if (!isConfirmed) return
+        try {
+            await httpClient.delete(`/comentario/${id}`)
+        } catch (error) {
+            await Swal.fire({ icon: 'error', title: 'No se pudo eliminar el comentario', html: mensajeError(error) })
+        } finally {
             obtenerComentariosxUIDLOCATION(uid_location)
         }
     }
@@ -49,6 +73,7 @@ export const useComentarioStore = () => {
     }
   return {
     patchComentario,
+    eliminarComentario,
     obtenerComentariosxUIDLOCATION,
     postComentario,
     obtenerComentarioxID,

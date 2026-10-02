@@ -11,6 +11,10 @@ import { useSesionStore } from '@/hook/useSesionStore';
 import { AvatarCirculo } from '@/components/Avatar/AvatarCirculo';
 import { ajusteAvatarUltimo } from '@/components/Avatar/encuadreFoto';
 import { getBlobUrl } from '@/helpers/blobUrl';
+import { formatDate } from '@/helpers/FormatDate';
+
+/** "dd/mm/yyyy hh:mm" de una fecha del backend ('' si no viene) */
+const fechaHora = (fecha?: string) => fecha ? formatDate(new Date(fecha), 'yyyy-mm-dd', 'dd/mm/yyyy hh:mm') : ''
 
 /** Tamaño de las fotos de los comentarios (px) */
 const TAMANO_AVATAR = 55
@@ -18,7 +22,7 @@ type props = {
     uid_location: string;
 }
 export const ContainerComentarios = ({uid_location}:props) => {
-    const { obtenerComentariosxUIDLOCATION, postComentario, loading, patchComentario } = useComentarioStore()
+    const { obtenerComentariosxUIDLOCATION, postComentario, loading, patchComentario, eliminarComentario } = useComentarioStore()
     const { comentarios } = useSelector((state: RootState)=>state.COMENTARIO)
     // Quien comenta es el usuario logueado: su nombre y su foto van junto al formulario
     const { usuario, nombreUsuario, obtenerUsuarioSesion } = useSesionStore()
@@ -26,19 +30,15 @@ export const ContainerComentarios = ({uid_location}:props) => {
       if (!usuario) obtenerUsuarioSesion()
     }, [])
     const [editingId, setEditingId] = useState<number | null>(null)
-    const { register, formState: { errors }, handleSubmit, getValues, reset}  = useForm<ComentarioProps>({mode: 'onSubmit', defaultValues: initialComentario})
+    const { register, formState: { errors }, handleSubmit, reset}  = useForm<ComentarioProps>({mode: 'onSubmit', defaultValues: initialComentario})
     useEffect(() => {
       obtenerComentariosxUIDLOCATION(uid_location)
     }, [uid_location])
     
-    const onSubmitComentario = ()=>{
-      const { uid_location:uid_lok, fecha_created, fecha_updated, nombre_usuario, id, usuario, ...val } = getValues() as ComentarioProps
-      console.log({uid_lok, fecha_created, fecha_updated, nombre_usuario, id, usuario});
-      postComentario({
-        uid_location,
-        ...val
-      }, uid_location)
-      reset()
+    // Solo se envían el texto y dónde va: el autor lo pone el backend con el token
+    const onSubmitComentario = async ({ comentario }: ComentarioProps)=>{
+      const publicado = await postComentario({ uid_location, comentario: comentario.trim() }, uid_location)
+      if (publicado) reset()
     }
     const onUpdateComentario = (comentario:string, id:number)=>{
       patchComentario(comentario, uid_location, id)
@@ -59,9 +59,11 @@ export const ContainerComentarios = ({uid_location}:props) => {
           <div className='mt-3'>
             <form onSubmit={handleSubmit(onSubmitComentario)}>
               <InputCR {...register("comentario", {
-                required: "Este campo es obligatorio"
+                required: "Escribe el comentario",
+                validate: (valor) => !!String(valor ?? '').trim() || "Escribe el comentario",
+                maxLength: { value: 450, message: "Máximo 450 caracteres" },
               })} label="Comentario" type='text-area' messageErrors={errors.comentario?.message}/>
-              <ButtonCR variant="primary" label={'Comentar'} onClick={()=>onSubmitComentario()}/>
+              <ButtonCR variant="primary" label={'Comentar'} type="submit"/>
             </form>
           </div>
         </div>
@@ -78,7 +80,11 @@ export const ContainerComentarios = ({uid_location}:props) => {
                 <AppComentario  
     isEditing={editingId === m.id}
     onOpenEdit={() => setEditingId(m.id)}
-    onCloseEdit={() => setEditingId(null)} id={m.id} onUpdated={onUpdateComentario} comentario={m.comentario} fecha_created={m.fecha_created} fecha_update={m.fecha_updated}
+    onCloseEdit={() => setEditingId(null)} id={m.id} onUpdated={onUpdateComentario} comentario={m.comentario}
+    // Editar y eliminar: solo su autor o un super usuario (el backend también lo valida al eliminar)
+    onEliminar={m.id_user === usuario?.id || usuario?.is_super_user ? (id) => eliminarComentario(id, uid_location) : undefined} fecha_created={fechaHora(m.createdAt)}
+    // Solo si se editó después de creado
+    fecha_update={m.updatedAt && m.updatedAt !== m.createdAt ? `Editado ${fechaHora(m.updatedAt)}` : ''}
     nombre_usuario={`${m.usuario?.nombres ?? ''} ${m.usuario?.apellidos ?? ''}`.trim()}
     avatar={getBlobUrl(m.avatar_usuario?.url_avatar_ultimo)}
     ajusteAvatar={ajusteAvatarUltimo(m.avatar_usuario)} />

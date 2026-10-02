@@ -23,6 +23,8 @@ export const TabDatosPersonales = ({ activo = true }: TabDatosPersonalesProps) =
   const {colaborador} = useSelector((state: RootState)=>state.PERFIL_COLABORADOR)
   const { register, formState: { errors }, reset, getValues} = useForm<ColaboradorProps>({mode: "all",defaultValues: colaborador })
   const { data:dataGeneroPersona, cargar:cargarGeneroPersona } = useTerminologiaPersona('GeneroPersona');
+  const { data:dataDistritoCallao, cargar:cargarDistritoCallao } = useTerminologiaPersona('distritosCallao');
+  const { data:dataDistritoLima, cargar:cargarDistritoLima } = useTerminologiaPersona('distritosLima');
   const { data:dataEstadoCivilPersona, cargar:cargarEstadoCivilPersona } = useTerminologiaPersona('EstadoCivilPersona');
   const { data:dataTipoDeDocumentoPersona, cargar:cargarTipoDeDocumentoPersona } = useTerminologiaPersona('TipoDeDocumentoPersona');
   useEffect(() => {
@@ -31,6 +33,8 @@ export const TabDatosPersonales = ({ activo = true }: TabDatosPersonalesProps) =
     cargarGeneroPersona()
     cargarEstadoCivilPersona()
     cargarTipoDeDocumentoPersona()
+    cargarDistritoCallao()
+    cargarDistritoLima()
   }, [activo, uid])
   useEffect(() => {
     if (colaborador) {
@@ -92,26 +96,21 @@ export const TabDatosPersonales = ({ activo = true }: TabDatosPersonalesProps) =
                   })} label="N° de documento" messageErrors={errors.numero_documento?.message}/>
                 </Col>
                 <Col lg={6}>
-                  <InputSelectCR {...register("id_nacionalidad", {
-                    required: "Este campo es obligatorio"
-                  })} label="Nacionalidad" options={dataTipoDeDocumentoPersona} messageErrors={errors.id_nacionalidad?.message}/>
-                </Col>
-                <Col lg={6}>
                   <InputSelectCR {...register("id_distrito", {
                     required: "Este campo es obligatorio"
-                  })} label="Distrito" options={dataTipoDeDocumentoPersona} messageErrors={errors.id_distrito?.message}/>
+                  })} label="Distrito" options={[...dataDistritoCallao, ...dataDistritoLima]} messageErrors={errors.id_distrito?.message}/>
                 </Col>
-                <Col lg={12}>
+                <Col lg={6}>
                   <InputCR {...register("direccion", {
                     required: "Este campo es obligatorio"
                   })} label="Direccion" messageErrors={errors.direccion?.message}/>
                 </Col>
-                <Col lg={12}>
+                <Col lg={6}>
                   <InputCR {...register("email_personal", {
                     required: "Este campo es obligatorio",
                   })} label="Email personal" messageErrors={errors.email_personal?.message}/>
                 </Col>
-                <Col lg={12}>
+                <Col lg={6}>
                   <InputCR {...register("email_corporativo", {
                     required: "Este campo es obligatorio",
                   })} label="Email corporativo" messageErrors={errors.email_corporativo?.message}/>
