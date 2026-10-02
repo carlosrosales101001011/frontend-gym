@@ -1,4 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import IconCR from '@/components/Icons/IconCR';
+import { ButtonCR } from '@/components/Button/ButtonCR';
+import { ModalAsignarPassword } from './ModalAsignarPassword';
 import type { UserProps } from '../store/usuariosSlice';
 import { DataTableTest } from '@/components/DataTableTest/DataTableTest';
 import { useAppSelector } from '@/stores/Store';
@@ -9,6 +13,8 @@ type Props ={
 export const DataTableUsuarios = ({ otrosBotones}:Props) => {
     const [, uid_modulo, ] = location.pathname.split('/');
     const { users } = useAppSelector((state)=>state.USER)
+    // Usuario al que se le cambia la contraseña (null = modal cerrado)
+    const [usuarioPassword, setUsuarioPassword] = useState<{ id: number, nombre: string } | null>(null)
     const columns = [
         {
             header: 'Id',
@@ -43,10 +49,10 @@ export const DataTableUsuarios = ({ otrosBotones}:Props) => {
                 </>
             )
         }},
-        {header: 'Creado por',id: 5,  render: (row:UserProps)=>{
+        {header: 'Creado por', campoBusqueda: 'label_nombres_apellidos_userParent', id: 5,  render: (row:UserProps)=>{
             return (
                 <>
-                {row.id_userParent}
+                {row.label_nombres_apellidos_userParent || <span className="opacity-50">—</span>}
                 </>
             )
         }},
@@ -64,6 +70,17 @@ export const DataTableUsuarios = ({ otrosBotones}:Props) => {
                 </>
             )
         }},
+        {header: 'Cambiar contraseña', id: 8, render: (row:UserProps)=>{
+            return (
+                <ButtonCR
+                    label='Cambiar'
+                    icon={<IconCR name='lock' size={12} className='' />}
+                    variant='outline-primary'
+                    className='btn-sm'
+                    onClick={() => setUsuarioPassword({ id: row.id ?? 0, nombre: `${row.nombres} ${row.apellidos}`.trim() })}
+                />
+            )
+        }},
         {header: '', widthEditable: true,
             sortable: false, id: 7, render: (row:UserProps)=>{
             return (
@@ -77,6 +94,7 @@ export const DataTableUsuarios = ({ otrosBotones}:Props) => {
     ]
   return (
     <div>
+            {usuarioPassword && <ModalAsignarPassword usuario={usuarioPassword} onHide={() => setUsuarioPassword(null)} />}
             <DataTableTest congelarColumnas
             permitirOcultarColumnas
             permitirReordenarColumnas

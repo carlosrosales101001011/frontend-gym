@@ -9,16 +9,19 @@ import { PieStep } from "../components/PieStep";
 
 type StepModulosProps = {
   setStep: (step: number) => void;
+  /** Se llama cuando el usuario quedó registrado (este es el último paso mientras "Entidades" está en pausa) */
+  onGuardado: () => void;
 }
 
 /**
  * Paso 2: qué secciones ve el nuevo usuario. Se ofrecen las secciones de quien registra
  * (a la izquierda) y se pasan a la derecha al asignarlas; los módulos salen de las secciones.
  */
-export const StepModulos = ({ setStep }: StepModulosProps) => {
-  const { modulosDisponibles, idsSeccionAsignadas, obtenerAccesosCreador, asignarSecciones } = useGestionUsuariosStore()
+export const StepModulos = ({ setStep, onGuardado }: StepModulosProps) => {
+  const { modulosDisponibles, idsSeccionAsignadas, obtenerAccesosCreador, asignarSecciones, guardarUsuario } = useGestionUsuariosStore()
   const [asignadas, setAsignadas] = useState(() => new Set(idsSeccionAsignadas))
   const [busqueda, setBusqueda] = useState("")
+  const [guardando, setGuardando] = useState(false)
 
   useEffect(() => {
     obtenerAccesosCreador()
@@ -45,13 +48,24 @@ export const StepModulos = ({ setStep }: StepModulosProps) => {
   const asignar = (ids: number[]) => setAsignadas((actual) => new Set([...actual, ...ids]))
   const quitar = (ids: number[]) => setAsignadas((actual) => new Set([...actual].filter((id) => !ids.includes(id))))
 
-  const guardarYSeguir = async (siguiente: number) => {
-    if (siguiente > 1 && asignadas.size === 0) {
+  /** Vuelve a "Información" conservando las secciones elegidas */
+  const volver = () => {
+    asignarSecciones([...asignadas])
+    setStep(0)
+  }
+
+  /** Registra el usuario con las secciones elegidas (sin permisos por entidad mientras ese paso está en pausa) */
+  const guardar = async () => {
+    if (asignadas.size === 0) {
       await Swal.fire({ icon: 'warning', title: 'Sin secciones', text: 'Asigna al menos una sección al usuario.' })
       return
     }
-    asignarSecciones([...asignadas])
-    setStep(siguiente)
+    const ids = [...asignadas]
+    asignarSecciones(ids)
+    setGuardando(true)
+    const guardado = await guardarUsuario([], ids)
+    setGuardando(false)
+    if (guardado) onGuardado()
   }
 
   return (
@@ -70,7 +84,12 @@ export const StepModulos = ({ setStep }: StepModulosProps) => {
           <PanelSeccionesAsignadas modulos={modulosAsignados} totalPorModulo={totalPorModulo} onQuitar={quitar} />
         </Col>
       </Row>
-      <PieStep onAtras={() => guardarYSeguir(0)} onSiguiente={() => guardarYSeguir(2)} />
+      <PieStep
+        onAtras={volver}
+        labelSiguiente={guardando ? 'Guardando...' : 'Guardar usuario'}
+        onSiguiente={guardar}
+        disabled={guardando}
+      />
     </div>
   );
 }

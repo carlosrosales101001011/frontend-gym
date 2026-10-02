@@ -16,8 +16,11 @@ type StepInformacionProps = {
 type FormInformacion = UserProps & { password_confirmacion: string }
 
 const PATRON_EMAIL = { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Email inválido" }
+/** Mismas reglas que el backend (CreateUserDto) */
+const PATRON_USUARIO = { value: /^[a-zA-Z0-9._-]{3,30}$/, message: "De 3 a 30 caracteres: letras, números, punto, guion o guion bajo" }
+const PATRON_PASSWORD = { value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*(\d|\W)).{6,50}$/, message: "De 6 a 50 caracteres, con mayúscula, minúscula y un número o símbolo" }
 
-/** Paso 1: datos del usuario. Los dos correos son obligatorios en el backend (IsEmail) */
+/** Paso 1: datos del usuario. Los correos son opcionales (si se escriben, deben ser válidos) */
 export const StepInformacion = ({setStep}:StepInformacionProps) => {
   const { user, opcionesEmpleados, obtenerOpcionesEmpleados, guardarInformacion } = useGestionUsuariosStore()
   const { cargar:cargarRoles, data:dataRoles } = useTerminologiaPersona('userRoles')
@@ -51,16 +54,26 @@ export const StepInformacion = ({setStep}:StepInformacionProps) => {
           })} label="Apellidos" name="apellidos" required messageErrors={errors.apellidos?.message}/>
         </Col>
         <Col lg={6}>
-          <InputCR {...register("email", { required: "El correo personal es obligatorio", pattern: PATRON_EMAIL })}
-            label="Correo personal" name="email" required messageErrors={errors.email?.message} />
+          <InputCR {...register("email", { pattern: PATRON_EMAIL })}
+            label="Correo personal" name="email" messageErrors={errors.email?.message} />
         </Col>
         <Col lg={6}>
-          <InputCR {...register("email_corporativo", { required: "El correo empresarial es obligatorio", pattern: PATRON_EMAIL })}
-            label="Correo empresarial" name="email_corporativo" required messageErrors={errors.email_corporativo?.message}/>
+          <InputCR {...register("email_corporativo", { pattern: PATRON_EMAIL })}
+            label="Correo empresarial" name="email_corporativo" messageErrors={errors.email_corporativo?.message}/>
+        </Col>
+        <Col lg={6}>
+          <InputCR {...register("usuario", { required: "El usuario es obligatorio", pattern: PATRON_USUARIO })}
+            label="Usuario" name="usuario" required maxLength={30} autoComplete="off" messageErrors={errors.usuario?.message} />
+        </Col>
+        <Col lg={6}>
+          <InputCR {...register("telefono", {
+            required: 'El teléfono es obligatorio'
+          })} label="Teléfono" name="telefono" required messageErrors={errors.telefono?.message}/>
         </Col>
         <Col lg={6}>
           <InputCR {...register("password", {
-            required: 'La contraseña es obligatoria'
+            required: 'La contraseña es obligatoria',
+            pattern: PATRON_PASSWORD,
           })} type="password" autoComplete="new-password" label="Contraseña" name="password" required messageErrors={errors.password?.message}/>
         </Col>
         <Col lg={6}>
@@ -68,11 +81,6 @@ export const StepInformacion = ({setStep}:StepInformacionProps) => {
             required: 'Repite la contraseña',
             validate: (valor, valores) => valor === valores.password || 'Las contraseñas no coinciden',
           })} type="password" autoComplete="new-password" label="Repetir la contraseña" name="password_confirmacion" required messageErrors={errors.password_confirmacion?.message}/>
-        </Col>
-        <Col lg={6}>
-          <InputCR {...register("telefono", {
-            required: 'El teléfono es obligatorio'
-          })} label="Teléfono" name="telefono" required messageErrors={errors.telefono?.message}/>
         </Col>
         <Col lg={6}>
           {/* El backend espera números (IsNumber) */}

@@ -78,6 +78,12 @@ export type VentaEditableForm = {
   fecha_venta: string
 }
 
+/** Lo que se envía al editar la venta: el comprobante es opcional (null = sin comprobante) */
+export type VentaEditablePayload = Partial<Omit<VentaEditableForm, 'id_tipo_comprobante' | 'n_comprobante'>> & {
+  id_tipo_comprobante?: number | null
+  n_comprobante?: string | null
+}
+
 export type MembresiaForm = {
   id_programa: number
   id_plan: number

@@ -31,7 +31,7 @@ const ESTADOS = [
  * Solo se puede otorgar lo que quien registra tiene autorizado; lo demás queda "Denegado" y bloqueado.
  */
 export const StepEntidades = ({ setStep, onGuardado }: StepEntidadesProps) => {
-  const { modulosDisponibles, idsSeccionAsignadas, permisosCreador, guardarUsuario } = useGestionUsuariosStore()
+  const { modulosDisponibles, idsSeccionAsignadas, permisosCreador, creadorEsSuperUsuario, guardarUsuario } = useGestionUsuariosStore()
   const { cargar: cargarEntidades, data: opcionesEntidades } = useTerminologiaPersona('entidadSistema')
   const { register, setValue, watch, reset, handleSubmit } = useForm<FormPermisos>({ defaultValues: { permisos: [] } })
   const [guardando, setGuardando] = useState(false)
@@ -50,26 +50,28 @@ export const StepEntidades = ({ setStep, onGuardado }: StepEntidadesProps) => {
   )], [modulosDisponibles, idsSeccionAsignadas])
 
   const creadorDe = (idEntidad: number) => permisosCreador.find((permiso) => permiso.id_entidad === idEntidad)
+  /** Acciones que quien registra puede otorgar en una entidad (un super usuario, todas) */
+  const otorgablesDe = (idEntidad: number) => accionesOtorgables(creadorDe(idEntidad), creadorEsSuperUsuario)
 
   useEffect(() => {
     const labelEntidad = (id: number) => opcionesEntidades.find((opcion) => opcion.value === id)?.label ?? `Entidad ${id}`
     reset({
-      permisos: armarPermisosIniciales(idsEntidad, permisosCreador, labelEntidad)
-        .map((permiso) => ({ ...permiso, id_estado_ALL: estadoComun(permiso, accionesOtorgables(creadorDe(permiso.id_entidad))) })),
+      permisos: armarPermisosIniciales(idsEntidad, permisosCreador, labelEntidad, creadorEsSuperUsuario)
+        .map((permiso) => ({ ...permiso, id_estado_ALL: estadoComun(permiso, otorgablesDe(permiso.id_entidad)) })),
     })
-  }, [idsEntidad, permisosCreador, opcionesEntidades])
+  }, [idsEntidad, permisosCreador, creadorEsSuperUsuario, opcionesEntidades])
 
   /** Cambia una acción y recalcula "Todos" */
   const onCambiarAccion = (index: number, accion: AccionCrud, valor: number) => {
     setValue(`permisos.${index}.${campoEstado(accion)}`, valor)
     const fila = { ...permisos[index], [campoEstado(accion)]: valor }
-    setValue(`permisos.${index}.id_estado_ALL`, estadoComun(fila, accionesOtorgables(creadorDe(fila.id_entidad))))
+    setValue(`permisos.${index}.id_estado_ALL`, estadoComun(fila, otorgablesDe(fila.id_entidad)))
   }
 
   /** "Todos": aplica el estado a las acciones que se pueden otorgar */
   const onCambiarTodos = (index: number, valor: number) => {
     setValue(`permisos.${index}.id_estado_ALL`, valor)
-    accionesOtorgables(creadorDe(permisos[index].id_entidad))
+    otorgablesDe(permisos[index].id_entidad)
       .forEach((accion) => setValue(`permisos.${index}.${campoEstado(accion)}`, valor))
   }
 
@@ -97,6 +99,7 @@ export const StepEntidades = ({ setStep, onGuardado }: StepEntidadesProps) => {
           <tbody>
             {permisos.map((permiso, index) => {
               const creador = creadorDe(permiso.id_entidad)
+              const otorgables = otorgablesDe(permiso.id_entidad)
               return (
                 <tr key={permiso.id_entidad}>
                   <td className="tbody-actual">{permiso.label_entidad}</td>
@@ -106,7 +109,7 @@ export const StepEntidades = ({ setStep, onGuardado }: StepEntidadesProps) => {
                         <MultiStateCheckboxCR
                           registration={register(`permisos.${index}.${campoEstado(key)}`, { setValueAs: Number })}
                           value={permiso[campoEstado(key)]}
-                          disabled={!puedeOtorgar(creador, key)}
+                          disabled={!puedeOtorgar(creador, key, creadorEsSuperUsuario)}
                           onValueChange={(valor) => onCambiarAccion(index, key, Number(valor))}
                           states={ESTADOS}
                         />
@@ -118,7 +121,7 @@ export const StepEntidades = ({ setStep, onGuardado }: StepEntidadesProps) => {
                       <MultiStateCheckboxCR
                         registration={register(`permisos.${index}.id_estado_ALL`, { setValueAs: Number })}
                         value={permiso.id_estado_ALL}
-                        disabled={accionesOtorgables(creador).length === 0}
+                        disabled={otorgables.length === 0}
                         onValueChange={(valor) => onCambiarTodos(index, Number(valor))}
                         states={ESTADOS}
                       />

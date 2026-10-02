@@ -6,6 +6,8 @@ export type UsuarioSesionProps = {
     nombres: string,
     apellidos: string,
     label_rol: string,
+    /** Puede otorgar cualquier permiso y cambiar contraseñas de otros usuarios */
+    is_super_user?: boolean,
 }
 export type sesionState = {
     usuario: UsuarioSesionProps | null,

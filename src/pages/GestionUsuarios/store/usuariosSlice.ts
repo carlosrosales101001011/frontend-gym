@@ -8,6 +8,8 @@ export type UserProps = {
   apellidos: string;
   email_corporativo: string;
   email: string;
+  /** Para iniciar sesión (además del email); único */
+  usuario: string;
   telefono: string;
   password: string;
   id_estado:number;
@@ -15,7 +17,10 @@ export type UserProps = {
   id_rol: number;
   is_super_user: boolean;
   id_userParent:number;
-  fecha_creacion: Date;
+  /** "Nombres Apellidos" de quien lo registró (lo pone el backend) */
+  label_nombres_apellidos_userParent?: string;
+  /** La pone guardarUsuario al registrar; en el store va como texto (Redux solo guarda valores serializables) */
+  fecha_creacion: string;
 };
 
 /** Sección que quien registra puede asignar (sale de sus propios módulos) */
@@ -53,6 +58,8 @@ export type UserState = {
   modulosDisponibles: ModuloDisponibleProps[],
   /** Permisos de quien registra: solo puede otorgar las acciones que tiene autorizadas */
   permisosCreador: PermisoEntidadProps[],
+  /** Quien registra es super usuario: puede otorgar todas las acciones, tenga o no el permiso */
+  creadorEsSuperUsuario: boolean,
   opcionesEmpleados: OpcionesSelect[],
 }
 
@@ -63,6 +70,7 @@ export const initialUser: UserProps = {
     apellidos: '',
     email_corporativo: '',
     email: '',
+    usuario: '',
     telefono: '',
     password: '',
     id_estado: 0,
@@ -70,7 +78,7 @@ export const initialUser: UserProps = {
     id_rol: 0,
     id_userParent:0,
     is_super_user: false,
-    fecha_creacion: new Date(),
+    fecha_creacion: '',
 }
 export const initialStateUser: UserState = {
   users: [],
@@ -78,6 +86,7 @@ export const initialStateUser: UserState = {
   idsSeccionAsignadas: [],
   modulosDisponibles: [],
   permisosCreador: [],
+  creadorEsSuperUsuario: false,
   opcionesEmpleados: [],
 };
 
@@ -94,8 +103,9 @@ export const usuariosSlice = createSlice({
     onSetModulosDisponibles: (state, action: PayloadAction<ModuloDisponibleProps[]>) => {
       state.modulosDisponibles = action.payload;
     },
-    onSetPermisosCreador: (state, action: PayloadAction<PermisoEntidadProps[]>) => {
-      state.permisosCreador = action.payload;
+    onSetPermisosCreador: (state, action: PayloadAction<{ permisos: PermisoEntidadProps[], esSuperUsuario: boolean }>) => {
+      state.permisosCreador = action.payload.permisos;
+      state.creadorEsSuperUsuario = action.payload.esSuperUsuario;
     },
     onSetOpcionesEmpleados: (state, action: PayloadAction<OpcionesSelect[]>) => {
       state.opcionesEmpleados = action.payload;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import ModalCR from '../Modal/ModalCR';
 import { InputSearcherCR } from '../TextFields/InputSearcherCR';
 import { ItemSearching } from './ItemSearching';
+import { ItemSearchingSkeleton } from './ItemSearchingSkeleton';
 import { useDebounce } from '@/hook/useDebounce';
 import type { AjusteFoto } from '../Avatar/encuadreFoto';
 
@@ -24,12 +25,16 @@ type ModalSearchingProps = {
     items?: ItemResultado[];
     onSelect?: (id: number) => void;
     onSearch?: (query: string, signal?: AbortSignal) => void;
+    /** true mientras se espera la búsqueda: muestra tarjetas de carga en vez de los resultados */
+    cargando?: boolean;
 }
 
 const ITEM_HEIGHT = 56
 const MAX_VISIBLE_ITEMS = 7
+/** Tarjetas de carga: las que entran en la lista sin scroll */
+const ITEMS_SKELETON = MAX_VISIBLE_ITEMS
 
-export const ModalSearching = ({isOpen, onHide, id, labelInput='Buscar por nombre, DNI o Telefono', items=[], onSelect, onSearch}:ModalSearchingProps) => {
+export const ModalSearching = ({isOpen, onHide, id, labelInput='Buscar por nombre, DNI o Telefono', items=[], onSelect, onSearch, cargando=false}:ModalSearchingProps) => {
     const [query, setQuery] = useState('')
     const debouncedQuery = useDebounce(query, 400)
 
@@ -68,7 +73,9 @@ export const ModalSearching = ({isOpen, onHide, id, labelInput='Buscar por nombr
         </ModalCR.Header>
         <ModalCR.Body>
             <div className="scroll-mode-actual" style={{maxHeight: `${ITEM_HEIGHT * MAX_VISIBLE_ITEMS}px`}}>
-                {itemsFiltrados.length === 0 ? (
+                {cargando ? (
+                    Array.from({ length: ITEMS_SKELETON }, (_, i) => <ItemSearchingSkeleton key={i} indice={i} />)
+                ) : itemsFiltrados.length === 0 ? (
                     <div className="text-center color-mode-actual py-4">
                         No se encontro ningun item
                     </div>

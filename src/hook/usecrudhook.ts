@@ -4,7 +4,7 @@ import { useQueryParams } from "@/hook/useQueryParams";
 import { querys } from "@/types/parametros";
 import { useDispatch } from "react-redux";
 import type { UnknownAction } from "@reduxjs/toolkit";
-import { onSetItemsLen, onSetTotalShow } from "@/stores/ui/uiSlice";
+import { onFinCargaTabla, onInicioCargaTabla, onSetItemsLen, onSetTotalShow } from "@/stores/ui/uiSlice";
 import { removeNull } from "@/helpers/removeNull";
 
 export const useCrudhook = <T,>(model: string,  action?: (payload: T[]) => UnknownAction) => {
@@ -47,11 +47,18 @@ export const useCrudhook = <T,>(model: string,  action?: (payload: T[]) => Unkno
             const offset = (safePage - 1) * safeShow;
             
             console.log({q});
-            const { data } = await httpClient.get(`${model}/search`, {
-                // columnas: solo si se eligieron en "Buscar en columnas" (sin ella el backend busca en todas)
-                params: { q, show: safeShow, offset, ...(queryColumnas ? { columnas: queryColumnas } : {}) },
-                signal,
-            });
+            // Mientras busca, DataTableTest muestra el skeleton (una fila por cada fila de la página)
+            dispatch(onInicioCargaTabla());
+            let data;
+            try {
+                ({ data } = await httpClient.get(`${model}/search`, {
+                    // columnas: solo si se eligieron en "Buscar en columnas" (sin ella el backend busca en todas)
+                    params: { q, show: safeShow, offset, ...(queryColumnas ? { columnas: queryColumnas } : {}) },
+                    signal,
+                }));
+            } finally {
+                dispatch(onFinCargaTabla());
+            }
             console.log({data, offset, safeShow, safePage}, 'en parametros: ',{q, show, page});
             
             if (typeof action === 'function') {

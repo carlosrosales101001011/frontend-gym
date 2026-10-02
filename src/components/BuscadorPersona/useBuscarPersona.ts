@@ -23,8 +23,11 @@ export type PersonaBuscada = {
 // Búsqueda de personas por tipo (colaborador, cliente, ...); sin idTipo busca en todas. Estado local de cada buscador.
 export const useBuscarPersona = (idTipo?: number) => {
   const [personas, setPersonas] = useState<PersonaBuscada[]>([])
+  /** true mientras se espera la respuesta (el modal muestra tarjetas de carga) */
+  const [cargando, setCargando] = useState(false)
 
   const buscarPersona = async (q: string, signal?: AbortSignal) => {
+    setCargando(true)
     try {
       const url = idTipo ? `/persona/id_tipo/${idTipo}/search/box` : '/persona/search/box'
       const { data } = await httpClient.get(url, {
@@ -34,8 +37,11 @@ export const useBuscarPersona = (idTipo?: number) => {
       setPersonas(data.items)
     } catch (error) {
       if (!signal?.aborted) console.log(error)
+    } finally {
+      // Si se canceló es porque empezó otra búsqueda: esa apaga la carga al terminar
+      if (!signal?.aborted) setCargando(false)
     }
   }
 
-  return { personas, buscarPersona }
+  return { personas, cargando, buscarPersona }
 }

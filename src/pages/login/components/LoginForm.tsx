@@ -30,15 +30,14 @@ export const LoginForm = () => {
         </div>
       )}
 
+      {/* Se puede entrar con el email o con el nombre de usuario (el backend decide por la @) */}
       <InputCR
-        label="Correo electrónico"
-        autoComplete="email"
-        inputMode="email"
+        label="Email o usuario"
+        autoComplete="username"
         autoFocus
         messageErrors={errors.email?.message}
         {...register("email", {
-          required: "El email es obligatorio",
-          pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Email inválido" },
+          required: "Ingresa tu email o usuario",
         })}
       />
 

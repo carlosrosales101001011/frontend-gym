@@ -1,0 +1,26 @@
+// Skeleton genérico (barras y círculos con brillo) en los colores del tema actual.
+// Uso: <span class="skeleton-cr" style="width: 60%; height: 12px" />, o .skeleton-cr--circulo para avatares.
+@keyframes skeleton-cr-brillo {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-cr {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, $item-hover-actual 25%, $card-border-actual 37%, $item-hover-actual 63%);
+  background-size: 400% 100%;
+  animation: skeleton-cr-brillo 1.4s ease infinite;
+
+  &--circulo {
+    flex-shrink: 0;
+    border-radius: 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-cr {
+    animation: none;
+  }
+}

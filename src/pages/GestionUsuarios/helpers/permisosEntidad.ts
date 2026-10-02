@@ -20,18 +20,18 @@ export type AccionCrud = (typeof ACCIONES_CRUD)[number]['key']
 
 export const campoEstado = (accion: AccionCrud) => `id_estado_${accion}` as const
 
-/** Quien registra solo puede otorgar las acciones que él tiene autorizadas */
-export const puedeOtorgar = (permisoCreador: PermisoEntidadProps | undefined, accion: AccionCrud) =>
-  permisoCreador?.[campoEstado(accion)] === ESTADO_PERMISO.AUTORIZADO
+/** Quien registra solo puede otorgar las acciones que él tiene autorizadas; un super usuario, todas */
+export const puedeOtorgar = (permisoCreador: PermisoEntidadProps | undefined, accion: AccionCrud, esSuperUsuario = false) =>
+  esSuperUsuario || permisoCreador?.[campoEstado(accion)] === ESTADO_PERMISO.AUTORIZADO
 
 /**
  * Permisos iniciales del nuevo usuario, uno por entidad de las secciones asignadas:
  * "Permiso" en lo que quien registra puede otorgar y "Denegado" en lo demás.
  */
-export const armarPermisosIniciales = (idsEntidad: number[], permisosCreador: PermisoEntidadProps[], labelEntidad: (idEntidad: number) => string): PermisoEntidadProps[] =>
+export const armarPermisosIniciales = (idsEntidad: number[], permisosCreador: PermisoEntidadProps[], labelEntidad: (idEntidad: number) => string, esSuperUsuario = false): PermisoEntidadProps[] =>
   idsEntidad.map((idEntidad) => {
     const creador = permisosCreador.find((permiso) => permiso.id_entidad === idEntidad)
-    const estado = (accion: AccionCrud) => puedeOtorgar(creador, accion) ? ESTADO_PERMISO.PERMISO : ESTADO_PERMISO.DENEGADO
+    const estado = (accion: AccionCrud) => puedeOtorgar(creador, accion, esSuperUsuario) ? ESTADO_PERMISO.PERMISO : ESTADO_PERMISO.DENEGADO
     return {
       id_entidad: idEntidad,
       label_entidad: creador?.label_entidad || labelEntidad(idEntidad),
@@ -43,14 +43,15 @@ export const armarPermisosIniciales = (idsEntidad: number[], permisosCreador: Pe
   })
 
 /** Acciones de una entidad que quien registra puede otorgar */
-export const accionesOtorgables = (permisoCreador: PermisoEntidadProps | undefined) =>
-  ACCIONES_CRUD.filter(({ key }) => puedeOtorgar(permisoCreador, key)).map(({ key }) => key)
+export const accionesOtorgables = (permisoCreador: PermisoEntidadProps | undefined, esSuperUsuario = false) =>
+  ACCIONES_CRUD.filter(({ key }) => puedeOtorgar(permisoCreador, key, esSuperUsuario)).map(({ key }) => key)
 
 /**
  * Valor de la columna "Todos": el estado común de las acciones otorgables (las bloqueadas no cuentan),
- * o "Permiso" si difieren o no hay ninguna otorgable.
+ * "Permiso" si difieren, o "Denegado" si no se puede otorgar ninguna.
  */
 export const estadoComun = (permiso: PermisoEntidadProps, acciones: AccionCrud[]) => {
+  if (acciones.length === 0) return ESTADO_PERMISO.DENEGADO
   const estados = new Set(acciones.map((accion) => permiso[campoEstado(accion)]))
   return estados.size === 1 ? [...estados][0] : ESTADO_PERMISO.PERMISO
 }

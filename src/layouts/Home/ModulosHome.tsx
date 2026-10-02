@@ -7,6 +7,7 @@ import IconCR from '@/components/Icons/IconCR';
 import getDateHoy from '@/helpers/getDateHoy';
 import { useAuth } from '@/hook/useAuth';
 import { useSesionStore } from '@/hook/useSesionStore';
+import { useUbicacionUsuario } from '@/hook/useUbicacionUsuario';
 import { useIrAModulo } from '@/hook/useIrAModulo';
 import { IconosTopbar } from '@/components/TopBar/IconosTopbar';
 import { LogoEmpresa } from '@/components/LogoEmpresa/LogoEmpresa';
@@ -68,8 +69,8 @@ export const ModulosHome: React.FC = () => {
     return `${dia} ${date} ${mes} ${anio} · ${hora}:${minuto.toString().padStart(2, '0')}`;
   }, []);
 
-  // TODO: la planta sigue fija hasta que el backend la exponga
-  const usuario = { planta: 'Planta Monterrey' };
+  // Distrito y ciudad del navegador del usuario; '' si no da permiso de ubicación
+  const ubicacion = useUbicacionUsuario();
   const { nombreUsuario, obtenerUsuarioSesion } = useSesionStore();
   useEffect(() => {
     obtenerUsuarioSesion();
@@ -104,7 +105,7 @@ export const ModulosHome: React.FC = () => {
             <span className="nk-eyebrow">Bienvenido</span>
             <h1 className="nk-title">{nombreUsuario}</h1>
           </div>
-          <div className="nk-meta">{fechaHoy} · {usuario.planta}</div>
+          <div className="nk-meta">{fechaHoy}{ubicacion && ` · ${ubicacion}`}</div>
         </div>
         {/* <section className="nk-section">
           <div className="nk-section-head">
@@ -308,7 +309,8 @@ const nkStyles = `
 .nk-mod-card.is-active { border-color: #1E7A52; box-shadow: 0 0 0 1px #1E7A52; }
 .nk-mod-card.is-locked { cursor: not-allowed; background: #FBFAF6; color: #A6A192; }
 .nk-mod-top { display: flex; align-items: flex-start; justify-content: space-between; }
-.nk-mod-title { font-weight: 700; font-size: 13px; }
+.nk-mod-title { font-weight: 700; font-size: 16px; line-height: 1.25; color: var(--bs-primary); }
+.nk-mod-card.is-locked .nk-mod-title { color: inherit; }
 .nk-mod-desc { font-size: 11.5px; color: #8B8B83; }
 .nk-count-badge {
   background: #F5F3EC; color: #6E6A5C; font-size: 11px; font-weight: 700;

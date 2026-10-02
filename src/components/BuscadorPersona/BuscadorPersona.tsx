@@ -23,7 +23,7 @@ type BuscadorPersonaProps = {
 
 export const BuscadorPersona = ({ idTipo, label, placeholder = 'Buscar por nombre, DNI o Telefono', value, onSelect, required = false, onChange, soloNombre = false }: BuscadorPersonaProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const { personas, buscarPersona } = useBuscarPersona(idTipo)
+  const { personas, cargando, buscarPersona } = useBuscarPersona(idTipo)
 
   const items: ItemResultado[] = useMemo(() => personas.map((persona) => ({
     id: persona.id,
@@ -85,6 +85,7 @@ export const BuscadorPersona = ({ idTipo, label, placeholder = 'Buscar por nombr
         onHide={() => setIsOpen(false)}
         items={items}
         onSearch={buscarPersona}
+        cargando={cargando}
         onSelect={onSelectPersona}
       />
     </div>

@@ -120,8 +120,6 @@ export const useVentasStore = () => {
           !venta.id_cli && 'Cliente',
           !venta.id_empl && 'Asesor / Vendedor',
           !venta.id_sucursal && 'Sucursal',
-          !venta.id_tipo_comprobante && 'Tipo de comprobante',
-          !venta.n_comprobante && 'N° de comprobante',
         ].filter(Boolean) as string[]
 
         if (camposFaltantes.length > 0) {
@@ -142,9 +140,14 @@ export const useVentasStore = () => {
         setLoadingVenta(true)
         const inicio = Date.now()
         try {
-          const { detalleventa_membresias, detalleventa_productos, detalleventa_pagos, montoTotal, id_tipo_cli, ...ventaData } = venta
-          // El tipo de cliente es opcional: sin elegir no se envía
-          const dataVenta = await postVenta({ ...ventaData, ...(id_tipo_cli ? { id_tipo_cli } : {}) })
+          const { detalleventa_membresias, detalleventa_productos, detalleventa_pagos, montoTotal, id_tipo_cli, id_tipo_comprobante, n_comprobante, ...ventaData } = venta
+          // Tipo de cliente y comprobante son opcionales: sin elegir (o vacíos) no se envían
+          const dataVenta = await postVenta({
+            ...ventaData,
+            ...(id_tipo_cli ? { id_tipo_cli } : {}),
+            ...(id_tipo_comprobante ? { id_tipo_comprobante } : {}),
+            ...(n_comprobante.trim() ? { n_comprobante: n_comprobante.trim() } : {}),
+          })
           const id_venta = dataVenta?.data?.id
 
           if (detalleventa_membresias.id_programa) {

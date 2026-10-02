@@ -6,6 +6,9 @@ export type SeguimientoMembresiaProps = {
   id_venta?: number;
   label_venta?: string;
   label_nombres_apellidos_cli: string;
+  /** Asesor / vendedor de la venta */
+  id_empl?: number;
+  label_nombres_apellidos_empl?: string;
   telefono_cli: string,
   email_cli: string,
   label_distrito_cli: string,

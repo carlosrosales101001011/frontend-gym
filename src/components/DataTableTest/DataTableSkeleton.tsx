@@ -14,9 +14,9 @@ export default function DataTableSkeleton({ columnsCount, rows }: DataTableSkele
   return (
     <>
       {Array.from({ length: Math.max(rows, 0) }).map((_, rowIndex) => (
-        <tr key={rowIndex}>
+        <tr key={rowIndex} aria-hidden="true">
           {Array.from({ length: Math.max(columnsCount, 1) }).map((_, colIndex) => (
-            <td key={colIndex}>
+            <td key={colIndex} className={`tbody-actual ${styles.skeletonCell}`}>
               <div
                 className={styles.skeletonBar}
                 style={{ width: `${WIDTH_PATTERN[(rowIndex + colIndex) % WIDTH_PATTERN.length]}%` }}

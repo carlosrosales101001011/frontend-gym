@@ -39,7 +39,7 @@ export const TabVentas = ({ activo }: TabVentasProps) => {
           <div className="small opacity-75">{venta.label_tipo_comprobante}</div>
         </div>
       ),
-      searchValue: (venta) => `${venta.n_comprobante} ${venta.label_tipo_comprobante}`,
+      searchValue: (venta) => `${venta.n_comprobante ?? ''} ${venta.label_tipo_comprobante ?? ''}`,
     },
     {
       id: 'asesor',

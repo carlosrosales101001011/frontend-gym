@@ -19,9 +19,10 @@ export const DataTableSeguimiento = ({ data, tipo }: Props) => {
                     <div>{row.label_nombres_apellidos_cli}</div>
                     <div style={{ fontSize: '12px' }}>Email: {row.email_cli?.trim() ? `${row.email_cli}` : <span className='text-danger'>Sin email</span>}</div>
                     <div style={{ fontSize: '12px' }}>Telefono: {row.telefono_cli?.trim() ? `${row.telefono_cli}` : <span className='text-danger'>Sin telefono</span>}</div>
+                    <div style={{ fontSize: '12px' }}>Asesor: {row.label_nombres_apellidos_empl?.trim() ? row.label_nombres_apellidos_empl : <span className='text-danger'>Sin asesor</span>}</div>
                 </div>
             ),
-            searchValue: (row) => `${row.label_nombres_apellidos_cli ?? ''} ${row.email_cli ?? ''} ${row.telefono_cli ?? ''}`,
+            searchValue: (row) => `${row.label_nombres_apellidos_cli ?? ''} ${row.email_cli ?? ''} ${row.telefono_cli ?? ''} ${row.label_nombres_apellidos_empl ?? ''}`,
         },
         tipo === 'activo'
             ? {

@@ -88,7 +88,6 @@ export const DetalleVentaApp = () => {
                 label='Tipo de comprobante'
                 defaultValue={String(venta.id_tipo_comprobante)}
                 onChange={(e) => onActualizarVenta('id_tipo_comprobante', Number(e.target.value))}
-                required
               />
             </Col>
             <Col lg={6}>
@@ -97,7 +96,7 @@ export const DetalleVentaApp = () => {
                 label='Comprobante'
                 value={venta.n_comprobante}
                 onChange={(e) => onActualizarVenta('n_comprobante', e.target.value)}
-                required
+                maxLength={25}
               />
             </Col>
           </Row>

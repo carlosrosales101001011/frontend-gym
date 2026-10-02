@@ -14,6 +14,7 @@ import {
   type PermisoEntidadProps,
   type UserProps,
 } from "../store/usuariosSlice";
+import type { UsuarioSesionProps } from "@/stores/sesion/sesionSlice";
 import { agruparSeccionesPorModulo, type FilaSeccionModuloUser } from "../helpers/seccionesPorModulo";
 
 /** Colaborador (persona id_tipo 1) para el select "Empleado" */
@@ -32,7 +33,7 @@ type ModuloUserBackend = { id: number, id_modulo: number }
 
 export const useGestionUsuariosStore = () => {
   const dispatch = useAppDispatch()
-  const { user, idsSeccionAsignadas, modulosDisponibles, permisosCreador, opcionesEmpleados } = useAppSelector((state) => state.USER)
+  const { user, idsSeccionAsignadas, modulosDisponibles, permisosCreador, creadorEsSuperUsuario, opcionesEmpleados } = useAppSelector((state) => state.USER)
   const { searcher } = useCrudhook<UserProps>('/user', onSetDataUsers)
   const { obtenerAll: obtenerColaboradoresApi } = useCrudhook<ColaboradorProps>('/persona/id_tipo/1')
 
@@ -51,21 +52,26 @@ export const useGestionUsuariosStore = () => {
   /** Módulos, secciones y permisos de quien registra: es lo máximo que puede darle al nuevo usuario */
   const obtenerAccesosCreador = async () => {
     try {
-      const [respuestaSecciones, respuestaEntidades] = await Promise.all([
+      const [respuestaSecciones, respuestaEntidades, respuestaYo] = await Promise.all([
         httpClient.get('/modulo-x-user/user/secciones'),
         httpClient.get('/entidad-x-user/user/all'),
+        httpClient.get('/user/me'),
       ])
       const secciones: FilaSeccionModuloUser[] = respuestaSecciones.data
       const entidades: EntidadUserBackend[] = respuestaEntidades.data
+      const yo: UsuarioSesionProps = respuestaYo.data
       dispatch(onSetModulosDisponibles(agruparSeccionesPorModulo(secciones)))
-      dispatch(onSetPermisosCreador(entidades.map(({ entidad, ...permiso }) => ({
-        id_entidad: permiso.id_entidad,
-        label_entidad: entidad?.valor ?? '',
-        id_estado_CREATE: permiso.id_estado_CREATE,
-        id_estado_READ: permiso.id_estado_READ,
-        id_estado_UPDATE: permiso.id_estado_UPDATE,
-        id_estado_DELETE: permiso.id_estado_DELETE,
-      }))))
+      dispatch(onSetPermisosCreador({
+        esSuperUsuario: !!yo.is_super_user,
+        permisos: entidades.map(({ entidad, ...permiso }) => ({
+          id_entidad: permiso.id_entidad,
+          label_entidad: entidad?.valor ?? '',
+          id_estado_CREATE: permiso.id_estado_CREATE,
+          id_estado_READ: permiso.id_estado_READ,
+          id_estado_UPDATE: permiso.id_estado_UPDATE,
+          id_estado_DELETE: permiso.id_estado_DELETE,
+        })),
+      }))
     } catch (error) {
       console.log(error);
     }
@@ -75,18 +81,18 @@ export const useGestionUsuariosStore = () => {
    * Registra el usuario con sus accesos, en orden: usuario → módulos → secciones de cada módulo → permisos.
    * Los módulos salen de las secciones asignadas. Devuelve true si se guardó (y refresca la tabla).
    */
-  const guardarUsuario = async (permisos: PermisoEntidadProps[]) => {
+  const guardarUsuario = async (permisos: PermisoEntidadProps[], idsSecciones: number[] = idsSeccionAsignadas) => {
     try {
       // id_userParent no se envía: el backend lo toma del token de quien registra
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id_userParent, ...datosUsuario } = user
-      const { data: usuario }: { data?: UserProps } = await httpClient.post('/user/register', { ...datosUsuario, fecha_creacion: new Date() })
+      const { data: usuario }: { data?: UserProps } = await httpClient.post('/user/register', { ...datosUsuario, fecha_creacion: new Date().toISOString() })
       if (!usuario?.id) throw 'No se pudo registrar el usuario'
       const id_user = usuario.id
 
       const secciones = modulosDisponibles
         .flatMap((modulo) => modulo.secciones)
-        .filter((seccion) => idsSeccionAsignadas.includes(seccion.id_seccion))
+        .filter((seccion) => idsSecciones.includes(seccion.id_seccion))
       const idsModulo = [...new Set(secciones.map((seccion) => seccion.id_modulo))]
 
       const { data: modulosUser }: { data: ModuloUserBackend[] } = await httpClient.post('/modulo-x-user/bulk',
@@ -116,16 +122,30 @@ export const useGestionUsuariosStore = () => {
     }
   }
 
+  /** Asigna una contraseña nueva a otro usuario (solo quien lo registró o un super usuario). Devuelve true si se guardó */
+  const asignarPassword = async (idUsuario: number, password_nueva: string) => {
+    try {
+      await httpClient.patch(`/user/id/${idUsuario}/password`, { password_nueva })
+      await Swal.fire({ icon: 'success', title: 'Contraseña actualizada', timer: 1500, showConfirmButton: false })
+      return true
+    } catch (e) {
+      await Swal.fire({ icon: 'error', title: 'No se pudo cambiar la contraseña', html: mensajeError(e) })
+      return false
+    }
+  }
+
   return {
     user,
     idsSeccionAsignadas,
     modulosDisponibles,
     permisosCreador,
+    creadorEsSuperUsuario,
     opcionesEmpleados,
     searcher,
     obtenerOpcionesEmpleados,
     obtenerAccesosCreador,
     guardarUsuario,
+    asignarPassword,
     guardarInformacion: (data: UserProps) => dispatch(onSetUser(data)),
     asignarSecciones: (ids: number[]) => dispatch(onSetSeccionesAsignadas(ids)),
     resetRegistro: () => dispatch(onResetRegistro()),

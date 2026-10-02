@@ -10,6 +10,7 @@ import { querys } from '@/types/parametros'
 import { SearchedCR } from '@/components/DataTableTest/SearchedCR'
 import { DropdownCR, DropdownCheckCR } from '@/components/DropdownCR/DropdownCR'
 import DataTableSkeleton from '@/components/DataTableTest/DataTableSkeleton'
+import { useAppSelector } from '@/stores/Store'
 
 /** Escapa caracteres especiales de regex para poder buscar el término literal */
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -160,8 +161,11 @@ export function DataTableTest<T>({
 
   const { get: getQueryParam, set: setQueryParam } = useQueryParams()
   const searchTerm = getQueryParam(querys.search)
-  /** Cantidad de filas por página actual (misma fuente que usa Paginacion) */
+  /** Cantidad de filas por página actual (misma fuente que usa Paginacion): el skeleton dibuja esas filas */
   const skeletonRows = Number(getQueryParam(querys.show)) || 20
+  // Skeleton mientras el searcher (useCrudhook) trae la página, o si quien usa la tabla pasa loading
+  const cargandoTabla = useAppSelector((state) => state.UI.cargandoTabla) > 0
+  const mostrarSkeleton = loading || cargandoTabla
 
   const initialPersisted = useRef<PersistedState | null>(null)
   if (initialPersisted.current === null) {
@@ -714,7 +718,7 @@ export function DataTableTest<T>({
               </tr>
             </thead>
             <tbody >
-              {loading ? (
+              {mostrarSkeleton ? (
                 <DataTableSkeleton columnsCount={displayColumns.length} rows={skeletonRows} />
               ) : data.length === 0 ? (
                 <tr>

@@ -7,10 +7,17 @@
   }
 }
 
+// Fila del skeleton: mismo alto aproximado que una fila con datos
+.skeletonCell {
+  height: 41px;
+  vertical-align: middle;
+}
+
+// Barra con brillo; colores del tema actual (variables CSS de _variables-custom.scss), sirve en modo claro y nocturno
 .skeletonBar {
-  height: 14px;
-  border-radius: 4px;
-  background: linear-gradient(90deg, #e9ecef 25%, #f3f4f6 37%, #e9ecef 63%);
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--cr-item-hover) 25%, var(--cr-card-border) 37%, var(--cr-item-hover) 63%);
   background-size: 400% 100%;
   animation: dtSkeletonShimmer 1.4s ease infinite;
 }

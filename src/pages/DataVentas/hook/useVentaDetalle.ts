@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import httpClient from '@/common/helpers/httpClient'
-import type { MembresiaForm, PagoForm, ProductoForm, VentaDetalleProps, VentaEditableForm } from '../types'
+import type { MembresiaForm, PagoForm, ProductoForm, VentaDetalleProps, VentaEditablePayload } from '../types'
 
 const mensajeError = (error: unknown) =>
   Array.isArray(error) ? error.join('<br/>') : String(error)
@@ -81,7 +81,7 @@ export const useVentaDetalle = (id: number, onCambio?: () => void) => {
     loading,
     error,
     recargar: cargar,
-    actualizarVenta: (values: Partial<VentaEditableForm>) =>
+    actualizarVenta: (values: VentaEditablePayload) =>
       ejecutar(() => httpClient.patch(`/venta/id/${id}`, values)),
     guardarMembresia: (values: MembresiaForm, idDetalle?: number) =>
       guardarDetalle('/detalleventa-membresias', values, idDetalle),

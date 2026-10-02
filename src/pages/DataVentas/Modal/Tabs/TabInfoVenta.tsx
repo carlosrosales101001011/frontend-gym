@@ -67,9 +67,12 @@ export const TabInfoVenta = ({ venta, actualizarVenta }: TabInfoVentaProps) => {
 
   const onGuardar = async () => {
     setGuardando(true)
-    const { fecha_venta, ...resto } = form
+    const { fecha_venta, id_tipo_comprobante, n_comprobante, ...resto } = form
     const ok = await actualizarVenta({
       ...resto,
+      // Comprobante opcional: sin tipo o sin número se guarda vacío (null)
+      id_tipo_comprobante: id_tipo_comprobante || null,
+      n_comprobante: n_comprobante.trim() || null,
       // datetime-local está en hora local; se envía en ISO (UTC)
       ...(fecha_venta ? { fecha_venta: new Date(fecha_venta).toISOString() } : {}),
     })
