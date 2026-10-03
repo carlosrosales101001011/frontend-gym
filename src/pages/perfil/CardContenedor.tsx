@@ -7,6 +7,7 @@ import { TabContactoEmergencia } from './Tabs/TabContactoEmergencia/TabContactoE
 import { TabDatosPersonales } from '../PerfilCliente/TabDatosPersonales';
 import { TabMembresia } from './Tabs/TabMembresia/TabMembresia';
 import { TabVentas } from './Tabs/TabVentas/TabVentas';
+import { TabArchivos } from './Tabs/TabArchivos/TabArchivos';
 
 /** Título de pestaña con ícono (toma el color del texto de la pestaña) */
 const TituloTab = ({ icono, texto }: { icono: IconName, texto: string }) => (
@@ -38,6 +39,7 @@ export const CardContenedor = () => {
           <TabVentas activo={activeTab === 'ventas'}/>
         </TabCR>
         <TabCR eventKey="archivos" title={<TituloTab icono="carpeta" texto="Archivos" />}>
+          <TabArchivos activo={activeTab === 'archivos'}/>
         </TabCR>
         <TabCR eventKey="comentarios" title={<TituloTab icono="comentarios" texto="Comentarios" />}>
           <TabComentarios activo={activeTab === 'comentarios'}/>

@@ -5,6 +5,7 @@ import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { ModalCustomClientes } from "@/pages/GestionClientes/ModalCustomClientes"
 import { DataTableClientes } from "@/pages/GestionClientes/DataTableClientes"
 import { useClientesStore } from "@/pages/GestionClientes/useClientesStore"
+import { useSeguimientoMembresiaStore } from "@/pages/SeguimientoMembresia/useSeguimientoMembresiaStore"
 import { useQueryParams } from "@/hook/useQueryParams"
 import { querys } from "@/types/parametros"
 import type { isOpenModalCustom } from "@/types/props"
@@ -12,11 +13,16 @@ import type { isOpenModalCustom } from "@/types/props"
 export const App = () => {
     const [isOpenModalCustom, setisOpenModalCustom] = useState<isOpenModalCustom>({id: 0, isCopy: false,  isOpen: false})
     const { searcher } = useClientesStore()
+    const { obtenerMembresiaSeguimiento } = useSeguimientoMembresiaStore()
     const {  get } = useQueryParams();
     const querySearch = (get(querys.search)||'')
     const queryColumnas = get(querys.columnas)
     const page = Number(get(querys.page))
     const show = Number(get(querys.show))
+    // Seguimiento de membresías: de aquí sale si el cliente está activo o inactivo
+    useEffect(() => {
+        obtenerMembresiaSeguimiento()
+    }, [])
     useEffect(() => {
         const ctrl = new AbortController();
         searcher(ctrl.signal).catch(e => {

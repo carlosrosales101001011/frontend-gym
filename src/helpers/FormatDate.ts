@@ -1,6 +1,9 @@
 import { format as formatFns, isValid, parse } from "date-fns";
 import { es } from "date-fns/locale";
 
+// Marca que se reemplaza por "am" / "pm" (date-fns en español escribe "a. m." / "p. m.")
+const AM_PM = '__AMPM__';
+
 // Formatos disponibles -> tokens de date-fns (en date-fns "mm" son minutos, "MM" es mes).
 const FORMATOS = {
     'yyyy-mm-dd': 'yyyy-MM-dd',
@@ -20,6 +23,7 @@ const FORMATOS = {
     'DDDD dd [de] MMMM': "EEEE dd 'de' MMMM",
     'dd [de] MMMM [del] yyyy': "dd 'de' MMMM 'del' yyyy",
     'd MMMM yyyy': 'd MMMM yyyy', // 1 agosto 2026
+    'd MMMM yyyy, hh:mmam': `d MMMM yyyy, hh:mm'${AM_PM}'`, // 21 julio 2026, 05:13pm
     'DDD dd MMM yyyy': 'EEE dd MMM yyyy',
     'dd MMM yyyy': 'dd MMM yyyy',
     'MMMM yyyy': 'MMMM yyyy',
@@ -34,5 +38,5 @@ export type FormatoFecha = keyof typeof FORMATOS;
 export const formatDate = (date: Date | string, dateFormat: FormatoFecha, format: FormatoFecha): string => {
     const fecha = typeof date === 'string' ? parse(date, FORMATOS[dateFormat], new Date(), { locale: es }) : date;
     if (!isValid(fecha)) return '';
-    return formatFns(fecha, FORMATOS[format], { locale: es });
+    return formatFns(fecha, FORMATOS[format], { locale: es }).replace(AM_PM, fecha.getHours() < 12 ? 'am' : 'pm');
 }

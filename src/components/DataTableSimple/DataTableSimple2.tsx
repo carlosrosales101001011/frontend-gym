@@ -3,6 +3,7 @@ import { Button, Dropdown, Form, Table } from 'react-bootstrap';
 import IconCR from '@/components/Icons/IconCR';
 import { InputCR } from '@/components/TextFields/InputCR';
 import { PaginacionCR } from '@/components/Paginacion/PaginacionCR';
+import { ContadorCoincidencias } from '@/components/SinResultados/ContadorCoincidencias';
 
 export type ColumnaSimple2<T> = {
   id: number | string;
@@ -96,7 +97,8 @@ export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostr
   return (
     <div>
       {mostrarBuscador && (
-        <div className="d-flex gap-2 flex-nowrap justify-content-end mb-2">
+        <div className="d-flex gap-2 flex-nowrap justify-content-end align-items-center mb-2">
+          {search.trim() && <ContadorCoincidencias total={filtered.length} />}
           <InputCR
             label="Buscar..."
             value={search}
@@ -179,7 +181,7 @@ export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostr
         <tbody>
           {pageRows.length === 0 ? (
             <tr>
-              <td colSpan={Math.max(columns.length, 1)} className="text-center py-4 ">
+              <td colSpan={Math.max(columns.length, 1)} className="text-center py-4 tbody-actual">
                 No hay datos disponibles
               </td>
             </tr>

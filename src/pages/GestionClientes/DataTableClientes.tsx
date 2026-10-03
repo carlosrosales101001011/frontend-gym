@@ -9,6 +9,9 @@ import { capitalizeWords } from "@/helpers/strings";
 import { getBlobUrl } from "@/helpers/blobUrl";
 import { AvatarCirculo } from "@/components/Avatar/AvatarCirculo";
 import { ajusteAvatarUltimo } from "@/components/Avatar/encuadreFoto";
+import { useMemo } from "react";
+import { useSeguimientoMembresiaStore } from "@/pages/SeguimientoMembresia/useSeguimientoMembresiaStore";
+import { diasVencidos } from "@/helpers/diasMembresia";
 
 type Props = {
     otrosBotones?: React.ReactNode
@@ -16,6 +19,17 @@ type Props = {
 }
 export const DataTableClientes = ({otrosBotones, onOpenModalCustom}:Props) => {
     const val = useAppSelector((state)=>state.CLIENTE.clientes)
+    const { SeguimientoMembresias } = useSeguimientoMembresiaStore()
+    // id del cliente -> su fecha de vencimiento más lejana (si tiene varias membresías)
+    const vencimientoxCliente = useMemo(() => {
+        const mapa = new Map<number, string>()
+        SeguimientoMembresias.forEach((m) => {
+            if (!m.id_cli || !m.fecha_vencimiento) return
+            const actual = mapa.get(m.id_cli)
+            if (!actual || diasVencidos(m.fecha_vencimiento) < diasVencidos(actual)) mapa.set(m.id_cli, m.fecha_vencimiento)
+        })
+        return mapa
+    }, [SeguimientoMembresias])
     console.log(onOpenModalCustom);
     
     // const { remove } = useClientesStore()
@@ -97,10 +111,13 @@ export const DataTableClientes = ({otrosBotones, onOpenModalCustom}:Props) => {
         header: 'Estado',
         id: 5,
         sortable: false,
-        render:()=>{
+        render:(row:ClienteProps)=>{
+            // Activo: hoy <= fecha de vencimiento (igual que en Seguimiento); sin membresía cuenta como inactivo
+            const vencimiento = vencimientoxCliente.get(row.id)
+            const activo = !!vencimiento && diasVencidos(vencimiento) <= 0
             return (
                 <>
-                    <Badge className="p-2 fs-6 bg-success">Activo</Badge>
+                    <Badge className={`p-2 fs-6 ${activo ? 'bg-success' : 'bg-danger'}`}>{activo ? 'Activo' : 'Inactivo'}</Badge>
                 </>
             )
         }

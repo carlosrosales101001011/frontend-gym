@@ -10,6 +10,7 @@ import { querys } from '@/types/parametros'
 import { SearchedCR } from '@/components/DataTableTest/SearchedCR'
 import { DropdownCR, DropdownCheckCR } from '@/components/DropdownCR/DropdownCR'
 import DataTableSkeleton from '@/components/DataTableTest/DataTableSkeleton'
+import { ContadorCoincidencias } from '@/components/SinResultados/ContadorCoincidencias'
 import { useAppSelector } from '@/stores/Store'
 
 /** Escapa caracteres especiales de regex para poder buscar el término literal */
@@ -165,6 +166,8 @@ export function DataTableTest<T>({
   const skeletonRows = Number(getQueryParam(querys.show)) || 20
   // Skeleton mientras el searcher (useCrudhook) trae la página, o si quien usa la tabla pasa loading
   const cargandoTabla = useAppSelector((state) => state.UI.cargandoTabla) > 0
+  /** Total de resultados de la búsqueda (lo guarda el searcher en el store UI) */
+  const totalResultados = useAppSelector((state) => state.UI.totalShow)
   const mostrarSkeleton = loading || cargandoTabla
 
   const initialPersisted = useRef<PersistedState | null>(null)
@@ -573,6 +576,7 @@ export function DataTableTest<T>({
           {otrosBotones}
         </div>
         <div className="d-flex gap-2 flex-nowrap ms-auto">
+          {searchTerm.trim() && <ContadorCoincidencias total={totalResultados} cargando={mostrarSkeleton} />}
           <SearchedCR onSearchChange={onSearchChange} columnasBusqueda={searchColumnsArray}/>
           {columnasBuscables.length > 0 && (
             <DropdownCR
@@ -722,7 +726,7 @@ export function DataTableTest<T>({
                 <DataTableSkeleton columnsCount={displayColumns.length} rows={skeletonRows} />
               ) : data.length === 0 ? (
                 <tr>
-                  <td colSpan={Math.max(displayColumns.length, 1)} className="text-center text-muted py-4">
+                  <td colSpan={Math.max(displayColumns.length, 1)} className="text-center py-4 tbody-actual">
                     No hay datos disponibles
                   </td>
                 </tr>

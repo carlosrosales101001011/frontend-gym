@@ -79,7 +79,7 @@ export const ModalSearching = ({isOpen, onHide, id, labelInput='Buscar por nombr
                     Array.from({ length: ITEMS_SKELETON }, (_, i) => <ItemSearchingSkeleton key={i} indice={i} />)
                 ) : itemsFiltrados.length === 0 ? (
                     <div className="text-center color-mode-actual py-4">
-                        No se encontro ningun item
+                        No se encontró ningún resultado
                     </div>
                 ) : (
                     itemsFiltrados.map((item)=>(

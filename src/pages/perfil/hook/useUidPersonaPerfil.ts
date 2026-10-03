@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { usePersonaPerfil, type PersonaPerfilProps } from './usePersonaPerfil'
 
 /** Uids de la persona que ubican sus datos relacionados (comentarios, contactos de emergencia) */
-type CampoUid = 'uid_comentario' | 'uid_contactoEmergencia'
+type CampoUid = 'uid_comentario' | 'uid_contactoEmergencia' | 'uid_archivos'
 
 /**
  * Uid de la persona del perfil (de la URL) que una pestaña pasa a su componente.

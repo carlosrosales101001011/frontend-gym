@@ -1,0 +1,149 @@
+// AppArchivos: archivos de una persona en tarjetas (components/Archivos). Colores del tema actual.
+.archivos-cr {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+
+  // Tarjeta para subir: click o arrastrar
+  &__subir {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 190px;
+    padding: 16px;
+    border: 2px dashed $card-border-actual;
+    border-radius: 12px;
+    color: $color-actual;
+    background: transparent;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+
+    svg,
+    svg * {
+      color: var(--bs-primary) !important;
+    }
+
+    &:hover:not(:disabled),
+    &--arrastrando {
+      border-color: var(--bs-primary);
+      background-color: rgba(var(--bs-primary-rgb), 0.06);
+    }
+
+    &:disabled {
+      cursor: progress;
+      opacity: 0.7;
+    }
+  }
+
+  &__subir-titulo {
+    font-weight: 700;
+  }
+
+  &__subir-detalle {
+    font-size: 11px;
+    opacity: 0.65;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+    padding: 12px;
+    border: 1px solid $card-border-actual;
+    border-radius: 12px;
+    background-color: $card-actual;
+    transition: box-shadow 0.15s ease;
+
+    &:hover {
+      box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  &__vista {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 84px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: $item-hover-actual;
+  }
+
+  &__miniatura {
+    width: 100%;
+    height: 84px;
+    object-fit: cover;
+  }
+
+  &__icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+
+    svg,
+    svg * {
+      color: inherit !important;
+    }
+  }
+
+  &__nombre {
+    overflow: hidden;
+    color: $color-actual;
+    font-size: 13px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__meta {
+    margin-top: 2px;
+    color: $color-actual;
+    font-size: 11px;
+    opacity: 0.65;
+  }
+
+  &__acciones {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 10px;
+  }
+
+  &__accion {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 30px;
+    border: 1px solid $card-border-actual;
+    border-radius: 8px;
+    color: $color-actual !important;
+    background: transparent;
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $item-hover-actual;
+    }
+
+    &--eliminar {
+      flex: 0 0 34px;
+
+      &:hover,
+      &:hover svg,
+      &:hover svg * {
+        border-color: var(--bs-danger);
+        color: var(--bs-danger) !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+// "N coincidencias exactas" a la izquierda del buscador
+.contador-coincidencias {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background-color: $item-hover-actual;
+  color: $color-actual;
+  font-size: 12px;
+  white-space: nowrap;
+
+  strong {
+    color: $color-actual;
+  }
+
+  &--cero {
+    background-color: rgba(var(--bs-danger-rgb), 0.12);
+
+    &,
+    strong {
+      color: var(--bs-danger) !important;
+    }
+  }
+}

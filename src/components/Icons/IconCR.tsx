@@ -31,6 +31,8 @@ import { PiCirclesFourFill } from "react-icons/pi";
 import { MdWifi, MdWifi2Bar, MdWifiOff } from "react-icons/md";
 import { MdZoomIn, MdZoomOut, MdRotateLeft, MdRotateRight } from "react-icons/md";
 import { MdCardMembership, MdOutlineFolder, MdOutlineComment, MdOutlineContactPhone } from "react-icons/md";
+import { MdOutlineFileDownload, MdOutlineFileUpload } from "react-icons/md";
+import { FaRegFile, FaRegFileExcel, FaRegFileImage, FaRegFilePdf, FaRegFileWord } from "react-icons/fa";
 
 export type IconName =
   | "user"
@@ -92,7 +94,14 @@ export type IconName =
   | 'membresia'
   | 'carpeta'
   | 'comentarios'
-  | 'contactoTelefono';
+  | 'contactoTelefono'
+  | 'descargar'
+  | 'subir'
+  | 'archivo'
+  | 'archivoPdf'
+  | 'archivoImagen'
+  | 'archivoWord'
+  | 'archivoExcel';
 
 const icons: Record<IconName, IconType> = {
   user: FaUser,
@@ -155,6 +164,13 @@ const icons: Record<IconName, IconType> = {
   carpeta: MdOutlineFolder,
   comentarios: MdOutlineComment,
   contactoTelefono: MdOutlineContactPhone,
+  descargar: MdOutlineFileDownload,
+  subir: MdOutlineFileUpload,
+  archivo: FaRegFile,
+  archivoPdf: FaRegFilePdf,
+  archivoImagen: FaRegFileImage,
+  archivoWord: FaRegFileWord,
+  archivoExcel: FaRegFileExcel,
 };
 
 type Props = {

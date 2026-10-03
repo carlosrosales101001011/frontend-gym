@@ -13,8 +13,8 @@ import { ajusteAvatarUltimo } from '@/components/Avatar/encuadreFoto';
 import { getBlobUrl } from '@/helpers/blobUrl';
 import { formatDate } from '@/helpers/FormatDate';
 
-/** "dd/mm/yyyy hh:mm" de una fecha del backend ('' si no viene) */
-const fechaHora = (fecha?: string) => fecha ? formatDate(new Date(fecha), 'yyyy-mm-dd', 'dd/mm/yyyy hh:mm') : ''
+/** "21 julio 2026, 05:13pm" de una fecha del backend ('' si no viene) */
+const fechaHora = (fecha?: string) => fecha ? formatDate(new Date(fecha), 'yyyy-mm-dd', 'd MMMM yyyy, hh:mmam') : ''
 
 /** Tamaño de las fotos de los comentarios (px) */
 const TAMANO_AVATAR = 55
