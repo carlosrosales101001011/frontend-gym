@@ -79,7 +79,7 @@ export const AppRoutes = () => {
             <Route path="gestion-impuestos" element={<GestionImpuestos/>}/>
             <Route path="terminologias-financieras" element={<GestionTermGrupoFinanzas/>}/>
             <Route path="terminologias-grupos-financieros" element={<GestionTerminologiaFinanzas/>}/>
-            <Route path="gestion-modulos" element={<GestionModulos/>}/>
+            <Route path="gestion-modulos" element={<GestionSeccionXmodulouser/>}/>
             <Route path="gestion-secciones" element={<GestionSecciones/>}/>
             <Route path="gestion-entidad-user" element={<GestionEntidadxUser/>}/>
             <Route path="gestion-seccion-modulouser" element={<GestionSeccionXmodulouser/>}/>
@@ -94,7 +94,7 @@ export const AppRoutes = () => {
             <Route path="programa-planes" element={<GestionPlanesEntrenamiento/>}/>
             <Route path="gestion-metas" element={<GestionMetas/>}/>
             <Route path="reporte-metas" element={<ReporteMetas/>}/>
-            <Route path="reporte-venta" element={<ReporteVentas/>}/>
+            <Route path="reporte-ventas" element={<ReporteVentas/>}/>
             <Route path="modulo-x-user" element={<ModulosxUsuario/>}/>
             <Route path="asistencia" element={<GestionAsistencias/>}/>
             <Route element={<ProfileGuard gestion="gestion-usuario"/>}>

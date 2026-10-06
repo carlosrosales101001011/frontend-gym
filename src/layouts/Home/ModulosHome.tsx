@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { BuscadorGlobal } from '@/components/BuscadorGlobal/BuscadorGlobal';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/stores/Store';
 import type { moduloProps } from '@/routes/store/moduloSlice';
@@ -12,7 +13,6 @@ import { useIrAModulo } from '@/hook/useIrAModulo';
 import { IconosTopbar } from '@/components/TopBar/IconosTopbar';
 import { LogoEmpresa } from '@/components/LogoEmpresa/LogoEmpresa';
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay';
-import { colorPorTexto } from '@/helpers/colorPorTexto';
 import { ID_TIPO_MODULO_EMPRESARIAL } from '@/stores/permisos/permisoSlice';
 
 /**
@@ -59,11 +59,6 @@ export const ModulosHome: React.FC = () => {
   const empresariales = useMemo(() => modulos.filter((f) => f.modulo?.id_tipo === ID_TIPO_MODULO_EMPRESARIAL), [modulos]);
   // const personales = useMemo(() => modulos.filter((f) => f.modulo?.id_tipo === 2013), [modulos]);
 
-  const totalSeccionesEmpresariales = empresariales.reduce(
-    (acc, m) => acc + (withExtra(m).secciones ?? 0),
-    0,
-  );
-
   const fechaHoy = useMemo(() => {
     const { anio, dia, date, mes, hora, minuto } = getDateHoy();
     return `${dia} ${date} ${mes} ${anio} · ${hora}:${minuto.toString().padStart(2, '0')}`;
@@ -83,16 +78,23 @@ export const ModulosHome: React.FC = () => {
       <style>{nkStyles}</style>
       <LoadingOverlay show={loadingModulos} texto='Cargando módulos' />
 
+      {/* Arriba de todo, encima del logo (Ctrl+K lo enfoca); en la misma fila, a la derecha, los íconos del Topbar */}
+      <div className="nk-buscador">
+        
+        <div className="nk-header-iconos">
+          <IconosTopbar />
+        </div>
+      </div>
+
       <header className="nk-header">
         <div className="nk-logo">
           <LogoEmpresa alto={56} />
         </div>
-        {/* Mismos íconos que el Topbar de los módulos, a la derecha sin mover el logo del centro */}
-        <div className="nk-header-iconos">
-          <IconosTopbar />
-        </div>
+        
       </header>
-
+      <div className="nk-buscador-campo">
+          <BuscadorGlobal />
+        </div>
       {/* Fijo abajo a la derecha; en mobile queda solo el ícono */}
       <button type="button" className="nk-logout" onClick={logout} title="Cerrar sesión" aria-label="Cerrar sesión">
         <IconCR name="power" size={18} className="nk-logout-icon" />
@@ -195,7 +197,6 @@ type ItemClickProps = {
 // };
 
 const ModuloCard: React.FC<ItemClickProps> = ({ opt, isActive, onClick }) => {
-  const color = colorPorTexto(opt.modulo.label);
   const extra = withExtra(opt);
   const bloqueado = !!extra.sin_acceso;
   return (
@@ -206,8 +207,8 @@ const ModuloCard: React.FC<ItemClickProps> = ({ opt, isActive, onClick }) => {
       disabled={bloqueado}
     >
       <div className="nk-mod-top">
-        <span className="nk-icon-badge nk-icon-badge--sm" style={{ background: bloqueado ? '#EDEBE3' : color.bg, color: color.fg }}>
-          <IconCR name={opt.modulo.icono || 'no-icon'} size={18} />
+        <span className={`nk-icon-badge nk-icon-badge--sm icono-modulo${bloqueado ? ' icono-modulo--bloqueado' : ''}`}>
+          <IconCR name={opt.modulo.icono || 'no-icon'} size={18} className="" />
         </span>
       </div>
       <div className='d-flex flex-column'>
@@ -249,7 +250,21 @@ const nkStyles = `
   padding: 9px 28px;
 }
 .nk-logo { display: flex; align-items: center; gap: 10px; }
-.nk-header-iconos { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); }
+.nk-buscador {
+  display: grid;
+  /* Buscador centrado en la columna del medio; íconos alineados a su altura en la de la derecha */
+  grid-template-columns: 1fr minmax(0, 720px) 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 28px 4px;
+}
+.nk-buscador-campo { grid-column: 2; min-width: 0; }
+.nk-header-iconos { grid-column: 3; justify-self: end; }
+@media (max-width: 767.98px) {
+  .nk-buscador { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 14px 16px 4px; }
+  .nk-buscador-campo { grid-column: 1; }
+  .nk-header-iconos { grid-column: 2; }
+}
 
 .nk-logout {
   position: fixed; right: 24px; bottom: 24px; z-index: 1030;

@@ -246,8 +246,14 @@ export function DataTableTest<T>({
         ordered.push(col)
       }
     })
-    byId.forEach((col, id) => {
-      if (!seen.has(id)) ordered.push(col)
+    // Columnas que no están en el orden guardado (ej. una columna nueva): van justo después de la
+    // columna que las precede en la definición, no al final
+    const definidas = [...byId.values()]
+    definidas.forEach((col, indice) => {
+      if (seen.has(col.id)) return
+      seen.add(col.id)
+      const anterior = definidas.slice(0, indice).reverse().find((c) => ordered.includes(c))
+      ordered.splice(anterior ? ordered.indexOf(anterior) + 1 : 0, 0, col)
     })
     return ordered
   }, [columns, columnOrder])

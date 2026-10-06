@@ -20,6 +20,40 @@
     align-items: center;
   }
 
+  // Buscador al lado del breadcrumb; en pantallas angostas no entra y se oculta
+  &__buscador {
+    margin-left: 8px;
+
+    @media (max-width: 991.98px) {
+      display: none;
+    }
+  }
+
+  // Nombre del usuario logueado (a la izquierda de "Mis módulos"); en mobile no entra y se oculta
+  &__usuario {
+    max-width: 220px;
+    margin: 0 10px 0 6px;
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__usuario-skeleton {
+    display: inline-block;
+    width: 120px;
+    height: 12px;
+    margin: 0 10px 0 6px;
+  }
+
+  @media (max-width: 575.98px) {
+    &__usuario,
+    &__usuario-skeleton {
+      display: none;
+    }
+  }
+
   &__icon {
     font-size: 15px;
     background: none;

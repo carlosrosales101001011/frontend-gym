@@ -40,6 +40,7 @@ import { metaSlice } from "@/pages/GestionMeta/store/metaSlice";
 import { reporteMetaSlice } from "@/pages/ReporteMeta/store/reporteMetaSlice";
 import { reporteVentasSlice } from "@/pages/ReporteVentas/store/reporteVentasSlice";
 import { asistenciasSlice } from "@/pages/GestionAsistencias/store/asistenciasSlice";
+import { modulosUsuarioSlice } from "@/pages/GestionModuloxUsuario/store/modulosUsuarioSlice";
 
 export const store = configureStore({
     reducer: {
@@ -82,7 +83,8 @@ export const store = configureStore({
     META: metaSlice.reducer,
     REPORTE_META: reporteMetaSlice.reducer,
     REPORTE_VENTAS: reporteVentasSlice.reducer,
-    ASISTENCIAS: asistenciasSlice.reducer
+    ASISTENCIAS: asistenciasSlice.reducer,
+    MODULOS_USUARIO: modulosUsuarioSlice.reducer
 }
 })
 

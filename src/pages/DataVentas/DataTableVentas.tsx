@@ -9,6 +9,7 @@ import { ModalInfoVentas } from "./ModalInfoVentas"
 import { getFormatMoney } from "@/helpers/getNumbers"
 import { capitalizeWords } from "@/helpers/strings"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
+import { formatDate } from "@/helpers/FormatDate"
 
 export const DataTableVentas = () => {
     const { obtenerVentas } = useVentasStore()
@@ -38,6 +39,11 @@ export const DataTableVentas = () => {
                 id: 0,
                 header: 'ID',
                 render: (rowData: DataVentaProps) => <span>{rowData.id}</span>,
+            },
+            {
+                id: 10,
+                header: 'Fecha de registro',
+                render: (rowData: DataVentaProps) => <span>{rowData.fecha_venta ? formatDate(new Date(rowData.fecha_venta), 'yyyy-mm-dd', 'd MMMM yyyy') : ''}</span>,
             },
             {
                 id: 1,

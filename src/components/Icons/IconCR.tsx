@@ -33,6 +33,7 @@ import { MdZoomIn, MdZoomOut, MdRotateLeft, MdRotateRight } from "react-icons/md
 import { MdCardMembership, MdOutlineFolder, MdOutlineComment, MdOutlineContactPhone } from "react-icons/md";
 import { MdOutlineFileDownload, MdOutlineFileUpload } from "react-icons/md";
 import { FaRegFile, FaRegFileExcel, FaRegFileImage, FaRegFilePdf, FaRegFileWord } from "react-icons/fa";
+import { MdStar, MdStarBorder, MdPushPin, MdOutlinePushPin, MdDragIndicator, MdOutlineViewList } from "react-icons/md";
 
 export type IconName =
   | "user"
@@ -101,7 +102,13 @@ export type IconName =
   | 'archivoPdf'
   | 'archivoImagen'
   | 'archivoWord'
-  | 'archivoExcel';
+  | 'archivoExcel'
+  | 'estrella'
+  | 'estrellaVacia'
+  | 'fijado'
+  | 'fijadoVacio'
+  | 'arrastrar'
+  | 'secciones';
 
 const icons: Record<IconName, IconType> = {
   user: FaUser,
@@ -171,6 +178,12 @@ const icons: Record<IconName, IconType> = {
   archivoImagen: FaRegFileImage,
   archivoWord: FaRegFileWord,
   archivoExcel: FaRegFileExcel,
+  estrella: MdStar,
+  estrellaVacia: MdStarBorder,
+  fijado: MdPushPin,
+  fijadoVacio: MdOutlinePushPin,
+  arrastrar: MdDragIndicator,
+  secciones: MdOutlineViewList,
 };
 
 type Props = {

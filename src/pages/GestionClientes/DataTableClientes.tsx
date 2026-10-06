@@ -12,6 +12,8 @@ import { ajusteAvatarUltimo } from "@/components/Avatar/encuadreFoto";
 import { useMemo } from "react";
 import { useSeguimientoMembresiaStore } from "@/pages/SeguimientoMembresia/useSeguimientoMembresiaStore";
 import { diasVencidos } from "@/helpers/diasMembresia";
+import { useClientesStore } from "@/pages/GestionClientes/useClientesStore";
+import { BotonFotoCliente } from "@/pages/GestionClientes/components/BotonFotoCliente";
 
 type Props = {
     otrosBotones?: React.ReactNode
@@ -19,6 +21,8 @@ type Props = {
 }
 export const DataTableClientes = ({otrosBotones, onOpenModalCustom}:Props) => {
     const val = useAppSelector((state)=>state.CLIENTE.clientes)
+    // Tras subir una foto desde la tabla se vuelve a pedir la página (para ver la foto nueva)
+    const { searcher } = useClientesStore()
     const { SeguimientoMembresias } = useSeguimientoMembresiaStore()
     // id del cliente -> su fecha de vencimiento más lejana (si tiene varias membresías)
     const vencimientoxCliente = useMemo(() => {
@@ -53,6 +57,13 @@ export const DataTableClientes = ({otrosBotones, onOpenModalCustom}:Props) => {
                 </div>
             )
         }
+    },
+    {
+        header: 'Código',
+        id: 10,
+        campoBusqueda: 'person_code',
+        sortable: false,
+        render:(row:ClienteProps)=> row.person_code || <span className="opacity-50">—</span>
     },
     {
         header: 'Nombres y Apellidos', campoBusqueda: ['nombres', 'apellido_paterno', 'apellido_materno'],
@@ -121,6 +132,12 @@ export const DataTableClientes = ({otrosBotones, onOpenModalCustom}:Props) => {
                 </>
             )
         }
+    },
+    {
+        header: 'Foto',
+        id: 9,
+        sortable: false,
+        render:(row:ClienteProps)=> <BotonFotoCliente cliente={row} onSubida={() => searcher()} />
     },
     {
         header: '',

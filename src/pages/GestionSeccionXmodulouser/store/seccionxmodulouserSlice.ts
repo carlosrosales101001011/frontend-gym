@@ -1,38 +1,35 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type {
+  ModuloUsuarioProps, SeccionProps, UsuarioModulosProps,
+} from '@/pages/GestionModuloxUsuario/store/modulosUsuarioSlice';
 
-export type SeccionxmodulouserProps = {
-  id: number,
-  id_modulouser:number,
-  id_seccion:number,
+/** GET /seccion-x-modulouser/modulo-usuario/:id: lo que necesita el modal de secciones */
+export type DetalleSeccionesProps = {
+  /** El módulo del usuario con sus secciones y su dueño */
+  moduloUsuario: ModuloUsuarioProps & { id_user: number, usuario?: Omit<UsuarioModulosProps, 'modulos'> };
+  /** Todas las secciones (nav_seccion) */
+  catalogo: SeccionProps[];
+  /** Las que puede dar quien administra (super usuario: todas; los demás: las suyas en el módulo) */
+  idsPermitidas: number[];
 };
-export type SeccionxmodulouserState={
-    seccionxmodulouser: SeccionxmodulouserProps[],
-    seccionxmodulouserItem: SeccionxmodulouserProps
-}
 
-const initialseccionxmodulouser: SeccionxmodulouserProps = {
-  id: 0,
-  id_modulouser: 0,
-  id_seccion: 0,
-}
+export type SeccionxmodulouserState = {
+  /** Usuarios que administra quien está logueado, con sus módulos y secciones */
+  usuarios: UsuarioModulosProps[];
+};
+
 export const initialStateSeccionxmodulouser: SeccionxmodulouserState = {
-  seccionxmodulouserItem: initialseccionxmodulouser,
-  seccionxmodulouser: [],
+  usuarios: [],
 };
 
 export const seccionxmodulouserSlice = createSlice({
   name: "SECCIONXMODULOUSER",
   initialState: initialStateSeccionxmodulouser,
   reducers: {
-    // CREATE
-    addSeccionxmodulouser: (state, action: PayloadAction<SeccionxmodulouserProps>) => {
-      state.seccionxmodulouserItem = action.payload;
-    },
-    onSetDataSeccionxmodulouser: (state, action: PayloadAction<SeccionxmodulouserProps[]>)=>{
-      state.seccionxmodulouser = action.payload;
+    onSetUsuariosSecciones: (state, action: PayloadAction<UsuarioModulosProps[]>) => {
+      state.usuarios = action.payload;
     },
   },
 });
 
-
-export const { addSeccionxmodulouser, onSetDataSeccionxmodulouser } = seccionxmodulouserSlice.actions;
+export const { onSetUsuariosSecciones } = seccionxmodulouserSlice.actions;

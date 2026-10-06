@@ -3,6 +3,8 @@ import httpClient from '@/common/helpers/httpClient'
 
 export type PersonaBuscada = {
   id: number
+  /** Va en la URL del perfil */
+  uid?: string
   nombres: string
   apellido_paterno: string
   apellido_materno: string

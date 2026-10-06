@@ -134,6 +134,33 @@ export const useGestionUsuariosStore = () => {
     }
   }
 
+  /**
+   * Elimina al usuario (borrado lógico) con sus módulos, secciones y permisos, previa confirmación.
+   * Solo quien lo registró o un super usuario. Devuelve true si se eliminó
+   */
+  const eliminarUsuario = async (idUsuario: number, nombre: string) => {
+    const { isConfirmed } = await Swal.fire({
+      icon: 'warning',
+      title: '¿Eliminar usuario?',
+      html: `Se eliminará a <strong>${nombre}</strong> junto con sus módulos, las secciones de esos módulos y sus permisos. Ya no podrá iniciar sesión.`,
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: 'var(--bs-danger)',
+      focusCancel: true,
+    })
+    if (!isConfirmed) return false
+    try {
+      await httpClient.delete(`/user/id/${idUsuario}`)
+      await searcher()
+      await Swal.fire({ icon: 'success', title: 'Usuario eliminado', timer: 1500, showConfirmButton: false })
+      return true
+    } catch (e) {
+      await Swal.fire({ icon: 'error', title: 'No se pudo eliminar el usuario', html: mensajeError(e) })
+      return false
+    }
+  }
+
   return {
     user,
     idsSeccionAsignadas,
@@ -146,6 +173,7 @@ export const useGestionUsuariosStore = () => {
     obtenerAccesosCreador,
     guardarUsuario,
     asignarPassword,
+    eliminarUsuario,
     guardarInformacion: (data: UserProps) => dispatch(onSetUser(data)),
     asignarSecciones: (ids: number[]) => dispatch(onSetSeccionesAsignadas(ids)),
     resetRegistro: () => dispatch(onResetRegistro()),

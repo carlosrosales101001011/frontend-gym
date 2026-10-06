@@ -13,6 +13,9 @@ export const CAMPOS_PERSONA_SOLO_LECTURA = [
   'uid_comentario',
   'uid_contactoEmergencia',
   'uid_archivos',
+  // Fechas que pone el backend al registrar
+  'createdAt',
+  'fecha_registro',
 ] as const
 
 type CampoSoloLectura = typeof CAMPOS_PERSONA_SOLO_LECTURA[number]

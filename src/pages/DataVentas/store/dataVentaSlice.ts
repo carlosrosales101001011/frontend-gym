@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export type DataVentaProps = {
   id:number;
+  fecha_venta: string | null;
   label_nombres_apellidos_empl: string,
   label_nombres_apellidos_cli: string,
   montoTotal_membresia: number;

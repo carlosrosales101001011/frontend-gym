@@ -8,6 +8,8 @@ export type MembresiaActualProps = {
   label_programa: string | null
   label_plan: string | null
   label_horario: string | null
+  /** Inicio de la membresía vendida (null si no se encontró el detalle) */
+  fecha_inicio?: string | null
   fecha_vencimiento: string
   montoTotal: number
   montoPagado: number

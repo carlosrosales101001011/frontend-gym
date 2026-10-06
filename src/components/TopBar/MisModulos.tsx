@@ -4,7 +4,6 @@ import { useIrAModulo } from '@/hook/useIrAModulo'
 import IconCR from '@/components/Icons/IconCR'
 import { NubeCR } from '@/components/NubeCR/NubeCR'
 import { usePermisosStore } from '@/hook/usePermisosStore'
-import { colorPorTexto } from '@/helpers/colorPorTexto'
 import { useAppSelector } from '@/stores/Store'
 import { ID_TIPO_MODULO_EMPRESARIAL, type moduloProp } from '@/stores/permisos/permisoSlice'
 
@@ -41,17 +40,14 @@ export const MisModulos = () => {
       {(cerrar) => (
         <>
           <div className="mis-modulos__grid">
-            {empresariales.map((modulo) => {
-              const color = colorPorTexto(modulo.modulo.label)
-              return (
-                <button key={modulo.id} type="button" className="mis-modulos__item" onClick={() => irAModulo(modulo, cerrar)}>
-                  <span className="mis-modulos__icono" style={{ background: color.bg, color: color.fg }}>
-                    <IconCR name={modulo.modulo.icono || 'no-icon'} size={16} />
-                  </span>
-                  <span className="mis-modulos__label">{modulo.modulo.label}</span>
-                </button>
-              )
-            })}
+            {empresariales.map((modulo) => (
+              <button key={modulo.id} type="button" className="mis-modulos__item" onClick={() => irAModulo(modulo, cerrar)}>
+                <span className="mis-modulos__icono icono-modulo">
+                  <IconCR name={modulo.modulo.icono || 'no-icon'} size={16} className="" />
+                </span>
+                <span className="mis-modulos__label">{modulo.modulo.label}</span>
+              </button>
+            ))}
           </div>
           {!loadingModulos && empresariales.length === 0 && (
             <p className="small opacity-75 mb-0 text-center">No tienes módulos asignados.</p>

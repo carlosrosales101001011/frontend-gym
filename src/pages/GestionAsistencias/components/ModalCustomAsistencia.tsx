@@ -11,12 +11,10 @@ import { BuscadorPersona } from "@/components/BuscadorPersona/BuscadorPersona";
 import type { ItemResultado } from "@/components/ModalSearching/ModalSearching";
 import { useAsistenciasStore } from "../hook/useAsistenciasStore";
 import { useMembresiaActual } from "../hook/useMembresiaActual";
+import { TIPO_EVENTO_MANUAL } from "../hook/useRegistrarAsistencia";
 import { CardMembresiaAsistencia } from "./CardMembresiaAsistencia";
 
 const ID_TIPO_COLABORADOR = 1
-
-/** Tipo de evento de una asistencia registrada a mano (terminología persona/asistencia/tipo) */
-const TIPO_EVENTO_MANUAL = 'manual'
 
 type ModalCustomAsistenciaProps = {
   id: number

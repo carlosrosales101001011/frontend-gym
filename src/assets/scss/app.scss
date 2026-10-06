@@ -42,6 +42,7 @@ body{
 @import "custom/components/LeftSideBar";
 @import "custom/components/PrincipalView";
 @import "custom/components/ModulosHome";
+@import "custom/components/BuscadorGlobal";
 @import "custom/components/Item1";
 @import "custom/components/LoadingOverlay";
 @import "../../pages/GestionProgramasEntrenamiento/scss/cardPrograma";
@@ -54,6 +55,7 @@ body{
 @import "../../pages/login/scss/login";
 @import "../../pages/GestionMeta/scss/meta";
 @import "../../pages/GestionUsuarios/scss/gestionUsuarios";
+@import "../../pages/GestionModuloxUsuario/scss/gestionModulosUsuario";
 @import "../../pages/perfil/scss/itemMembresia";
 @import "../../pages/perfil/scss/cardActivoDesde";
 @import "../../pages/perfil/scss/perfilLayout";

@@ -4,6 +4,8 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 export type ClienteProps = {
   uid: string;
   id: number,
+  /** Código del cliente */
+  person_code?: string;
   id_tipo_documento: number;
   numero_documento: string;
   nombres: string;

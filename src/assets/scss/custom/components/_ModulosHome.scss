@@ -7,3 +7,23 @@
     height: 200px;
     margin: 15px;
 }
+// Ícono de un módulo (tarjetas del Home y "Mis módulos"): rojo primario sobre fondo rojo suave
+.icono-modulo {
+  background-color: rgba(var(--bs-primary-rgb), 0.12) !important;
+
+  // También las partes internas del ícono (el * global les pone el color del texto)
+  svg,
+  svg * {
+    color: var(--bs-primary) !important;
+  }
+
+  // Módulo sin acceso: gris
+  &--bloqueado {
+    background-color: rgba(128, 128, 128, 0.15) !important;
+
+    svg,
+    svg * {
+      color: #9a9a9a !important;
+    }
+  }
+}

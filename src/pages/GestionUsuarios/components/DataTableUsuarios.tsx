@@ -6,6 +6,7 @@ import { ModalAsignarPassword } from './ModalAsignarPassword';
 import type { UserProps } from '../store/usuariosSlice';
 import { DataTableTest } from '@/components/DataTableTest/DataTableTest';
 import { useAppSelector } from '@/stores/Store';
+import { useGestionUsuariosStore } from '../hook/useGestionUsuariosStore';
 
 type Props ={
     otrosBotones: React.ReactNode;
@@ -13,6 +14,8 @@ type Props ={
 export const DataTableUsuarios = ({ otrosBotones}:Props) => {
     const [, uid_modulo, ] = location.pathname.split('/');
     const { users } = useAppSelector((state)=>state.USER)
+    const { usuario: usuarioSesion } = useAppSelector((state)=>state.SESION)
+    const { eliminarUsuario } = useGestionUsuariosStore()
     // Usuario al que se le cambia la contraseña (null = modal cerrado)
     const [usuarioPassword, setUsuarioPassword] = useState<{ id: number, nombre: string } | null>(null)
     const columns = [
@@ -78,6 +81,20 @@ export const DataTableUsuarios = ({ otrosBotones}:Props) => {
                     variant='outline-primary'
                     className='btn-sm'
                     onClick={() => setUsuarioPassword({ id: row.id ?? 0, nombre: `${row.nombres} ${row.apellidos}`.trim() })}
+                />
+            )
+        }},
+        {header: 'Eliminar', id: 9, sortable: false, render: (row:UserProps)=>{
+            // Nadie se elimina a sí mismo (el backend también lo impide)
+            const esYo = row.id === usuarioSesion?.id
+            return (
+                <ButtonCR
+                    label='Eliminar'
+                    icon={<IconCR name='delete' size={12} className='' />}
+                    variant='outline-danger'
+                    className='btn-sm'
+                    disabled={esYo}
+                    onClick={() => eliminarUsuario(row.id ?? 0, `${row.nombres} ${row.apellidos}`.trim())}
                 />
             )
         }},
