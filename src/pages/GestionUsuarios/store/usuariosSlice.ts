@@ -15,6 +15,8 @@ export type UserProps = {
   id_estado:number;
   id_empl: number;
   id_rol: number;
+  /** Nombre del rol (lo pone el backend) */
+  label_rol?: string;
   is_super_user: boolean;
   id_userParent:number;
   /** "Nombres Apellidos" de quien lo registró (lo pone el backend) */

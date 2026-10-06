@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import IconCR from '@/components/Icons/IconCR';
 import { ButtonCR } from '@/components/Button/ButtonCR';
 import { ModalAsignarPassword } from './ModalAsignarPassword';
+import { ModalDetalleUsuario } from './ModalDetalleUsuario';
 import type { UserProps } from '../store/usuariosSlice';
 import { DataTableTest } from '@/components/DataTableTest/DataTableTest';
 import { useAppSelector } from '@/stores/Store';
@@ -18,6 +19,8 @@ export const DataTableUsuarios = ({ otrosBotones}:Props) => {
     const { eliminarUsuario } = useGestionUsuariosStore()
     // Usuario al que se le cambia la contraseña (null = modal cerrado)
     const [usuarioPassword, setUsuarioPassword] = useState<{ id: number, nombre: string } | null>(null)
+    // Usuario cuyo detalle se ve (null = modal cerrado)
+    const [usuarioDetalle, setUsuarioDetalle] = useState<UserProps | null>(null)
     const columns = [
         {
             header: 'Id',
@@ -73,6 +76,17 @@ export const DataTableUsuarios = ({ otrosBotones}:Props) => {
                 </>
             )
         }},
+        {header: 'Ver', id: 10, sortable: false, render: (row:UserProps)=>{
+            return (
+                <ButtonCR
+                    label='Ver'
+                    icon={<IconCR name='eye' size={12} className='' />}
+                    variant='outline-primary'
+                    className='btn-sm'
+                    onClick={() => setUsuarioDetalle(row)}
+                />
+            )
+        }},
         {header: 'Cambiar contraseña', id: 8, render: (row:UserProps)=>{
             return (
                 <ButtonCR
@@ -111,6 +125,7 @@ export const DataTableUsuarios = ({ otrosBotones}:Props) => {
     ]
   return (
     <div>
+            {usuarioDetalle && <ModalDetalleUsuario usuario={usuarioDetalle} onHide={() => setUsuarioDetalle(null)} />}
             {usuarioPassword && <ModalAsignarPassword usuario={usuarioPassword} onHide={() => setUsuarioPassword(null)} />}
             <DataTableTest congelarColumnas
             permitirOcultarColumnas

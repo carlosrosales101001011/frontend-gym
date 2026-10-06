@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import classNames from 'classnames'
 import IconCR from '@/components/Icons/IconCR'
+import { useAppSelector } from '@/stores/Store'
 import { esEventoBloqueado, obtenerEstado, TEXTO_EVENTO_BLOQUEADO } from '../helpers/agendaHelpers'
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 
@@ -12,8 +13,9 @@ type EventoChipProps = {
 
 /** Evento dentro del calendario, pintado con el color de su estado */
 export const EventoChip = ({ evento, onClick, style }: EventoChipProps) => {
-  const estado = obtenerEstado(evento.id_estado)
-  const bloqueado = esEventoBloqueado(evento)
+  const { estados } = useAppSelector((state) => state.AGENDA_NUTRICIONISTA)
+  const estado = obtenerEstado(estados, evento.id_estado)
+  const bloqueado = esEventoBloqueado(estados, evento)
   return (
     <button
       type="button"

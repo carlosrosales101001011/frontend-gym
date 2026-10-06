@@ -3,7 +3,7 @@ import { addDays, addMonths, addWeeks } from "date-fns"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { useAgendaNutricionistaStore } from "./hook/useAgendaNutricionistaStore"
 import { initialStateAgendaNutricionista, type EventoAgendaProps } from "./store/agendaNutricionistaSlice"
-import { aFechaISO, esEventoBloqueado, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
+import { aFechaISO, esEventoBloqueado, idEstadoInicial, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
 import { CalendarioToolbar } from "./components/CalendarioToolbar"
 import { LeyendaEstados } from "./components/LeyendaEstados"
 import { VistaMes } from "./components/VistaMes"
@@ -19,7 +19,7 @@ const MOVER_FECHA: Record<VistaCalendario, (fecha: Date, cantidad: number) => Da
 }
 
 export const App = () => {
-  const { eventos, minutosxcli, obtenerEventos } = useAgendaNutricionistaStore()
+  const { eventos, minutosxcli, estados, obtenerEventos, obtenerEstados } = useAgendaNutricionistaStore()
   const [vista, setVista] = useState<VistaCalendario>('mes')
   const [fecha, setFecha] = useState(new Date())
   const [modalEvento, setModalEvento] = useState<{ show: boolean, evento: EventoAgendaProps }>({
@@ -28,6 +28,7 @@ export const App = () => {
   })
 
   useEffect(() => {
+    obtenerEstados()
     obtenerEventos()
   }, [])
 
@@ -40,12 +41,13 @@ export const App = () => {
         fecha: aFechaISO(dia),
         hora_inicio: hora,
         hora_fin: sumarMinutos(hora, minutosxcli),
+        id_estado: idEstadoInicial(estados),
       },
     })
   }
   const onAbrirEvento = (evento: EventoAgendaProps) => {
     // Los eventos importantes (bloqueados) no se pueden editar desde la agenda
-    if (esEventoBloqueado(evento)) return
+    if (esEventoBloqueado(estados, evento)) return
     setModalEvento({ show: true, evento })
   }
   const onCerrarModal = () => {

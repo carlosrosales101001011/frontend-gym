@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { EstadoEvento } from '../helpers/agendaHelpers';
 
 export type EventoAgendaProps = {
   id: number,
@@ -19,13 +20,15 @@ export type AgendaNutricionistaState={
     evento: EventoAgendaProps,
     /** Duración de cada cita en minutos: la vista semana se divide en slots de este tamaño */
     minutosxcli: number
+    /** Estados de cita (terminología agenda / cita / estado) con su color */
+    estados: EstadoEvento[]
 }
 
 const initialEvento: EventoAgendaProps = {
   id: 0,
   id_cli: 0,
   id_nutricionista: 0,
-  id_estado: 1,
+  id_estado: 0,
   fecha: '',
   hora_inicio: '',
   hora_fin: '',
@@ -34,6 +37,7 @@ export const initialStateAgendaNutricionista: AgendaNutricionistaState = {
   evento: initialEvento,
   eventos: [],
   minutosxcli: 10,
+  estados: [],
 };
 
 export const agendaNutricionistaSlice = createSlice({
@@ -43,8 +47,11 @@ export const agendaNutricionistaSlice = createSlice({
     onSetDataEventos: (state, action: PayloadAction<EventoAgendaProps[]>)=>{
       state.eventos = action.payload;
     },
+    onSetEstadosCita: (state, action: PayloadAction<EstadoEvento[]>)=>{
+      state.estados = action.payload;
+    },
   },
 });
 
 
-export const { onSetDataEventos } = agendaNutricionistaSlice.actions;
+export const { onSetDataEventos, onSetEstadosCita } = agendaNutricionistaSlice.actions;

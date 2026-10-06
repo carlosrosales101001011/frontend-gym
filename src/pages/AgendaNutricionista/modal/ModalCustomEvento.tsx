@@ -14,7 +14,7 @@ import {
   DURACION_CITA_DEFAULT,
   DURACIONES_CITA,
   duracionEvento,
-  ESTADOS_SELECCIONABLES,
+  estadosSeleccionables,
   sumarMinutos,
   tituloVista,
 } from '../helpers/agendaHelpers'
@@ -39,7 +39,7 @@ type ModalCustomEventoProps = {
 }
 
 export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoProps) => {
-  const { eventos, guardarEvento, eliminarEvento } = useAgendaNutricionistaStore()
+  const { eventos, estados, guardarEvento, eliminarEvento } = useAgendaNutricionistaStore()
   const { register, formState: { errors }, handleSubmit, setError } = useForm<EventoAgendaProps>({ mode: 'onChange', defaultValues: evento })
   const [cliente, setCliente] = useState(() => aPersona(evento.id_cli, evento.label_cliente))
   const [nutricionista, setNutricionista] = useState(() => aPersona(evento.id_nutricionista, evento.label_nutricionista))
@@ -130,7 +130,7 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
                   />
                 </Col>
                 <Col lg={12}>
-                  <InputSelectCR options={ESTADOS_SELECCIONABLES} {...register('id_estado', {
+                  <InputSelectCR options={estadosSeleccionables(estados)} {...register('id_estado', {
                     required: 'Este campo es obligatorio'
                   })} label="Estado" name="id_estado" messageErrors={errors.id_estado?.message} />
                 </Col>

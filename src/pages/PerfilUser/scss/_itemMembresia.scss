@@ -1,0 +1,86 @@
+// Card de membresía del gym (perfil del cliente): barra de color a la izquierda según el estado
+.item-membresia {
+  --estado-membresia: #22c55e;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border-left: 4px solid var(--estado-membresia) !important;
+
+  &--por-vencer {
+    --estado-membresia: #eab308;
+  }
+
+  &--vencida {
+    --estado-membresia: #{$primary};
+  }
+}
+
+.item-membresia__encabezado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.item-membresia__icono {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: $item-hover-actual;
+}
+
+.item-membresia__titulo {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.item-membresia__detalle,
+.item-membresia__etiqueta {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.item-membresia__estado {
+  flex: 0 0 auto;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background-color: var(--estado-membresia);
+
+  &,
+  * {
+    color: #fff !important;
+  }
+}
+
+.item-membresia__dias {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.item-membresia__numero {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--estado-membresia) !important;
+}
+
+.item-membresia__pie {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 13px;
+  border-top: 1px solid $card-border-actual;
+}

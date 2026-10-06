@@ -8,6 +8,7 @@ import {
   startOfWeek,
 } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { normalizeText } from '@/helpers/strings'
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 
 export type VistaCalendario = 'mes' | 'semana' | 'dia'
@@ -18,7 +19,7 @@ export const VISTAS_CALENDARIO: { value: VistaCalendario, label: string }[] = [
   { value: 'dia', label: 'Día' },
 ]
 
-type EstadoEvento = {
+export type EstadoEvento = {
   value: number,
   label: string,
   color: string,
@@ -26,22 +27,35 @@ type EstadoEvento = {
   bloqueado?: boolean,
 }
 
-// TODO: si el backend agrega los estados a terminologia, cargarlos con useTerminologiaPersona
-export const ESTADOS_EVENTO: EstadoEvento[] = [
-  { value: 1, label: 'Pendiente', color: '#f59f00' },
-  { value: 2, label: 'Confirmado', color: '#1c7ed6' },
-  { value: 3, label: 'Atendido', color: '#2f9e44' },
-  { value: 4, label: 'No asistió', color: '#e03131' },
-  { value: 5, label: 'Importante', color: '#868e96', bloqueado: true },
-]
+/** Color (y si bloquea el evento) de cada estado, por su nombre en la terminología agenda / cita / estado */
+const ESTILO_ESTADO: Record<string, { color: string, bloqueado?: boolean }> = {
+  'pendiente': { color: '#f59f00' },
+  'confirmado': { color: '#1c7ed6' },
+  'atendido': { color: '#2f9e44' },
+  'no asistio': { color: '#e03131' },
+  'importante': { color: '#868e96', bloqueado: true },
+}
+/** Estado nuevo en la terminología sin color asignado aquí */
+const COLOR_OTRO_ESTADO = '#adb5bd'
+
+/** Estados de la terminología (value/label) con su color; en el orden en que se crearon */
+export const armarEstados = (terminologias: { value: number, label: string }[]): EstadoEvento[] =>
+  [...terminologias]
+    .sort((a, b) => a.value - b.value)
+    .map(({ value, label }) => ({ value, label, ...(ESTILO_ESTADO[normalizeText(label)] ?? { color: COLOR_OTRO_ESTADO }) }))
+
+export const obtenerEstado = (estados: EstadoEvento[], id_estado: number): EstadoEvento =>
+  estados.find((estado) => estado.value === id_estado) ?? { value: id_estado, label: 'Sin estado', color: COLOR_OTRO_ESTADO }
+
+export const esEventoBloqueado = (estados: EstadoEvento[], evento: EventoAgendaProps) =>
+  Boolean(obtenerEstado(estados, evento.id_estado).bloqueado)
 
 /** Estados que el nutricionista puede asignar en el formulario (los bloqueados no) */
-export const ESTADOS_SELECCIONABLES = ESTADOS_EVENTO.filter((estado) => !estado.bloqueado)
+export const estadosSeleccionables = (estados: EstadoEvento[]) => estados.filter((estado) => !estado.bloqueado)
 
-export const obtenerEstado = (id_estado: number) =>
-  ESTADOS_EVENTO.find((estado) => estado.value === id_estado) ?? ESTADOS_EVENTO[0]
-
-export const esEventoBloqueado = (evento: EventoAgendaProps) => Boolean(obtenerEstado(evento.id_estado).bloqueado)
+/** Estado con el que nace una cita: Pendiente (o el primero que se pueda elegir) */
+export const idEstadoInicial = (estados: EstadoEvento[]) =>
+  (estados.find((estado) => normalizeText(estado.label) === 'pendiente') ?? estadosSeleccionables(estados)[0])?.value ?? 0
 
 export const TEXTO_EVENTO_BLOQUEADO = 'Evento importante'
 

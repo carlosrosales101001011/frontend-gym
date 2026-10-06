@@ -13,8 +13,7 @@ type PersonaFoto = { id: number, uid_avatar?: string }
  * usa el modal de clientes: POST /persona/avatar/:uid_avatar. Si la persona aún no tiene uid_avatar,
  * primero se le asigna uno. Devuelve true si se subió.
  */
-/** idTipo: tipo de la persona (cliente por defecto; 1 = colaborador) */
-export const useFotoPerfil = (idTipo: number = ID_TIPO_CLIENTE) => {
+export const useFotoPerfil = () => {
   const [subiendo, setSubiendo] = useState(false)
 
   const subirFoto = async (persona: PersonaFoto, archivo: File) => {
@@ -26,7 +25,7 @@ export const useFotoPerfil = (idTipo: number = ID_TIPO_CLIENTE) => {
     try {
       const uid_avatar = persona.uid_avatar || crypto.randomUUID().toUpperCase()
       if (!persona.uid_avatar) {
-        await httpClient.patch(`/persona/id_tipo/${idTipo}/id/${persona.id}`, { uid_avatar })
+        await httpClient.patch(`/persona/id_tipo/${ID_TIPO_CLIENTE}/id/${persona.id}`, { uid_avatar })
       }
       const formData = new FormData()
       formData.append('file', archivo)

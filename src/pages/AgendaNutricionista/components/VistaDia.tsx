@@ -1,5 +1,6 @@
 import classNames from 'classnames'
 import IconCR from '@/components/Icons/IconCR'
+import { useAppSelector } from '@/stores/Store'
 import { esEventoBloqueado, eventosDelDia, obtenerEstado, TEXTO_EVENTO_BLOQUEADO } from '../helpers/agendaHelpers'
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 
@@ -11,6 +12,7 @@ type VistaDiaProps = {
 
 /** Lista de los eventos del día ordenados por hora */
 export const VistaDia = ({ fecha, eventos, onSeleccionarEvento }: VistaDiaProps) => {
+  const { estados } = useAppSelector((state) => state.AGENDA_NUTRICIONISTA)
   const eventosDia = eventosDelDia(eventos, fecha)
 
   if (eventosDia.length === 0) {
@@ -20,8 +22,8 @@ export const VistaDia = ({ fecha, eventos, onSeleccionarEvento }: VistaDiaProps)
   return (
     <div className="d-flex flex-column gap-2">
       {eventosDia.map((evento) => {
-        const estado = obtenerEstado(evento.id_estado)
-        const bloqueado = esEventoBloqueado(evento)
+        const estado = obtenerEstado(estados, evento.id_estado)
+        const bloqueado = esEventoBloqueado(estados, evento)
         return (
           <div
             key={evento.id}

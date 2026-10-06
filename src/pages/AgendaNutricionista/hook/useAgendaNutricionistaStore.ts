@@ -1,67 +1,95 @@
 import Swal from 'sweetalert2'
-import { useCrudhook } from "@/hook/usecrudhook"
-import { useAppDispatch, useAppSelector } from "@/stores/Store"
-import { onSetDataEventos, type EventoAgendaProps } from "../store/agendaNutricionistaSlice"
-import { EVENTOS_FALSOS } from "../helpers/eventosFalsos"
+import httpClient from '@/common/helpers/httpClient'
+import { mensajeError } from '@/helpers/mensajeError'
+import { useAppDispatch, useAppSelector } from '@/stores/Store'
+import { onSetDataEventos, onSetEstadosCita, type EventoAgendaProps } from '../store/agendaNutricionistaSlice'
+import { armarEstados, duracionEvento, sumarMinutos } from '../helpers/agendaHelpers'
 
-// TODO: poner en false cuando exista /agenda-nutricionista en el backend.
-// Con true, los eventos viven solo en el store (se pierden al recargar la página).
-const USAR_DATA_FALSA = true
-/**
- * La data falsa se carga una vez por carga del módulo: así lo agregado/editado se mantiene al
- * volver a la pantalla, y si cambia eventosFalsos.ts (recarga en caliente) se vuelve a cargar.
- */
-let dataFalsaCargada = false
+/** Cita tal como la devuelve /agenda-nutricionista */
+type CitaApi = {
+  id: number
+  id_cli: number
+  label_nombres_apellidos_cli?: string | null
+  id_empl: number
+  label_nombres_apellidos_empl?: string | null
+  /** yyyy-MM-dd (o ISO con hora) */
+  fecha: string
+  /** HH:mm[:ss] (o ISO 1970-01-01THH:mm) */
+  hora_inicio: string
+  duracionxmin: number
+  id_estado: number
+  label_estado?: string | null
+}
 
-const mensajeError = (error: unknown) =>
-  Array.isArray(error) ? error.join('<br/>') : String(error)
+/** "HH:mm" a partir de lo que devuelve la columna time del backend */
+const aHoraHHmm = (hora: string) => (hora.includes('T') ? hora.split('T')[1] : hora).slice(0, 5)
 
+/** Del backend al calendario (que trabaja con hora de fin y nombres cortos) */
+const desdeApi = (cita: CitaApi): EventoAgendaProps => {
+  const hora_inicio = aHoraHHmm(cita.hora_inicio)
+  return {
+    id: cita.id,
+    id_cli: cita.id_cli,
+    id_nutricionista: cita.id_empl,
+    id_estado: cita.id_estado,
+    fecha: cita.fecha.slice(0, 10),
+    hora_inicio,
+    hora_fin: sumarMinutos(hora_inicio, cita.duracionxmin),
+    label_cliente: cita.label_nombres_apellidos_cli ?? undefined,
+    label_nutricionista: cita.label_nombres_apellidos_empl ?? undefined,
+  }
+}
+
+/** Del calendario al backend (los label_* los pone el backend) */
+const haciaApi = (evento: EventoAgendaProps) => ({
+  id_cli: evento.id_cli,
+  id_empl: evento.id_nutricionista,
+  fecha: evento.fecha,
+  hora_inicio: evento.hora_inicio,
+  duracionxmin: duracionEvento(evento),
+  id_estado: evento.id_estado,
+})
+
+/** Citas de la agenda del nutricionista y sus estados (terminología agenda / cita / estado) */
 export const useAgendaNutricionistaStore = () => {
     const dispatch = useAppDispatch()
-    const { eventos, minutosxcli } = useAppSelector(e=>e.AGENDA_NUTRICIONISTA)
-    const { obtenerAll, post, patch, remove } = useCrudhook<EventoAgendaProps>('/agenda-nutricionista', onSetDataEventos)
+    const { eventos, minutosxcli, estados } = useAppSelector(e=>e.AGENDA_NUTRICIONISTA)
 
+    /** Todas las citas (el calendario las necesita todas para mostrar y validar cruces) */
     const obtenerEventos = async () => {
-      if (USAR_DATA_FALSA) {
-        if (!dataFalsaCargada) {
-          dispatch(onSetDataEventos(EVENTOS_FALSOS))
-          dataFalsaCargada = true
-        }
-        return
+      try {
+        const { data } = await httpClient.get('/agenda-nutricionista')
+        dispatch(onSetDataEventos((data.lista as CitaApi[]).map(desdeApi)))
+      } catch (e) {
+        await Swal.fire({ icon: 'error', title: 'No se pudo cargar la agenda', html: mensajeError(e) })
       }
-      await obtenerAll()
     }
 
-    const guardarEventoApi = async (evento: EventoAgendaProps) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- los label_* solo son para mostrar
-      const { id, label_cliente, label_nutricionista, ...values } = evento
-      if (id !== 0) {
-        await patch(values, id)
-      } else {
-        await post(values)
+    /** Estados de cita con su color; se piden una vez */
+    const obtenerEstados = async () => {
+      if (estados.length) return
+      try {
+        const { data } = await httpClient.get('/terminologia/entidad/agenda/grupo/cita/subgrupo/estado')
+        dispatch(onSetEstadosCita(armarEstados(data)))
+      } catch (error) {
+        console.log(error)
       }
-      // post/patch recargan con el searcher (paginado); el calendario necesita todos los eventos
-      await obtenerAll()
-    }
-    const guardarEventoFalso = (evento: EventoAgendaProps) => {
-      const nuevoId = Math.max(0, ...eventos.map((e) => e.id)) + 1
-      dispatch(onSetDataEventos(evento.id !== 0
-        ? eventos.map((e) => e.id === evento.id ? evento : e)
-        : [...eventos, { ...evento, id: nuevoId }]))
     }
 
     /** Crea o edita según el id. Devuelve true si se guardó. */
     const guardarEvento = async (evento: EventoAgendaProps) => {
       try {
-        if (USAR_DATA_FALSA) guardarEventoFalso(evento)
-        else await guardarEventoApi(evento)
+        if (evento.id !== 0) await httpClient.patch(`/agenda-nutricionista/id/${evento.id}`, haciaApi(evento))
+        else await httpClient.post('/agenda-nutricionista', haciaApi(evento))
+        await obtenerEventos()
         return true
       } catch (e) {
         await Swal.fire({ icon: 'error', title: 'No se pudo guardar', html: mensajeError(e) })
         return false
       }
     }
-    /** Pide confirmación y elimina. Devuelve true si se eliminó. */
+
+    /** Pide confirmación y elimina (borrado lógico). Devuelve true si se eliminó. */
     const eliminarEvento = async (id: number) => {
       const { isConfirmed } = await Swal.fire({
         icon: 'warning',
@@ -73,22 +101,21 @@ export const useAgendaNutricionistaStore = () => {
       })
       if (!isConfirmed) return false
       try {
-        if (USAR_DATA_FALSA) {
-          dispatch(onSetDataEventos(eventos.filter((e) => e.id !== id)))
-        } else {
-          await remove(id)
-          await obtenerAll()
-        }
+        await httpClient.delete(`/agenda-nutricionista/id/${id}`)
+        await obtenerEventos()
         return true
       } catch (e) {
         await Swal.fire({ icon: 'error', title: 'No se pudo eliminar', html: mensajeError(e) })
         return false
       }
     }
+
   return {
     eventos,
     minutosxcli,
+    estados,
     obtenerEventos,
+    obtenerEstados,
     guardarEvento,
     eliminarEvento,
   }

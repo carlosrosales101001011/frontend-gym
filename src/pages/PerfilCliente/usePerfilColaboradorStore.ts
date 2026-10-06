@@ -5,28 +5,10 @@ import { mensajeError } from "@/helpers/mensajeError";
 import { onSetDataColaborador, type ColaboradorProps } from "@/pages/PerfilCliente/store/perfilColaboradorSlice";
 import { useState } from "react";
 import { onSetContratosColaborador } from "@/pages/PerfilCliente/store/contratoColaboradorSlice";
+import { payloadDatosPersonales } from "@/helpers/payloadDatosPersonales";
 
 /** Id de tipo de persona "cliente" */
 const ID_TIPO_CLIENTE = 2
-
-/** Campos del formulario "Datos personales" que se envían (el backend rechaza los label_*, fecha_registro, etc.) */
-const CAMPOS_EDITABLES = [
-  'nombres', 'apellido_paterno', 'apellido_materno', 'fecha_nacimiento', 'telefono', 'numero_documento',
-  'direccion', 'email_personal', 'email_corporativo',
-  'id_genero', 'id_estado_civil', 'id_tipo_documento', 'id_nacionalidad', 'id_distrito',
-] as const
-
-/** Los selects devuelven texto ("3"): el backend los pide como número */
-const CAMPOS_NUMERICOS: readonly string[] = ['id_genero', 'id_estado_civil', 'id_tipo_documento', 'id_nacionalidad', 'id_distrito']
-
-/** Solo los campos editables; los ids como número (un select vacío no se envía) */
-const armarPayload = (datos: Partial<ColaboradorProps>) =>
-  Object.fromEntries(
-    CAMPOS_EDITABLES
-      .filter((campo) => datos[campo] !== undefined)
-      .filter((campo) => !CAMPOS_NUMERICOS.includes(campo) || (datos[campo] !== '' && datos[campo] !== null))
-      .map((campo) => [campo, CAMPOS_NUMERICOS.includes(campo) ? Number(datos[campo]) : datos[campo]])
-  )
 
 export const usePerfilColaboradorStore = () => {
     const dispatch = useDispatch()
@@ -49,7 +31,7 @@ export const usePerfilColaboradorStore = () => {
     const actualizarDatosPersonales = async(id:number, uid_person:string, datos:Partial<ColaboradorProps>)=>{
         setloading(true)
         try {
-            await httpClient.patch(`/persona/id_tipo/${ID_TIPO_CLIENTE}/id/${id}`, armarPayload(datos));
+            await httpClient.patch(`/persona/id_tipo/${ID_TIPO_CLIENTE}/id/${id}`, payloadDatosPersonales(datos));
             await obtenerDataColaboradorxUID(uid_person);
             await Swal.fire({ icon: 'success', title: 'Datos actualizados', timer: 1500, showConfirmButton: false });
             return true

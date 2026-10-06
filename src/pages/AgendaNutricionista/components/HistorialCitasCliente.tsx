@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { localDateStringToDate } from '@/helpers/getDate'
+import { useAppSelector } from '@/stores/Store'
 import { citasDelCliente, obtenerEstado } from '../helpers/agendaHelpers'
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 
@@ -14,6 +15,7 @@ type HistorialCitasClienteProps = {
 
 /** Columna del modal con las citas que tuvo (y tiene agendadas) el cliente seleccionado */
 export const HistorialCitasCliente = ({ eventos, id_cli, idEvento }: HistorialCitasClienteProps) => {
+  const { estados } = useAppSelector((state) => state.AGENDA_NUTRICIONISTA)
   if (!id_cli) {
     return (
       <div className="agenda__historial agenda__historial--inactivo">
@@ -29,7 +31,7 @@ export const HistorialCitasCliente = ({ eventos, id_cli, idEvento }: HistorialCi
       {citas.length === 0 && <div className="small">El cliente no tiene otras citas registradas</div>}
       <div className="agenda__historial-lista scroll-mode-actual">
         {citas.map((cita) => {
-          const estado = obtenerEstado(cita.id_estado)
+          const estado = obtenerEstado(estados, cita.id_estado)
           return (
             <div key={cita.id} className="agenda__historial-item" style={{ borderLeftColor: estado.color }}>
               <div className="d-flex justify-content-between gap-2">

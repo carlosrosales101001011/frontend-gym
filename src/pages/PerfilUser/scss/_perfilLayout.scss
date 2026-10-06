@@ -1,0 +1,118 @@
+// Perfil del cliente (pages/perfil/App.tsx y CardInfo.tsx).
+// Escritorio: CardInfo a la izquierda (380px) y CardContenedor a la derecha, ambos a toda la altura.
+// Celular: uno debajo del otro, y CardInfo horizontal (foto | nombre, email, teléfono).
+.perfil-layout {
+  display: flex;
+
+  &__info {
+    flex: 0 0 280px;
+    height: 100%;
+  }
+
+  &__contenedor {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+  }
+
+  @media (max-width: 767.98px) {
+    flex-direction: column;
+    // La pantalla hace scroll: cada card toma su alto natural
+    height: auto !important;
+
+    &__info,
+    &__contenedor {
+      flex-basis: auto;
+      height: auto;
+      padding-bottom: 0 !important;
+    }
+
+    &__contenedor {
+      padding-bottom: 1rem !important;
+    }
+  }
+}
+
+// CardInfo: en escritorio la cabecera y los datos no agrupan nada (display: contents) y el orden es
+// foto, nombre, "activo desde" y contacto; en celular la cabecera es una fila (foto | datos).
+.card-info {
+  &__cabecera,
+  &__datos {
+    display: contents;
+  }
+
+  &__foto {
+    order: 1;
+    margin: 0 auto 1rem;
+  }
+
+  &__nombre {
+    order: 2;
+    margin: 0.25rem 0;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  &__activo {
+    order: 3;
+    margin-top: 0.5rem;
+  }
+
+  &__contacto {
+    order: 4;
+  }
+
+  &__campo {
+    margin: 1rem 0;
+  }
+
+  // "Email:" / "Teléfono:": arriba del valor en escritorio, al lado en celular
+  &__etiqueta {
+    display: block;
+    font-weight: 700;
+  }
+
+  @media (max-width: 767.98px) {
+    &__cabecera {
+      display: flex;
+      order: 1;
+      align-items: center;
+      gap: 16px;
+    }
+
+    &__foto {
+      flex-shrink: 0;
+      margin: 0;
+    }
+
+    // La foto primero (a la izquierda) y los datos al lado
+    &__datos {
+      display: flex;
+      order: 2;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    &__nombre {
+      margin: 0 0 4px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    &__campo {
+      margin: 2px 0;
+      font-size: 13px;
+    }
+
+    &__etiqueta {
+      display: inline;
+      margin-right: 4px;
+    }
+
+    &__activo {
+      order: 2;
+      margin-top: 1rem;
+    }
+  }
+}

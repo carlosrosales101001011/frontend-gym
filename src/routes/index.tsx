@@ -31,6 +31,7 @@ const GestionTerminologiaFinanzas = lazy(() => import('@/pages/GestionTerminolog
 // TODO: PERFILES
 const Perfil = lazy(() => import('@/pages/perfil'));
 const PerfilColaborador = lazy(() => import('@/pages/PerfilColaborador/Index'));
+const PerfilUser = lazy(() => import('@/pages/PerfilUser'));
 // const PerfilCliente = lazy(() => import('@/pages/PerfilCliente/Index'));
 //TODO: CONFIGURACIONES APROXI
 const GestionModulos = lazy(() => import('@/pages/GestionModulos'));
@@ -99,7 +100,7 @@ export const AppRoutes = () => {
             <Route path="asistencia" element={<GestionAsistencias/>}/>
             <Route element={<ProfileGuard gestion="gestion-usuario"/>}>
               <Route path="gestion-usuario" element={<GestionUsuario/>}/>
-              <Route path="perfil-usuario/:uid_user" element={<Perfil/>}/>
+              <Route path="perfil-usuario/:uid_person" element={<PerfilUser/>}/>
             </Route>
             <Route element={<ProfileGuard gestion="gestion-clientes"/>}>
               <Route path="gestion-clientes" element={<GestionClientes/>}/>
