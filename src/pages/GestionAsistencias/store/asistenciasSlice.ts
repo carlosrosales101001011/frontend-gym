@@ -5,7 +5,7 @@ export type AsistenciaProps = {
   id: number;
   id_persona: number;
   /** Lo arma el backend con los nombres de la persona */
-  label_nombres_apellidos_persona?: string | null;
+  label_nombres_apellidos_persona: string;
   id_tipo_evento: number;
   /** Lo arma el backend con el valor de la terminología */
   label_tipo_evento?: string | null;
@@ -13,6 +13,9 @@ export type AsistenciaProps = {
   deviceSN?: string | null;
   /** Fecha y hora de la marcación (la pone el backend al crear) */
   fecha_registro: string;
+  /** Usuario que la registró (lo pone el backend con el token); null en las anteriores */
+  id_usercreated?: number | null;
+  label_nombres_apellidos_usercreated?: string | null;
 };
 
 export type AsistenciasState = {

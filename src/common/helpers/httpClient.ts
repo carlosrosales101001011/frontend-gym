@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { STORAGE_KEY } from '@/providers/AuthProvider';
+import { formatearNombres } from '@/helpers/formatoNombres';
 
 const ErrorCodeMessages: { [key: number]: string } = {
 	401: 'Invalid credentials',
@@ -45,6 +46,9 @@ _httpClient.interceptors.request.use((config) => {
 });
 
 _httpClient.interceptors.response.use((response) => {
+		// Nombres, direcciones y nombres de catálogo llegan como "Nombre Apellido" a todas las pantallas
+		// (y así se copian); la base no se toca. Ver helpers/formatoNombres.ts
+		response.data = formatearNombres(response.data);
 		return response;
 	}, _errorHandler);
 	return {

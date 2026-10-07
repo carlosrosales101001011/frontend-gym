@@ -12,7 +12,7 @@ export const PageBreadCumb = ({title=''}) => {
   return (
     <>
       <Helmet>
-        <title>{title} | Sistema any</title>
+        <title>{title} | Sistema tribu1</title>
       </Helmet>
     </>
   )

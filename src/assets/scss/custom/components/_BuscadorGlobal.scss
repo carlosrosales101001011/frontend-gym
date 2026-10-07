@@ -1,7 +1,7 @@
 // Buscador grande del Home (components/BuscadorGlobal): pantallas y personas. Colores del tema actual.
 .buscador-global {
   position: relative;
-  width: min(720px, 100%);
+  width: min(936px, 100%);
   margin: 0 auto;
 
   &__campo {
@@ -127,16 +127,20 @@
   &__asistencia {
     display: inline-flex;
     flex-shrink: 0;
+    // Va debajo del nombre (columna flex): sin esto se estira a todo el ancho
+    align-self: flex-start;
+    margin-top: 4px;
     align-items: center;
-    gap: 5px;
-    height: 26px;
-    padding: 0 10px;
+    gap: 3px;
+    height: 22px;
+    padding: 0 6px;
     border: 1px solid var(--bs-primary);
-    border-radius: 7px;
+    border-radius: 6px;
     background: transparent;
     color: var(--bs-primary) !important;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
+    line-height: 1;
     white-space: nowrap;
     cursor: pointer;
 
@@ -212,7 +216,7 @@
 
   // Topbar: más angosto, sin sombra y el panel un poco más ancho que el campo
   &--compacto {
-    width: 300px;
+    width: 390px;
     margin: 0;
 
     .buscador-global__campo {

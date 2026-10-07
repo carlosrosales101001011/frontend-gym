@@ -1,6 +1,9 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { OpcionesSelect } from '@/types/props';
 
+/** users.id_estado: 1 = activo (0 = inactivo) */
+export const ID_ESTADO_ACTIVO = 1;
+
 export type UserProps = {
   id?:number;
   uuid: string;
@@ -75,7 +78,8 @@ export const initialUser: UserProps = {
     usuario: '',
     telefono: '',
     password: '',
-    id_estado: 0,
+    // Un usuario nuevo nace activo
+    id_estado: ID_ESTADO_ACTIVO,
     id_empl: 0,
     id_rol: 0,
     id_userParent:0,

@@ -4,7 +4,8 @@ import IconCR from '@/components/Icons/IconCR';
 import { ButtonCR } from '@/components/Button/ButtonCR';
 import { ModalAsignarPassword } from './ModalAsignarPassword';
 import { ModalDetalleUsuario } from './ModalDetalleUsuario';
-import type { UserProps } from '../store/usuariosSlice';
+import { BadgeEstado } from '@/components/Badge/BadgeEstado';
+import { ID_ESTADO_ACTIVO, type UserProps } from '../store/usuariosSlice';
 import { DataTableTest } from '@/components/DataTableTest/DataTableTest';
 import { useAppSelector } from '@/stores/Store';
 import { useGestionUsuariosStore } from '../hook/useGestionUsuariosStore';
@@ -55,38 +56,34 @@ export const DataTableUsuarios = ({ otrosBotones}:Props) => {
                 </>
             )
         }},
-        {header: 'Creado por', campoBusqueda: 'label_nombres_apellidos_userParent', id: 5,  render: (row:UserProps)=>{
+        {header: 'Creado por', campoBusqueda: 'label_nombres_apellidos_userParent', id: 4,  render: (row:UserProps)=>{
             return (
                 <>
                 {row.label_nombres_apellidos_userParent || <span className="opacity-50">—</span>}
                 </>
             )
         }},
-        {header: 'Fecha creado',id: 6,  render: (row:UserProps)=>{
+        {header: 'Fecha creado',id: 5,  render: (row:UserProps)=>{
             return (
                 <>
                 {row.fecha_creacion}
                 </>
             )
         }},
-        {header: 'Estado',id: 4, widthEditable: true, render: (row:UserProps)=>{
-            return (
-                <>
-                {row.id_estado === 1 ? 'Activo' : 'Inactivo'}
-                </>
-            )
+        {header: 'Estado',id: 6, widthEditable: true, render: (row:UserProps)=>{
+            return <BadgeEstado activo={row.id_estado === ID_ESTADO_ACTIVO} />
         }},
-        {header: 'Ver', id: 10, sortable: false, render: (row:UserProps)=>{
-            return (
-                <ButtonCR
-                    label='Ver'
-                    icon={<IconCR name='eye' size={12} className='' />}
-                    variant='outline-primary'
-                    className='btn-sm'
-                    onClick={() => setUsuarioDetalle(row)}
-                />
-            )
-        }},
+        // {header: 'Ver', id: 7, sortable: false, render: (row:UserProps)=>{
+        //     return (
+        //         <ButtonCR
+        //             label='Ver'
+        //             icon={<IconCR name='eye' size={12} className='' />}
+        //             variant='outline-primary'
+        //             className='btn-sm'
+        //             onClick={() => setUsuarioDetalle(row)}
+        //         />
+        //     )
+        // }},
         {header: 'Cambiar contraseña', id: 8, render: (row:UserProps)=>{
             return (
                 <ButtonCR
@@ -98,22 +95,8 @@ export const DataTableUsuarios = ({ otrosBotones}:Props) => {
                 />
             )
         }},
-        {header: 'Eliminar', id: 9, sortable: false, render: (row:UserProps)=>{
-            // Nadie se elimina a sí mismo (el backend también lo impide)
-            const esYo = row.id === usuarioSesion?.id
-            return (
-                <ButtonCR
-                    label='Eliminar'
-                    icon={<IconCR name='delete' size={12} className='' />}
-                    variant='outline-danger'
-                    className='btn-sm'
-                    disabled={esYo}
-                    onClick={() => eliminarUsuario(row.id ?? 0, `${row.nombres} ${row.apellidos}`.trim())}
-                />
-            )
-        }},
         {header: '', widthEditable: true,
-            sortable: false, id: 7, render: (row:UserProps)=>{
+            sortable: false, id: 9, render: (row:UserProps)=>{
             return (
                 <div>
                     <Link to={`/${uid_modulo}/perfil-usuario/${row.uuid}`} className='text-info' style={{cursor: 'pointer'}}>

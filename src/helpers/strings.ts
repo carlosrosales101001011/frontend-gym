@@ -1,9 +1,13 @@
 // strings.ts
+/**
+ * "JUAN pérez BOLAÑOS" -> "Juan Pérez Bolaños": mayúscula solo en la letra que inicia cada palabra.
+ * (No usa \b: solo reconoce letras sin tilde y capitalizaba después de ñ/tildes, ej. "BolaÑOs")
+ */
 export const capitalizeWords = (text: string): string =>
   text
     .trim()
     .toLowerCase()
-    .replace(/\b\p{L}/gu, (letter) => letter.toUpperCase());
+    .replace(/(?<![\p{L}\p{N}])\p{L}/gu, (letter) => letter.toUpperCase());
 
 export const normalizeText = (text: string): string =>
   text

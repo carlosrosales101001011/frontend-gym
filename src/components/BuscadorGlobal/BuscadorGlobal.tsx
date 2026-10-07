@@ -161,25 +161,7 @@ export const BuscadorGlobal = ({ compacto = false }: BuscadorGlobalProps) => {
 
       {mostrarPanel && (
         <div id="buscador-global-resultados" className="buscador-global__panel" role="listbox">
-          {pantallasFiltradas.length > 0 && <div className="buscador-global__grupo">Pantallas</div>}
-          {pantallasFiltradas.map((pantalla, i) => (
-            <button key={pantalla.ruta} type="button" role="option" aria-selected={indiceActivo === i}
-              className={`buscador-global__item ${indiceActivo === i ? 'buscador-global__item--activo' : ''}`}
-              onMouseDown={(e) => e.preventDefault()} onMouseEnter={() => setActivo(i)}
-              onClick={() => elegir({ tipo: 'pantalla', pantalla })}>
-              <span className="buscador-global__icono icono-modulo">
-                <IconCR name={(pantalla.icono || 'no-icon') as IconName} size={16} className="" />
-              </span>
-              <span className="buscador-global__texto">
-                <span className="buscador-global__titulo">{pantalla.label}</span>
-                <span className="buscador-global__detalle">
-                  {pantalla.modulo}{pantalla.enMantenimiento && ' · En mantenimiento'}
-                </span>
-              </span>
-              <IconCR name="arrowRight" size={16} className="buscador-global__ir" />
-            </button>
-          ))}
-
+          
           {buscaPersonas && (personasVisibles.length > 0 || cargandoLista) && <div className="buscador-global__grupo">Personas</div>}
           {cargandoLista
             ? Array.from({ length: 3 }, (_, i) => (
@@ -212,20 +194,37 @@ export const BuscadorGlobal = ({ compacto = false }: BuscadorGlobalProps) => {
                       {[config?.nombre, persona.numero_documento, persona.telefono].filter(Boolean).join(' · ')}
                       {sinAccesoPerfil && ' · Sin acceso a su perfil'}
                     </span>
-                  </span>
                   {puedeRegistrarAsistencia && (
                     <button type="button" className="buscador-global__asistencia" disabled={registrando}
                       onClick={(e) => { e.stopPropagation(); registrarAsistencia(persona.id, nombre, persona.id_tipo === ID_TIPO_CLIENTE) }}
                       title={`Registrar asistencia de ${nombre}`}>
-                      <IconCR name="check" size={12} className="" />
+                      <IconCR name="check" size={10} className="" />
                       {registrando ? 'Registrando…' : 'Registrar asistencia'}
                     </button>
                   )}
+                  </span>
                   {ruta && <IconCR name="arrowRight" size={16} className="buscador-global__ir" />}
                 </div>
               )
             })}
-
+          {pantallasFiltradas.length > 0 && <div className="buscador-global__grupo">Pantallas</div>}
+          {pantallasFiltradas.map((pantalla, i) => (
+            <button key={pantalla.ruta} type="button" role="option" aria-selected={indiceActivo === i}
+              className={`buscador-global__item ${indiceActivo === i ? 'buscador-global__item--activo' : ''}`}
+              onMouseDown={(e) => e.preventDefault()} onMouseEnter={() => setActivo(i)}
+              onClick={() => elegir({ tipo: 'pantalla', pantalla })}>
+              <span className="buscador-global__icono icono-modulo">
+                <IconCR name={(pantalla.icono || 'no-icon') as IconName} size={16} className="" />
+              </span>
+              <span className="buscador-global__texto">
+                <span className="buscador-global__titulo">{pantalla.label}</span>
+                <span className="buscador-global__detalle">
+                  {pantalla.modulo}{pantalla.enMantenimiento && ' · En mantenimiento'}
+                </span>
+              </span>
+              <IconCR name="arrowRight" size={16} className="buscador-global__ir" />
+            </button>
+          ))}
           {sinResultados && <p className="buscador-global__vacio">Sin resultados para "{consulta}"</p>}
           {!buscaPersonas && pantallasFiltradas.length > 0 && (
             <p className="buscador-global__ayuda">Escribe al menos {MIN_LETRAS_PERSONAS} letras para buscar personas</p>

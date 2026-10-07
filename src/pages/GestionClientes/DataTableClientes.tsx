@@ -1,4 +1,4 @@
-import { Badge } from "react-bootstrap";
+import { BadgeEstado } from "@/components/Badge/BadgeEstado";
 import { useAppSelector } from "@/stores/Store";
 import type { ClienteProps } from "@/pages/GestionClientes/store/clientesSlice"
 // import { useClientesStore } from "@/pages/GestionClientes/useClientesStore";
@@ -126,11 +126,7 @@ export const DataTableClientes = ({otrosBotones, onOpenModalCustom}:Props) => {
             // Activo: hoy <= fecha de vencimiento (igual que en Seguimiento); sin membresía cuenta como inactivo
             const vencimiento = vencimientoxCliente.get(row.id)
             const activo = !!vencimiento && diasVencidos(vencimiento) <= 0
-            return (
-                <>
-                    <Badge className={`p-2 fs-6 ${activo ? 'bg-success' : 'bg-danger'}`}>{activo ? 'Activo' : 'Inactivo'}</Badge>
-                </>
-            )
+            return <BadgeEstado activo={activo} />
         }
     },
     {

@@ -4,8 +4,9 @@ import ModalCR from '@/components/Modal/ModalCR'
 import { ButtonCR } from '@/components/Button/ButtonCR'
 import { formatDate } from '@/helpers/FormatDate'
 import { useAppSelector } from '@/stores/Store'
+import { BadgeEstado } from '@/components/Badge/BadgeEstado'
 import { useGestionUsuariosStore } from '../hook/useGestionUsuariosStore'
-import type { UserProps } from '../store/usuariosSlice'
+import { ID_ESTADO_ACTIVO, type UserProps } from '../store/usuariosSlice'
 
 type ModalDetalleUsuarioProps = {
   usuario: UserProps
@@ -55,7 +56,7 @@ export const ModalDetalleUsuario = ({ usuario, onHide }: ModalDetalleUsuarioProp
         <Dato etiqueta="Rol">{usuario.label_rol || SIN_DATO}</Dato>
         <Dato etiqueta="Colaborador">{colaborador || (usuario.id_empl ? `#${usuario.id_empl}` : SIN_DATO)}</Dato>
         <Dato etiqueta="Super usuario">{usuario.is_super_user ? 'Sí' : 'No'}</Dato>
-        <Dato etiqueta="Estado">{usuario.id_estado === 1 ? 'Activo' : 'Inactivo'}</Dato>
+        <Dato etiqueta="Estado"><BadgeEstado activo={usuario.id_estado === ID_ESTADO_ACTIVO} /></Dato>
         <Dato etiqueta="Creado por">{usuario.label_nombres_apellidos_userParent || SIN_DATO}</Dato>
         <Dato etiqueta="Fecha de creación">{fechaCreacion || SIN_DATO}</Dato>
         <div className="d-flex mt-3">

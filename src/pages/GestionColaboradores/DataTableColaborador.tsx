@@ -1,4 +1,4 @@
-import { Badge } from "react-bootstrap";
+import { BadgeEstado } from "@/components/Badge/BadgeEstado";
 import { useAppSelector } from "@/stores/Store";
 import type { ColaboradorProps } from "@/pages/GestionColaboradores/store/colaboradoresSlice"
 import { Link, useLocation } from "react-router-dom";
@@ -76,11 +76,7 @@ export const DataTableColaborador = ({otrosBotones}:Props) => {
         id: 5,
         sortable: false,
         render:()=>{
-            return (
-                <>
-                    <Badge className="p-2 fs-6 bg-success">Activo</Badge>
-                </>
-            )
+            return <BadgeEstado activo />
         }
     },
     {

@@ -2,6 +2,7 @@ import { DataTableTest } from "@/components/DataTableTest/DataTableTest"
 import { formatDate } from "@/helpers/FormatDate"
 import type { AsistenciaProps } from "../store/asistenciasSlice"
 import { useAsistenciasStore } from "../hook/useAsistenciasStore"
+import { capitalizeWords } from "@/helpers/strings"
 
 type DataTableAsistenciasProps = {
   onOpenModalCustom?: (id: number) => void
@@ -21,23 +22,29 @@ export const DataTableAsistencias = ({  otrosBotones }: DataTableAsistenciasProp
     {
       id: 1,
       header: 'Persona', campoBusqueda: 'label_nombres_apellidos_persona',
-      render: (rowData: AsistenciaProps) => <span>{rowData.label_nombres_apellidos_persona}</span>,
+      render: (rowData: AsistenciaProps) => <span>{capitalizeWords(rowData?.label_nombres_apellidos_persona)}</span>,
     },
-    {
-      id: 2,
-      header: 'Tipo de evento', campoBusqueda: 'label_tipo_evento',
-      render: (rowData: AsistenciaProps) => <span>{rowData.label_tipo_evento}</span>,
-    },
+    // {
+    //   id: 2,
+    //   header: 'Tipo de evento', campoBusqueda: 'label_tipo_evento',
+    //   render: (rowData: AsistenciaProps) => <span>{rowData.label_tipo_evento}</span>,
+    // },
     {
       id: 3,
       header: 'Fecha y hora',
       render: (rowData: AsistenciaProps) => <span>{formatDate(new Date(rowData.fecha_registro), 'yyyy-mm-dd', 'dd/mm/yyyy hh:mm')}</span>,
     },
     {
-      id: 4,
-      header: 'Dispositivo', campoBusqueda: 'deviceSN',
-      render: (rowData: AsistenciaProps) => <span>{rowData.deviceSN || <span className="opacity-75">Manual</span>}</span>,
+      id: 6,
+      header: 'Registrado por', campoBusqueda: 'label_nombres_apellidos_usercreated',
+      // Las registradas antes de guardar quién las crea no lo tienen
+      render: (rowData: AsistenciaProps) => rowData.label_nombres_apellidos_usercreated || <span className="opacity-50">—</span>,
     },
+    // {
+    //   id: 4,
+    //   header: 'Dispositivo', campoBusqueda: 'deviceSN',
+    //   render: (rowData: AsistenciaProps) => <span>{rowData.deviceSN || <span className="opacity-75">Manual</span>}</span>,
+    // },
     // {
     //   id: 5,
     //   header: '',
