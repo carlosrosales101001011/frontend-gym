@@ -3,7 +3,7 @@ import { addDays, addMonths, addWeeks } from "date-fns"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { useAgendaNutricionistaStore } from "./hook/useAgendaNutricionistaStore"
 import { initialStateAgendaNutricionista, type EventoAgendaProps } from "./store/agendaNutricionistaSlice"
-import { aFechaISO, esEventoBloqueado, idEstadoInicial, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
+import { aFechaISO, esEventoBloqueado, idEstadoInicial, saltarDomingo, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
 import { CalendarioToolbar } from "./components/CalendarioToolbar"
 import { LeyendaEstados } from "./components/LeyendaEstados"
 import { VistaMes } from "./components/VistaMes"
@@ -15,7 +15,8 @@ import { ModalCustomEvento } from "./modal/ModalCustomEvento"
 const MOVER_FECHA: Record<VistaCalendario, (fecha: Date, cantidad: number) => Date> = {
   mes: addMonths,
   semana: addWeeks,
-  dia: addDays,
+  // Sin domingos: de sábado se pasa a lunes y de lunes a sábado
+  dia: (fecha, cantidad) => saltarDomingo(addDays(fecha, cantidad), cantidad > 0 ? 1 : -1),
 }
 
 export const App = () => {
@@ -77,7 +78,7 @@ export const App = () => {
           onCambiarVista={setVista}
           onAnterior={() => setFecha(MOVER_FECHA[vista](fecha, -1))}
           onSiguiente={() => setFecha(MOVER_FECHA[vista](fecha, 1))}
-          onHoy={() => setFecha(new Date())}
+          onHoy={() => setFecha(saltarDomingo(new Date()))}
           centro={<LeyendaEstados />}
         />
         <div className="flex-grow-1 scroll-mode-actual overflow-x-hidden" style={{ minHeight: 0 }}>

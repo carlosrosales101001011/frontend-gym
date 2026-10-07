@@ -54,6 +54,7 @@ const ReporteMetas = lazy(() => import('@/pages/ReporteMeta'));
 const ReporteVentas = lazy(() => import('@/pages/ReporteVentas'));
 const ModulosxUsuario = lazy(() => import('@/pages/GestionModuloxUsuario'));
 const GestionAsistencias = lazy(() => import('@/pages/GestionAsistencias'));
+const ReporteAsistenciasClientes = lazy(() => import('@/pages/ReporteAsistenciaClientes'));
 // const InformacionEmpresa = lazy(() => import('@/pages/InformacionEmpresa'));
 export const AppRoutes = () => {
   return (
@@ -98,6 +99,8 @@ export const AppRoutes = () => {
             <Route path="reporte-ventas" element={<ReporteVentas/>}/>
             <Route path="modulo-x-user" element={<ModulosxUsuario/>}/>
             <Route path="asistencia" element={<GestionAsistencias/>}/>
+            <Route path="reporte-asistencia-clientes" element={<ReporteAsistenciasClientes/>}/>
+            {/* reporte-asistencia-clientes */}
             <Route element={<ProfileGuard gestion="gestion-usuario"/>}>
               <Route path="gestion-usuario" element={<GestionUsuario/>}/>
               <Route path="perfil-usuario/:uid_person" element={<PerfilUser/>}/>

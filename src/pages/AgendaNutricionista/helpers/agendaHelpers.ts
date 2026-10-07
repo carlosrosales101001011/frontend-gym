@@ -4,6 +4,7 @@ import {
   endOfMonth,
   endOfWeek,
   format,
+  isSunday,
   startOfMonth,
   startOfWeek,
 } from 'date-fns'
@@ -74,6 +75,11 @@ export const DURACION_CITA_DEFAULT = DURACIONES_CITA[0].value
 
 /** La semana empieza el lunes */
 const OPCIONES_SEMANA = { weekStartsOn: 1 as const }
+/** La agenda no atiende domingos: se muestra de lunes a sábado */
+const DIAS_VISIBLES = 6
+
+/** Si la fecha cae domingo, el siguiente día de atención en esa dirección (1 = lunes, -1 = sábado) */
+export const saltarDomingo = (fecha: Date, direccion: 1 | -1 = 1) => isSunday(fecha) ? addDays(fecha, direccion) : fecha
 
 export const aFechaISO = (fecha: Date) => format(fecha, 'yyyy-MM-dd')
 
@@ -125,15 +131,15 @@ export const eventosDelDia = (eventos: EventoAgendaProps[], dia: Date) => {
     .sort((a, b) => aMinutos(a.hora_inicio) - aMinutos(b.hora_inicio))
 }
 
-/** Días que muestra la vista mes: semanas completas de lunes a domingo */
+/** Días que muestra la vista mes: semanas completas de lunes a sábado (sin domingos) */
 export const diasDelMes = (fecha: Date) => eachDayOfInterval({
   start: startOfWeek(startOfMonth(fecha), OPCIONES_SEMANA),
   end: endOfWeek(endOfMonth(fecha), OPCIONES_SEMANA),
-})
+}).filter((dia) => !isSunday(dia))
 
 export const diasDeLaSemana = (fecha: Date) => {
   const inicio = startOfWeek(fecha, OPCIONES_SEMANA)
-  return Array.from({ length: 7 }, (_, i) => addDays(inicio, i))
+  return Array.from({ length: DIAS_VISIBLES }, (_, i) => addDays(inicio, i))
 }
 
 const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1)
@@ -141,6 +147,10 @@ const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.sli
 export const tituloVista = (vista: VistaCalendario, fecha: Date) => {
   if (vista === 'mes') return capitalizar(format(fecha, "MMMM 'de' yyyy", { locale: es }))
   if (vista === 'dia') return capitalizar(format(fecha, "EEEE d 'de' MMMM 'de' yyyy", { locale: es }))
+  // "Octubre 5 - 10"; si la semana cruza de mes: "Octubre 26 - Noviembre 1"
   const dias = diasDeLaSemana(fecha)
-  return `${format(dias[0], "d MMM", { locale: es })} - ${format(dias[6], "d MMM yyyy", { locale: es })}`
+  const inicio = dias[0]
+  const fin = dias[dias.length - 1]
+  const mismoMes = inicio.getMonth() === fin.getMonth()
+  return `${capitalizar(format(inicio, 'MMMM d', { locale: es }))} - ${mismoMes ? format(fin, 'd') : capitalizar(format(fin, 'MMMM d', { locale: es }))}`
 }

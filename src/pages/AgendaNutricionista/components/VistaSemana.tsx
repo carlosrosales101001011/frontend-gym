@@ -11,6 +11,7 @@ import {
 } from '../helpers/agendaHelpers'
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 import { EventoChip } from './EventoChip'
+import { LineaHoraActual } from './LineaHoraActual'
 
 type VistaSemanaProps = {
   fecha: Date
@@ -46,15 +47,17 @@ export const VistaSemana = ({ fecha, eventos, minutosxcli, onSeleccionarSlot, on
           onClick={() => onVerDia(dia)}
           title="Ver eventos del día"
         >
-          {format(dia, 'EEE d', { locale: es })}
+          {format(dia, 'EEEE d', { locale: es })}
         </button>
       ))}
 
       <div>
         {slots.map((hora) => (
           <div key={hora} className="agenda__semana-hora" style={{ height: ALTO_SLOT }}>
-            {/* Solo se rotulan las horas en punto para no saturar la columna */}
-            {hora.endsWith(':00') ? hora : ''}
+            {/* Hora en punto grande; los demás pasos solo sus minutos, en gris */}
+            {hora.endsWith(':00')
+              ? <span className="agenda__semana-hora-punta">{hora}</span>
+              : <span className="agenda__semana-hora-min">:{hora.slice(3)}</span>}
           </div>
         ))}
       </div>
@@ -71,12 +74,14 @@ export const VistaSemana = ({ fecha, eventos, minutosxcli, onSeleccionarSlot, on
               {hora}
             </div>
           ))}
+          {isToday(dia) && <LineaHoraActual minutosxcli={minutosxcli} />}
           {/* Los slots ocupados quedan tapados por su evento (que abre la edición) */}
           {eventosDelDia(eventos, dia).map((evento) => (
             <EventoChip
               key={evento.id}
               evento={evento}
               onClick={onSeleccionarEvento}
+              dosLineas
               style={{ position: 'absolute', left: 2, right: 2, ...estiloEvento(evento) }}
             />
           ))}

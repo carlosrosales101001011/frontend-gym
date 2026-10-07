@@ -7,7 +7,7 @@ import { ButtonCR } from "@/components/Button/ButtonCR";
 import { useGestionUsuariosStore } from "../hook/useGestionUsuariosStore";
 
 /** Mismas reglas que el backend (ReglasPassword) */
-const PATRON_PASSWORD = { value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*(\d|\W)).{6,50}$/, message: "De 6 a 50 caracteres, con mayúscula, minúscula y un número o símbolo" }
+const PATRON_PASSWORD = { value: /^(?=.*(\d|\W)).{6,50}$/, message: "De 6 a 50 caracteres, con al menos un número o símbolo" }
 
 type FormAsignarPassword = {
   password_nueva: string

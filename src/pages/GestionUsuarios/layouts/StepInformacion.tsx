@@ -18,7 +18,7 @@ type FormInformacion = UserProps & { password_confirmacion: string }
 const PATRON_EMAIL = { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Email inválido" }
 /** Mismas reglas que el backend (CreateUserDto) */
 const PATRON_USUARIO = { value: /^[a-zA-Z0-9._-]{3,30}$/, message: "De 3 a 30 caracteres: letras, números, punto, guion o guion bajo" }
-const PATRON_PASSWORD = { value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*(\d|\W)).{6,50}$/, message: "De 6 a 50 caracteres, con mayúscula, minúscula y un número o símbolo" }
+const PATRON_PASSWORD = { value: /^(?=.*(\d|\W)).{6,50}$/, message: "De 6 a 50 caracteres, con al menos un número o símbolo" }
 
 /** Paso 1: datos del usuario. Los correos son opcionales (si se escriben, deben ser válidos) */
 export const StepInformacion = ({setStep}:StepInformacionProps) => {

@@ -4,6 +4,27 @@
 /** Fondo azul opaco que resalta el día actual (mes y semana) */
 $agenda-bg-hoy: rgba(28, 126, 214, 0.12);
 
+// Evento en dos líneas (vista semana): horario arriba, nombre del cliente abajo (cada línea con "…" si no entra)
+.agenda__evento--dos-lineas {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 3px;
+  white-space: normal;
+
+  .agenda__evento-horario,
+  .agenda__evento-nombre {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .agenda__evento-nombre {
+    font-weight: 600;
+  }
+}
+
 .agenda__evento {
   display: block;
   width: 100%;
@@ -50,7 +71,7 @@ $agenda-bg-hoy: rgba(28, 126, 214, 0.12);
 // ── Vista mes ──────────────────────────────────────────────
 .agenda__mes {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr)); // lunes a sábado (sin domingo)
   border-top: 1px solid $card-border-actual;
   border-left: 1px solid $card-border-actual;
 }
@@ -59,8 +80,9 @@ $agenda-bg-hoy: rgba(28, 126, 214, 0.12);
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: 6px;
+  padding: 8px 6px;
   background-color: $card-actual;
+  font-size: 15px; // nombre completo del día (Lunes, Martes...)
   font-weight: bold;
   text-align: center;
   border-right: 1px solid $card-border-actual;
@@ -129,14 +151,15 @@ $agenda-bg-hoy: rgba(28, 126, 214, 0.12);
 // ── Vista semana ───────────────────────────────────────────
 .agenda__semana {
   display: grid;
-  grid-template-columns: 56px repeat(7, minmax(0, 1fr));
+  grid-template-columns: 56px repeat(6, minmax(0, 1fr)); // horas + lunes a sábado
 }
 
 .agenda__semana-cabecera {
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: 6px;
+  padding: 8px 6px;
+  font-size: 15px; // nombre completo del día y número (Lunes 5)
   border: none;
   border-bottom: 1px solid $card-border-actual;
   background-color: $card-actual;
@@ -159,6 +182,18 @@ $agenda-bg-hoy: rgba(28, 126, 214, 0.12);
   font-size: 11px;
   text-align: right;
   transform: translateY(-8px);
+}
+
+// Hora en punto: más grande
+.agenda__semana-hora-punta {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+// Minutos de los demás pasos (":20", ":40"): gris y chicos
+.agenda__semana-hora-min {
+  color: #9a9a9a !important;
+  font-size: 10px;
 }
 
 .agenda__semana-columna {
@@ -188,6 +223,42 @@ $agenda-bg-hoy: rgba(28, 126, 214, 0.12);
     color: $color-actual !important;
     background-color: $item-hover-actual;
   }
+}
+
+// Línea de la hora actual (columna de hoy en la vista semana): encima de los slots y eventos, sin tapar clicks
+.agenda__ahora {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: 2px;
+  background-color: $primary;
+  pointer-events: none;
+
+  // Punto al inicio de la línea
+  &::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: $primary;
+  }
+}
+
+.agenda__ahora-hora {
+  position: absolute;
+  top: -9px;
+  right: 2px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background-color: $primary;
+  color: #fff !important;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 16px;
 }
 
 // ── Vista día ──────────────────────────────────────────────

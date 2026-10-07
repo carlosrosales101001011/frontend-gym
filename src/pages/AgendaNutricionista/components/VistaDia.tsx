@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import IconCR from '@/components/Icons/IconCR'
 import { useAppSelector } from '@/stores/Store'
-import { esEventoBloqueado, eventosDelDia, obtenerEstado, TEXTO_EVENTO_BLOQUEADO } from '../helpers/agendaHelpers'
+import { duracionEvento, esEventoBloqueado, eventosDelDia, obtenerEstado, TEXTO_EVENTO_BLOQUEADO } from '../helpers/agendaHelpers'
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 
 type VistaDiaProps = {
@@ -33,6 +33,7 @@ export const VistaDia = ({ fecha, eventos, onSeleccionarEvento }: VistaDiaProps)
           >
             <div className="fw-bold fs-5" style={{ minWidth: 120 }}>
               {evento.hora_inicio} - {evento.hora_fin}
+              <div className="small fw-normal opacity-75">{duracionEvento(evento)} min</div>
             </div>
             {bloqueado ? (
               <div className="flex-grow-1 fw-bold d-flex align-items-center gap-2">

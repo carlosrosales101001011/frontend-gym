@@ -22,7 +22,7 @@ export const VistaMes = ({ fecha, eventos, onSeleccionarDia, onSeleccionarEvento
     <div className="agenda__mes">
       {diasDeLaSemana(fecha).map((dia) => (
         <div key={dia.toISOString()} className="agenda__mes-cabecera text-capitalize">
-          {format(dia, 'EEE', { locale: es })}
+          {format(dia, 'EEEE', { locale: es })}
         </div>
       ))}
       {diasDelMes(fecha).map((dia) => {
