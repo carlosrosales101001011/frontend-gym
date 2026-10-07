@@ -124,8 +124,12 @@
 // Contenido de la nube "Mis módulos": módulos del usuario en 2 columnas
 .mis-modulos__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr); // una sola columna
   gap: 8px;
+  // Alto para 5 módulos (48px cada uno + 8px entre ellos); desde el sexto, scroll dentro de la ventanita
+  max-height: calc(5 * 48px + 4 * 8px);
+  overflow-y: auto;
+  padding-right: 4px; // que el scroll no tape los bordes
 }
 
 .mis-modulos__item {
