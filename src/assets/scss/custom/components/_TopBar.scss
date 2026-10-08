@@ -20,14 +20,6 @@
     align-items: center;
   }
 
-  // Buscador al lado del breadcrumb; en pantallas angostas no entra y se oculta
-  &__buscador {
-    margin-left: 8px;
-
-    @media (max-width: 991.98px) {
-      display: none;
-    }
-  }
 
   // Nombre del usuario logueado (a la izquierda de "Mis módulos"); en mobile no entra y se oculta
   &__usuario {
@@ -213,4 +205,26 @@
   height: 0.9rem;
   border-width: 0.15em;
   opacity: 0.7;
+}
+
+// Lupa del buscador global (al lado del nombre del usuario); abre un modal (BuscadorTopbar)
+.buscador-topbar__lupa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 4px;
+  border-radius: 8px;
+
+  &:hover,
+  &--abierta {
+    background-color: $item-hover-actual;
+    opacity: 1;
+  }
+
+  &--abierta svg,
+  &--abierta svg * {
+    color: $primary !important;
+  }
 }

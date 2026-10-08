@@ -3,6 +3,20 @@ import type { HTMLInputTypeAttribute, InputHTMLAttributes, ReactNode } from 'rea
 // import classNames from "classnames";
 
 type typeInput='normal-select'| 'multi-select' | 'normal' | 'date'| 'datetime' | 'password' | 'text-area'
+
+/** Ícono dentro del campo (ej. <IconCR name="search" />) */
+export type IconoInputCR = {
+    icon: ReactNode;
+    /** Lado del campo (por defecto 'left') */
+    position?: 'left' | 'right';
+    /** true = fondo gris; '#...' = ese color; sin valor = sin fondo */
+    background?: boolean | string;
+}
+
+/** Cada ícono ocupa un cuadro del alto del campo */
+const ANCHO_ICONO = 32
+/** Gris que funciona en modo claro y oscuro */
+const FONDO_GRIS = 'rgba(128, 128, 128, 0.16)'
 interface TextLabelProps
 extends InputHTMLAttributes<HTMLInputElement>
 {
@@ -22,6 +36,8 @@ startAdornment?: ReactNode;
 endAdornment?: ReactNode;
 className?: string;
 messageErrors?:string;
+/** Íconos dentro del campo, a la izquierda o derecha, con fondo opcional (ver IconoInputCR) */
+iconos?: IconoInputCR[];
 }
 export const InputCR: React.FC<TextLabelProps> = ({
 label,
@@ -31,12 +47,40 @@ LabelColor,
 required = false,
 messageErrors='',
 onChange,
+iconos = [],
 ...props
 }) => {
 const classNameLabel = `${LabelColor}`;
 // const onFocusInput = ()=>{
 //     setisFocusableSelect(!isFocusableSelect)
 // }
+
+// Íconos: el texto y la etiqueta se corren para no quedar debajo de ellos
+const izquierda = iconos.filter((icono) => (icono.position ?? 'left') === 'left')
+const derecha = iconos.filter((icono) => icono.position === 'right')
+const estiloInput: React.CSSProperties = {
+    ...props.style,
+    ...(izquierda.length ? { paddingLeft: izquierda.length * ANCHO_ICONO + 8 } : {}),
+    ...(derecha.length ? { paddingRight: derecha.length * ANCHO_ICONO + 8 } : {}),
+}
+const estiloLabel: React.CSSProperties | undefined = izquierda.length ? { left: izquierda.length * ANCHO_ICONO + 8 } : undefined
+const renderIconos = () => (
+    <>
+        {[...izquierda.map((icono, i) => ({ icono, lado: 'left' as const, i })), ...derecha.map((icono, i) => ({ icono, lado: 'right' as const, i }))]
+            .map(({ icono, lado, i }) => (
+                <span
+                    key={`${lado}-${i}`}
+                    className={`textfield-icono textfield-icono--${lado}`}
+                    style={{
+                        [lado]: 1 + i * ANCHO_ICONO,
+                        backgroundColor: icono.background === true ? FONDO_GRIS : icono.background || undefined,
+                    }}
+                >
+                    {icono.icon}
+                </span>
+            ))}
+    </>
+)
 
 const renderInput = (typeInput:HTMLInputTypeAttribute) => (
     <div className="bg-actual">
@@ -49,10 +93,12 @@ const renderInput = (typeInput:HTMLInputTypeAttribute) => (
             placeholder=" "
             required={required}
             {...props}
+            style={estiloInput}
             onChange={onChange}
         />
             
-            <label className={`textfield-label ${messageErrors.trim().length !==0 && 'text-danger'} ${classNameLabel}`}>{label}{required && <span className="text-danger"> *</span>}</label>
+            <label className={`textfield-label ${messageErrors.trim().length !==0 && 'text-danger'} ${classNameLabel}`} style={estiloLabel}>{label}{required && <span className="text-danger"> *</span>}</label>
+            {renderIconos()}
         </div>
     </div>
 );
@@ -116,9 +162,11 @@ const renderInputDate = (typeInput:HTMLInputTypeAttribute) => {
                 placeholder=" "
                 required={required}
                 {...props}
+                style={estiloInput}
                 onChange={typeInput === 'date' ? handleDateChange : onChange}
             />
-                <label className={`textfield-label ${messageErrors.trim().length !==0 && 'text-danger'} ${classNameLabel}`}>{label}{required && <span className="text-danger"> *</span>}</label>
+                <label className={`textfield-label ${messageErrors.trim().length !==0 && 'text-danger'} ${classNameLabel}`} style={estiloLabel}>{label}{required && <span className="text-danger"> *</span>}</label>
+                {renderIconos()}
             </div>
         </div>
     )

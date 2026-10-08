@@ -38,6 +38,7 @@ import { extRegaloSlice } from "@/pages/GestionExtensionRegalos/store/extRegaloS
 import { planEntrenamientoSlice } from "@/pages/GestionPlanesEntrenamiento/store/planEntrenamientoSlice";
 import { metaSlice } from "@/pages/GestionMeta/store/metaSlice";
 import { reporteMetaSlice } from "@/pages/ReporteMeta/store/reporteMetaSlice";
+import { reporteAsistenciaSlice } from "@/pages/ReporteAsistenciaClientes/store/reporteAsistenciaSlice";
 import { reporteVentasSlice } from "@/pages/ReporteVentas/store/reporteVentasSlice";
 import { asistenciasSlice } from "@/pages/GestionAsistencias/store/asistenciasSlice";
 import { modulosUsuarioSlice } from "@/pages/GestionModuloxUsuario/store/modulosUsuarioSlice";
@@ -82,6 +83,7 @@ export const store = configureStore({
     PLAN_ENTRENAMIENTO: planEntrenamientoSlice.reducer,
     META: metaSlice.reducer,
     REPORTE_META: reporteMetaSlice.reducer,
+    REPORTE_ASISTENCIA: reporteAsistenciaSlice.reducer,
     REPORTE_VENTAS: reporteVentasSlice.reducer,
     ASISTENCIAS: asistenciasSlice.reducer,
     MODULOS_USUARIO: modulosUsuarioSlice.reducer

@@ -6,7 +6,7 @@ import { MisModulos } from '@/components/TopBar/MisModulos';
 import { IconosTopbar } from '@/components/TopBar/IconosTopbar';
 import { NombreModulo } from '@/components/TopBar/NombreModulo';
 import { NombreUsuario } from '@/components/TopBar/NombreUsuario';
-import { BuscadorGlobal } from '@/components/BuscadorGlobal/BuscadorGlobal';
+import { BuscadorTopbar } from '@/components/TopBar/BuscadorTopbar';
 type props = {
 onOpenSideBar:()=>void;
 /** Con el sidebar abierto el logo va en el sidebar; cerrado, aquí */
@@ -23,14 +23,12 @@ export const Topbar = ({onOpenSideBar, isOpenSideBar = false}:props) => {
         </button>
         {!isOpenSideBar && <LogoEmpresa alto={32} />}
         <NombreModulo /> {'>'} {title}
-        {/* Mismo buscador del Home (pantallas y clientes); Ctrl+K lo enfoca */}
-        <div className="topbar__buscador">
-          <BuscadorGlobal compacto />
-        </div>
       </div>
       {/* RIGHT */}
       <div className="topbar__right">
         <NombreUsuario />
+        {/* Lupa del buscador global (pantallas y personas); Ctrl+K la abre */}
+        <BuscadorTopbar />
         <IconosTopbar />
         <MisModulos />
       </div>

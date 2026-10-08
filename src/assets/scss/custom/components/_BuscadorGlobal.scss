@@ -233,4 +233,25 @@
       width: 420px;
     }
   }
+
+  // Dentro de un modal (lupa del Topbar): ocupa todo el ancho y los resultados van debajo del campo
+  &--modal {
+    width: 100%;
+
+    .buscador-global__campo {
+      height: 44px;
+      box-shadow: none;
+    }
+
+    .buscador-global__input {
+      font-size: 15px;
+    }
+
+    .buscador-global__panel {
+      position: static;
+      max-height: 60vh;
+      margin-top: 12px;
+      box-shadow: none;
+    }
+  }
 }

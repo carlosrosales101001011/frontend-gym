@@ -134,7 +134,7 @@ export const AppContactoEmergencia = ({ uid_location = '', UsarApiPOST = true, c
     <div>
         <ButtonCR label={'Agregar contacto de emergencia'} icon={<IconCR name='plus' size={14}/>} onClick={() => setContactoModal(null)}/>
         <div className='mt-2'>
-          <DataTableSimple2 mostrarBuscador={false} mostrarTamanoPagina={false} data={UsarApiPOST ? contactosEmergencia : contactosLocales} columns={columns} defaultPageSize={10} />
+          <DataTableSimple2 mostrarBuscador={false} mostrarTamanoPagina={false} mostrarPaginacion={false} data={UsarApiPOST ? contactosEmergencia : contactosLocales} columns={columns} defaultPageSize={10} />
         </div>
         {/* Se monta al abrirse: el formulario arranca vacío o con el contacto a editar */}
         {contactoModal !== undefined && (

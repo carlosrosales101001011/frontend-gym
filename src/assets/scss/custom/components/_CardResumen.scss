@@ -1,0 +1,40 @@
+// CardResumen (components/CardResumen): card pequeña de un dato. Varias juntas: .card-resumen-grupo
+.card-resumen-grupo {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 280px));
+  gap: 12px;
+}
+
+.card-resumen {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+
+  &__icono {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  &__titulo {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.7;
+  }
+
+  &__valor {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  &__detalle {
+    font-size: 11px;
+    opacity: 0.6;
+  }
+}

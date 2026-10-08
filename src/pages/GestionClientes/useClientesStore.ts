@@ -9,6 +9,20 @@ export const useClientesStore = () => {
     const { post, obtener, patch, obtenerxID, dataxID, remove, searcher } = useCrudhook<ClienteProps>('/persona/id_tipo/2', onSetDataClientes)
     const blobStorage = useBlobStorage()
 
+    /**
+     * ¿Ya hay un cliente con ese tipo y número de documento? excluirId: al editar, el propio cliente no cuenta.
+     * Devuelve el nombre del cliente que lo tiene, o null si está libre.
+     */
+    const buscarDocumentoRepetido = async (id_tipo_documento: number, numero_documento: string, excluirId?: number) => {
+      const { data }: { data: { existe: boolean, persona: { nombres: string, apellido_paterno: string, apellido_materno: string } | null } } =
+        await httpClient.get('/persona/id_tipo/2/documento', {
+          params: { id_tipo_documento, numero_documento, ...(excluirId ? { excluir_id: excluirId } : {}) },
+        })
+      return data.existe && data.persona
+        ? [data.persona.nombres, data.persona.apellido_paterno, data.persona.apellido_materno].filter(Boolean).join(' ')
+        : null
+    }
+
     /** Sube la foto al Azure Blob Storage; devuelve el id del registro de la imagen (para su encuadre) */
     const subirAvatar = async (uid_avatar: string, archivo: File) => {
       const formData = new FormData()
@@ -38,6 +52,7 @@ export const useClientesStore = () => {
     }
 
   return {
+    buscarDocumentoRepetido,
     remove,
     guardarContactosEmergencia,
     guardarPrimerComentario,

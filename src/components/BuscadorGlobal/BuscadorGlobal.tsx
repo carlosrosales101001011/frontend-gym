@@ -34,6 +34,12 @@ type Resultado =
 type BuscadorGlobalProps = {
   /** Versión angosta para el Topbar (al lado del breadcrumb) */
   compacto?: boolean
+  /** Enfoca el campo al montarse (ej. al abrirlo desde la lupa del Topbar) */
+  autoFocus?: boolean
+  /** Se llama con Esc o al elegir un resultado (ej. para cerrar el modal del Topbar) */
+  onCerrar?: () => void
+  /** Dentro de un modal: los resultados van debajo del campo (no flotando) y no se cierran al perder el foco */
+  enModal?: boolean
 }
 
 /**
@@ -42,7 +48,7 @@ type BuscadorGlobalProps = {
  * (botón, si el usuario tiene la sección de asistencia). Ctrl+K lo enfoca; ↑ ↓ y Enter eligen; Esc cierra.
  * Estilos en _BuscadorGlobal.scss.
  */
-export const BuscadorGlobal = ({ compacto = false }: BuscadorGlobalProps) => {
+export const BuscadorGlobal = ({ compacto = false, autoFocus = false, onCerrar, enModal = false }: BuscadorGlobalProps) => {
   const navigate = useNavigate()
   const inputRef = useRef<HTMLInputElement>(null)
   const { pantallas, cargandoPantallas } = useBuscadorGlobal()
@@ -51,6 +57,13 @@ export const BuscadorGlobal = ({ compacto = false }: BuscadorGlobalProps) => {
   const [abierto, setAbierto] = useState(false)
   const [activo, setActivo] = useState(0)
   const { registrarAsistencia, registrandoId } = useRegistrarAsistencia()
+
+  // autoFocus: se enfoca después de montarse (un modal que se abre toma el foco primero; así queda en el campo)
+  useEffect(() => {
+    if (!autoFocus) return
+    const t = setTimeout(() => inputRef.current?.focus(), 80)
+    return () => clearTimeout(t)
+  }, [autoFocus])
 
   // Ctrl+K / Cmd+K enfoca el buscador desde cualquier parte del Home
   useEffect(() => {
@@ -112,12 +125,14 @@ export const BuscadorGlobal = ({ compacto = false }: BuscadorGlobalProps) => {
     if (!ruta) return
     setAbierto(false)
     navigate(ruta)
+    onCerrar?.()
   }
 
   const onTeclado = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
       setAbierto(false)
       inputRef.current?.blur()
+      onCerrar?.()
     } else if (e.key === 'ArrowDown' && resultados.length) {
       e.preventDefault()
       setAbierto(true)
@@ -131,12 +146,12 @@ export const BuscadorGlobal = ({ compacto = false }: BuscadorGlobalProps) => {
     }
   }
 
-  const mostrarPanel = abierto && consulta.length > 0
+  const mostrarPanel = (enModal || abierto) && consulta.length > 0
   const cargandoLista = buscaPersonas && cargandoPersonas
   const sinResultados = !resultados.length && !cargandoLista && !cargandoPantallas
 
   return (
-    <div className={`buscador-global ${compacto ? 'buscador-global--compacto' : ''}`}>
+    <div className={`buscador-global ${compacto ? 'buscador-global--compacto' : ''} ${enModal ? 'buscador-global--modal' : ''}`}>
       <div className={`buscador-global__campo ${mostrarPanel ? 'buscador-global__campo--abierto' : ''}`}>
         <IconCR name="search" size={16} className="buscador-global__lupa" />
         <input
@@ -148,7 +163,7 @@ export const BuscadorGlobal = ({ compacto = false }: BuscadorGlobalProps) => {
           onChange={(e) => { setTexto(e.target.value); setActivo(0); setAbierto(true) }}
           onFocus={() => setAbierto(true)}
           // El retraso deja que el click en un resultado llegue antes de cerrar
-          onBlur={() => setTimeout(() => setAbierto(false), 150)}
+          onBlur={() => { if (!enModal) setTimeout(() => setAbierto(false), 150) }}
           onKeyDown={onTeclado}
           role="combobox"
           aria-expanded={mostrarPanel}

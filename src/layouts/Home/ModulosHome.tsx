@@ -67,8 +67,10 @@ export const ModulosHome: React.FC = () => {
   // Distrito y ciudad del navegador del usuario; '' si no da permiso de ubicación
   const ubicacion = useUbicacionUsuario();
   const { nombreUsuario, obtenerUsuarioSesion } = useSesionStore();
+  // Mientras /user/me (con guard) responde se ve un skeleton en lugar del nombre
+  const [cargandoNombre, setCargandoNombre] = useState(true);
   useEffect(() => {
-    obtenerUsuarioSesion();
+    obtenerUsuarioSesion().finally(() => setCargandoNombre(false));
   }, []);
   // Borra el token de localStorage; AuthGuard redirige solo a /login
   const { logout } = useAuth();
@@ -105,7 +107,10 @@ export const ModulosHome: React.FC = () => {
         <div className="nk-welcome">
           <div>
             <span className="nk-eyebrow">Bienvenido</span>
-            <h1 className="nk-title">{nombreUsuario}</h1>
+            <h1 className="nk-title">
+              {/* Si ya estaba en el store (ej. al volver de un módulo) se muestra sin esperar */}
+              {nombreUsuario || (cargandoNombre && <span className="skeleton-cr nk-title-skeleton" aria-label="Cargando usuario" />)}
+            </h1>
           </div>
           <div className="nk-meta">{fechaHoy}{ubicacion && ` · ${ubicacion}`}</div>
         </div>
@@ -284,6 +289,7 @@ const nkStyles = `
 .nk-welcome { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; }
 .nk-eyebrow { font-size: 11px; letter-spacing: 0.08em; color: #A6A192; font-weight: 700; text-transform: uppercase; }
 .nk-title { font-size: 30px; margin: 4px 0 0; font-weight: 700; }
+.nk-title-skeleton { display: inline-block; width: 260px; max-width: 70vw; height: 30px; vertical-align: middle; }
 .nk-meta { font-size: 13px; color: #8B8B83; }
 
 .nk-section { margin-bottom: 28px; }

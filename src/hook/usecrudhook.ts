@@ -14,6 +14,9 @@ export const useCrudhook = <T,>(model: string,  action?: (payload: T[]) => Unkno
     
     const querySearch = (get(querys.search)||'')
     const queryColumnas = get(querys.columnas)
+    // Rango de fechas: solo lo usan las pantallas que lo ponen en la URL (su backend lo acepta)
+    const queryFechaInicio = get(querys.fechaInicio)
+    const queryFechaFin = get(querys.fechaFin)
     const page = Number(get(querys.page))||1;
     const show = Number(get(querys.show))||20;
     const dispatch = useDispatch();
@@ -53,7 +56,12 @@ export const useCrudhook = <T,>(model: string,  action?: (payload: T[]) => Unkno
             try {
                 ({ data } = await httpClient.get(`${model}/search`, {
                     // columnas: solo si se eligieron en "Buscar en columnas" (sin ella el backend busca en todas)
-                    params: { q, show: safeShow, offset, ...(queryColumnas ? { columnas: queryColumnas } : {}) },
+                    params: {
+                        q, show: safeShow, offset,
+                        ...(queryColumnas ? { columnas: queryColumnas } : {}),
+                        ...(queryFechaInicio ? { fecha_inicio: queryFechaInicio } : {}),
+                        ...(queryFechaFin ? { fecha_fin: queryFechaFin } : {}),
+                    },
                     signal,
                 }));
             } finally {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { ButtonCR } from "@/components/Button/ButtonCR"
 import IconCR from "@/components/Icons/IconCR"
@@ -8,6 +8,8 @@ import { querys } from "@/types/parametros"
 import { useAsistenciasStore } from "./hook/useAsistenciasStore"
 import { DataTableAsistencias } from "./components/DataTableAsistencias"
 import { ModalCustomAsistencia } from "./components/ModalCustomAsistencia"
+import { FiltroFechasAsistencias } from "./components/FiltroFechasAsistencias"
+import { ResumenAsistencias } from "./components/ResumenAsistencias"
 
 /** Gestión de asistencias (persona_eventos_asistencia): marcaciones de clientes y colaboradores */
 export const App = () => {
@@ -21,13 +23,21 @@ export const App = () => {
   const queryColumnas = get(querys.columnas)
   const page = Number(get(querys.page))
   const show = Number(get(querys.show))
+  const fechaInicio = get(querys.fechaInicio)
+  const fechaFin = get(querys.fechaFin)
+  // Al entrar sin fechas el filtro pone la de hoy en la URL: se espera a eso para no pedir todo y luego hoy
+  const esperandoFechaInicial = useRef(!fechaInicio && !fechaFin)
   useEffect(() => {
+    if (esperandoFechaInicial.current) {
+      if (!fechaInicio && !fechaFin) return
+      esperandoFechaInicial.current = false
+    }
     const ctrl = new AbortController()
     searcher(ctrl.signal).catch(e => {
       if (e.name !== 'CanceledError') console.error(e)
     })
     return () => ctrl.abort()
-  }, [querySearch, queryColumnas, page, show])
+  }, [querySearch, queryColumnas, page, show, fechaInicio, fechaFin])
 
   return (
     <div>
@@ -36,6 +46,10 @@ export const App = () => {
       {isOpenModalCustom.isOpen && (
         <ModalCustomAsistencia id={isOpenModalCustom.id} onHide={onCloseModalCustom} show={isOpenModalCustom.isOpen} />
       )}
+      {/* Arriba del botón "Registrar asistencia": filtro por fecha de registro */}
+      <FiltroFechasAsistencias />
+      {/* Debajo del rango de fechas y arriba de la tabla */}
+      <ResumenAsistencias />
       <DataTableAsistencias
         otrosBotones={<ButtonCR label={'Registrar asistencia'} onClick={() => onOpenModalCustom(0)} icon={<IconCR name='plus' size={14}/>}/>}
         // onOpenModalCustom={onOpenModalCustom}

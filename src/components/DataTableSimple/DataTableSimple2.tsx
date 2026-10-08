@@ -24,6 +24,8 @@ type Props<T> = {
   mostrarBuscador?: boolean;
   /** Muestra "Mostrando [n] de N" para elegir filas por página (default: true) */
   mostrarTamanoPagina?: boolean;
+  /** Muestra la paginación (default: true) */
+  mostrarPaginacion?: boolean;
 };
 
 type SortState = { id: number | string; dir: 'asc' | 'desc' } | null;
@@ -37,7 +39,7 @@ const getColumnLabel = <T,>(column: ColumnaSimple2<T>): ReactNode =>
  * A diferencia de DataTableTest, todo el estado es local (no usa la URL ni Redux),
  * así que se pueden tener varias en la misma página sin que se pisen.
  */
-export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostrarBuscador = true, mostrarTamanoPagina = true }: Props<T>) {
+export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostrarBuscador = true, mostrarTamanoPagina = true, mostrarPaginacion = true }: Props<T>) {
   const [search, setSearch] = useState('');
   const [searchColumns, setSearchColumns] = useState<Set<number | string>>(() => new Set());
   const [sort, setSort] = useState<SortState>(null);
@@ -197,13 +199,15 @@ export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostr
         </tbody>
       </Table>
 
-      <PaginacionCR
-        pagina={currentPage}
-        porPagina={pageSize}
-        total={sorted.length}
-        onCambiarPagina={setPage}
-        onCambiarPorPagina={mostrarTamanoPagina ? (n) => { setPageSize(n); setPage(1); } : undefined}
-      />
+      {mostrarPaginacion && (
+        <PaginacionCR
+          pagina={currentPage}
+          porPagina={pageSize}
+          total={sorted.length}
+          onCambiarPagina={setPage}
+          onCambiarPorPagina={mostrarTamanoPagina ? (n) => { setPageSize(n); setPage(1); } : undefined}
+        />
+      )}
     </div>
   );
 }

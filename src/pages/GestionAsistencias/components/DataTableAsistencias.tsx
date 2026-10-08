@@ -3,6 +3,8 @@ import { formatDate } from "@/helpers/FormatDate"
 import type { AsistenciaProps } from "../store/asistenciasSlice"
 import { useAsistenciasStore } from "../hook/useAsistenciasStore"
 import { capitalizeWords } from "@/helpers/strings"
+import { ButtonCR } from "@/components/Button/ButtonCR"
+import IconCR from "@/components/Icons/IconCR"
 
 type DataTableAsistenciasProps = {
   onOpenModalCustom?: (id: number) => void
@@ -11,7 +13,7 @@ type DataTableAsistenciasProps = {
 
 /** Listado de asistencias (la más reciente primero, lo ordena el backend) */
 export const DataTableAsistencias = ({  otrosBotones }: DataTableAsistenciasProps) => {
-  const { asistencias } = useAsistenciasStore()
+  const { asistencias, eliminarAsistencia } = useAsistenciasStore()
 
   const columns = [
     {
@@ -39,6 +41,20 @@ export const DataTableAsistencias = ({  otrosBotones }: DataTableAsistenciasProp
       header: 'Registrado por', campoBusqueda: 'label_nombres_apellidos_usercreated',
       // Las registradas antes de guardar quién las crea no lo tienen
       render: (rowData: AsistenciaProps) => rowData.label_nombres_apellidos_usercreated || <span className="opacity-50">—</span>,
+    },
+    {
+      id: 7,
+      header: 'Eliminar', sortable: false,
+      // Pide confirmación, la da de baja (borrado lógico) y recarga la tabla
+      render: (rowData: AsistenciaProps) => (
+        <ButtonCR
+          label="Eliminar"
+          icon={<IconCR name="delete" size={12} className="" />}
+          variant="outline-danger"
+          className="btn-sm"
+          onClick={() => eliminarAsistencia(rowData.id)}
+        />
+      ),
     },
     // {
     //   id: 4,

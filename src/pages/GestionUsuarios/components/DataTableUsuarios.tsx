@@ -8,7 +8,7 @@ import { BadgeEstado } from '@/components/Badge/BadgeEstado';
 import { ID_ESTADO_ACTIVO, type UserProps } from '../store/usuariosSlice';
 import { DataTableTest } from '@/components/DataTableTest/DataTableTest';
 import { useAppSelector } from '@/stores/Store';
-import { useGestionUsuariosStore } from '../hook/useGestionUsuariosStore';
+// import { useGestionUsuariosStore } from '../hook/useGestionUsuariosStore';
 
 type Props ={
     otrosBotones: React.ReactNode;
@@ -16,8 +16,8 @@ type Props ={
 export const DataTableUsuarios = ({ otrosBotones}:Props) => {
     const [, uid_modulo, ] = location.pathname.split('/');
     const { users } = useAppSelector((state)=>state.USER)
-    const { usuario: usuarioSesion } = useAppSelector((state)=>state.SESION)
-    const { eliminarUsuario } = useGestionUsuariosStore()
+    // const { usuario: usuarioSesion } = useAppSelector((state)=>state.SESION)
+    // const { eliminarUsuario } = useGestionUsuariosStore()
     // Usuario al que se le cambia la contraseña (null = modal cerrado)
     const [usuarioPassword, setUsuarioPassword] = useState<{ id: number, nombre: string } | null>(null)
     // Usuario cuyo detalle se ve (null = modal cerrado)

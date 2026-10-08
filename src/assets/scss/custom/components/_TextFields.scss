@@ -184,6 +184,26 @@
           padding: 0 4px;
         }
 
+        // Íconos dentro del campo (InputCR prop `iconos`): cuadros del alto del input, dentro de su borde
+        .textfield-icono {
+          position: absolute;
+          top: 1px;
+          z-index: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 30px;
+
+          &--left:first-of-type {
+            border-radius: 5px 0 0 5px;
+          }
+
+          &--right:last-of-type {
+            border-radius: 0 5px 5px 0;
+          }
+        }
+
         .textfield-input:disabled {
           opacity: 0.7;
           cursor: not-allowed;
