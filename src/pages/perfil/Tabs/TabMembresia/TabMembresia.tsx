@@ -28,7 +28,7 @@ export const TabMembresia = ({ activo }: TabMembresiaProps) => {
         <Row className="g-3">
           {membresias.map((membresia) => (
             <Col key={membresia.id} xs={12}>
-              <ItemMembresia membresia={membresia} />
+              <ItemMembresia membresia={membresia} onCambio={() => uid_person && obtenerMembresias(uid_person)} />
             </Col>
           ))}
         </Row>

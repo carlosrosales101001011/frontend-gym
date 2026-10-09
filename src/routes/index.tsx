@@ -48,6 +48,7 @@ const Ventas = lazy(() => import('@/pages/DataVentas'));
 const SeguimientoMembresia = lazy(() => import('@/pages/SeguimientoMembresia'));
 const AgendaNutricionista = lazy(() => import('@/pages/AgendaNutricionista'));
 const ExtensionRegalos = lazy(() => import('@/pages/GestionExtensionRegalos'));
+const ExtensionCongelamiento = lazy(() => import('@/pages/GestionExtensionCongelamiento'));
 const GestionPlanesEntrenamiento = lazy(() => import('@/pages/GestionPlanesEntrenamiento'));
 const GestionMetas = lazy(() => import('@/pages/GestionMeta'));
 const ReporteMetas = lazy(() => import('@/pages/ReporteMeta'));
@@ -93,6 +94,7 @@ export const AppRoutes = () => {
             <Route path="seguimiento-membresia" element={<SeguimientoMembresia/>}/>
             <Route path="agenda-nutricionista" element={<AgendaNutricionista/>}/>
             <Route path="extension-regalos" element={<ExtensionRegalos/>}/>
+            <Route path="extension-congelamientos" element={<ExtensionCongelamiento/>}/>
             <Route path="programa-planes" element={<GestionPlanesEntrenamiento/>}/>
             <Route path="gestion-metas" element={<GestionMetas/>}/>
             <Route path="reporte-metas" element={<ReporteMetas/>}/>

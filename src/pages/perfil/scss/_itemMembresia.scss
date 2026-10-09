@@ -98,6 +98,19 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  // Se abre su modal con el detalle
+  &:hover {
+    background-color: $item-hover-actual;
+  }
 }
 
 .item-membresia__cupo-icono {
@@ -119,9 +132,11 @@
   }
 }
 
-// Pie a la izquierda: inicio y vencimiento
+// Pie a la izquierda: etiquetas (Inicia el / Vence el) en una columna y las fechas en otra
 .item-membresia__fechas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 32px;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  align-content: start;
+  gap: 4px 16px;
 }

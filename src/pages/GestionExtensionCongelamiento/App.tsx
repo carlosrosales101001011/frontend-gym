@@ -1,0 +1,10 @@
+import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
+
+export const App = () => {
+  return (
+    <div>
+        <PageBreadCumb title={'Extensiones de congelamiento'}/>
+        
+    </div>
+  )
+}
