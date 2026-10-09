@@ -1,7 +1,8 @@
-import IconCR from '@/components/Icons/IconCR'
+import { format, parseISO, subDays } from 'date-fns'
+import IconCR, { type IconName } from '@/components/Icons/IconCR'
 import { formatDate } from '@/helpers/FormatDate'
 import { diasVencidos, sesionesDisponibles } from '@/helpers/diasMembresia'
-import type { SeguimientoMembresiaProps } from '@/pages/SeguimientoMembresia/store/seguimientoMembresiaSlice'
+import type { MembresiaDetalleProps } from './types'
 
 /** Con 7 días o menos para vencer se avisa en amarillo */
 const DIAS_AVISO = 7
@@ -15,12 +16,23 @@ const ETIQUETA_ESTADO: Record<EstadoMembresia, string> = {
 }
 
 type ItemMembresiaProps = {
-  membresia: SeguimientoMembresiaProps
+  membresia: MembresiaDetalleProps
+}
+
+const FORMATO_FECHA_LARGA = 'DDDD dd [de] MMMM [del] yyyy'
+
+/** "1 Meses" -> "1 mes", "3 Meses" -> "3 meses"; sin plan -> "" */
+const textoPlan = (label_plan: string | null) => {
+  const meses = parseInt(label_plan ?? '', 10)
+  if (Number.isNaN(meses)) return label_plan ?? ''
+  return `${meses} ${meses === 1 ? 'mes' : 'meses'}`
 }
 
 /**
  * Card de una membresía del gym: estado (activa / por vencer / vencida), días de entrenamiento
- * que le quedan (o hace cuánto venció), fecha de vencimiento, comprobante de la venta y extensión actual.
+ * que le quedan (o hace cuánto venció), "[programa], [plan]" como título con el horario debajo,
+ * congelamiento y citas de nutrición (disponibles / regalados) extensión actual y, en el pie, inicio y vencimiento
+ * (con días sumados: "fin de la venta + días" en gris sobre el vencimiento).
  */
 export const ItemMembresia = ({ membresia }: ItemMembresiaProps) => {
   const vencidaHace = diasVencidos(membresia.fecha_vencimiento)
@@ -28,6 +40,12 @@ export const ItemMembresia = ({ membresia }: ItemMembresiaProps) => {
   const estado: EstadoMembresia = vencidaHace > 0 ? 'vencida' : diasRestantes <= DIAS_AVISO ? 'por-vencer' : 'activa'
   const numero = estado === 'vencida' ? vencidaHace : diasRestantes
   const plural = (n: number) => (n === 1 ? 'día' : 'días')
+  // Días de congelamiento ya usados (los que sumaron al vencimiento)
+  const diasCongelados = membresia.congelamiento_regalados - membresia.congelamiento_disponibles
+  // Días que se sumaron a la fecha fin de la venta para llegar al vencimiento
+  const diasSumados = membresia.dias_regalo + diasCongelados
+  // vencimiento = fecha fin de la venta + días corridos de las extensiones -> se resta para obtenerla
+  const fechaFinVenta = format(subDays(parseISO(membresia.fecha_vencimiento), diasSumados), 'yyyy-MM-dd')
 
   return (
     <div className={`item-membresia item-membresia--${estado} card-mode-actual`}>
@@ -36,9 +54,11 @@ export const ItemMembresia = ({ membresia }: ItemMembresiaProps) => {
           <IconCR name="apple" size={16} />
         </span>
         <div className="flex-grow-1 overflow-hidden">
-          <div className="item-membresia__titulo">Membresía gym</div>
+          <div className="item-membresia__titulo">
+            {[membresia.label_programa || 'Membresía gym', textoPlan(membresia.label_plan)].filter(Boolean).join(', ')}
+          </div>
           <div className="item-membresia__detalle">
-            {membresia.label_venta ? `Comprobante ${membresia.label_venta}` : 'Sin comprobante'}
+            {membresia.label_horario ? `Horario ${membresia.label_horario}` : 'Sin horario'}
           </div>
         </div>
         <span className="item-membresia__estado">{ETIQUETA_ESTADO[estado]}</span>
@@ -50,17 +70,84 @@ export const ItemMembresia = ({ membresia }: ItemMembresiaProps) => {
       </div>
 
       <div className="item-membresia__pie">
-        <div>
-          <div className="item-membresia__etiqueta">{estado === 'vencida' ? 'Venció el' : 'Vence el'}</div>
-          <div className="text-capitalize">{formatDate(membresia.fecha_vencimiento, 'yyyy-mm-dd', 'DDDD dd [de] MMMM [del] yyyy')}</div>
-        </div>
-        {membresia.label_extension_actual && (
-          <div className="text-end">
-            <div className="item-membresia__etiqueta">Extensión</div>
-            <div>{membresia.label_extension_actual}</div>
+        <div className="item-membresia__fechas">
+          {membresia.fecha_inicio && (
+            <div>
+              <div className="item-membresia__etiqueta">{estado === 'vencida' ? 'Inició el' : 'Inicia el'}</div>
+              <div className="text-capitalize">{formatDate(membresia.fecha_inicio, 'yyyy-mm-dd', FORMATO_FECHA_LARGA)}</div>
+            </div>
+          )}
+          <div>
+            {/* Arriba, en gris como etiqueta: con días sumados, "fecha fin de la venta + días" (días en rojo) */}
+            {diasSumados > 0 ? (
+              <div className="item-membresia__etiqueta">
+                <span className="text-capitalize">{formatDate(fechaFinVenta, 'yyyy-mm-dd', FORMATO_FECHA_LARGA)}</span>
+                <span className="item-membresia__extra" title="Días de regalo y congelamiento"> + {diasSumados} {plural(diasSumados)}</span>
+              </div>
+            ) : (
+              <div className="item-membresia__etiqueta">{estado === 'vencida' ? 'Venció el' : 'Vence el'}</div>
+            )}
+            <div className="text-capitalize">{formatDate(membresia.fecha_vencimiento, 'yyyy-mm-dd', FORMATO_FECHA_LARGA)}</div>
           </div>
-        )}
+        </div>
+        <div className="item-membresia__cupos">
+          {/* La de regalo ya se ve en "Regalo" */}
+          {membresia.label_extension_actual && membresia.label_extension_actual !== 'Regalo' && (
+            <div className="text-end">
+              <div className="item-membresia__etiqueta">Extensión</div>
+              <div>{membresia.label_extension_actual}</div>
+            </div>
+          )}
+          {membresia.dias_regalo > 0 && (
+            <div className="item-membresia__cupo">
+              <span className="item-membresia__cupo-icono">
+                <IconCR name="regalo" size={14} />
+              </span>
+              <div>
+                <div className="item-membresia__etiqueta">Regalo</div>
+                <div><strong>{membresia.dias_regalo}</strong> {membresia.dias_regalo === 1 ? 'día' : 'días'}</div>
+              </div>
+            </div>
+          )}
+          <CupoMembresia
+            icono="freeze"
+            etiqueta="Congelamiento"
+            disponibles={membresia.congelamiento_disponibles}
+            regalados={membresia.congelamiento_regalados}
+            unidad="días"
+          />
+          <CupoMembresia
+            icono="apple"
+            etiqueta="Citas nutricionista"
+            disponibles={membresia.citas_disponibles}
+            regalados={membresia.citas_regaladas}
+            unidad="citas"
+          />
+        </div>
       </div>
     </div>
   )
 }
+
+type CupoMembresiaProps = {
+  icono: IconName
+  etiqueta: string
+  disponibles: number
+  regalados: number
+  unidad: string
+}
+
+/** Ícono + etiqueta y "[disponibles] / [regalados] unidad" (sin regalo -> "Sin regalo"), en el pie a la derecha */
+const CupoMembresia = ({ icono, etiqueta, disponibles, regalados, unidad }: CupoMembresiaProps) => (
+  <div className="item-membresia__cupo">
+    <span className="item-membresia__cupo-icono">
+      <IconCR name={icono} size={14} />
+    </span>
+    <div>
+      <div className="item-membresia__etiqueta">{etiqueta}</div>
+      {regalados > 0
+        ? <div><strong>{disponibles}</strong> / {regalados} {unidad}</div>
+        : <div className="opacity-50">Sin regalo</div>}
+    </div>
+  </div>
+)

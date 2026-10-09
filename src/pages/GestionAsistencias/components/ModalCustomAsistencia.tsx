@@ -93,6 +93,8 @@ export const ModalCustomAsistencia = ({ id, show, onHide }: ModalCustomAsistenci
                 label='Cliente o colaborador'
                 required
                 soloNombre
+                // Al registrar, el buscador se abre solo con el cursor listo para escribir
+                abrirAlMontar={!esEdicion}
                 value={persona}
                 onSelect={(elegida) => {
                   setPersona(elegida)

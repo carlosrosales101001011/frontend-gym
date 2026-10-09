@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import ModalCR from '../Modal/ModalCR';
 import { InputSearcherCR } from '../TextFields/InputSearcherCR';
 import { ItemSearching } from './ItemSearching';
@@ -29,15 +29,21 @@ type ModalSearchingProps = {
     onSearch?: (query: string, signal?: AbortSignal) => void;
     /** true mientras se espera la búsqueda: muestra tarjetas de carga en vez de los resultados */
     cargando?: boolean;
+    /** Al abrir, pone el cursor en el campo de búsqueda (default: false) */
+    autoFocus?: boolean;
 }
+
+/** Espera para enfocar: ModalCR enfoca su propio contenedor al abrirse y hay que ir después */
+const ESPERA_FOCO_MS = 80
 
 const ITEM_HEIGHT = 56
 const MAX_VISIBLE_ITEMS = 7
 /** Tarjetas de carga: las que entran en la lista sin scroll */
 const ITEMS_SKELETON = MAX_VISIBLE_ITEMS
 
-export const ModalSearching = ({isOpen, onHide, id, labelInput='Buscar por nombre, DNI o Telefono', items=[], onSelect, onSearch, cargando=false}:ModalSearchingProps) => {
+export const ModalSearching = ({isOpen, onHide, id, labelInput='Buscar por nombre, DNI o Telefono', items=[], onSelect, onSearch, cargando=false, autoFocus=false}:ModalSearchingProps) => {
     const [query, setQuery] = useState('')
+    const idInput = useId()
     const debouncedQuery = useDebounce(query, 400)
 
     // dispara la busqueda en el servidor cada vez que cambia el termino (debounced) o se abre el modal
@@ -52,6 +58,12 @@ export const ModalSearching = ({isOpen, onHide, id, labelInput='Buscar por nombr
     useEffect(() => {
         if (!isOpen) setQuery('')
     }, [isOpen])
+
+    useEffect(() => {
+        if (!isOpen || !autoFocus) return
+        const espera = setTimeout(() => document.getElementById(idInput)?.focus(), ESPERA_FOCO_MS)
+        return () => clearTimeout(espera)
+    }, [isOpen, autoFocus, idInput])
 
     const onCancel = ()=>{
         onHide()
@@ -71,7 +83,7 @@ export const ModalSearching = ({isOpen, onHide, id, labelInput='Buscar por nombr
   return (
     <ModalCR size='md' position='center' show={isOpen} onHide={onCancel}>
         <ModalCR.Header showCloseButton={false}>
-            <InputSearcherCR placeholder={labelInput} onSearch={setQuery} />
+            <InputSearcherCR id={idInput} placeholder={labelInput} onSearch={setQuery} />
         </ModalCR.Header>
         <ModalCR.Body>
             <div className="scroll-mode-actual" style={{maxHeight: `${ITEM_HEIGHT * MAX_VISIBLE_ITEMS}px`}}>

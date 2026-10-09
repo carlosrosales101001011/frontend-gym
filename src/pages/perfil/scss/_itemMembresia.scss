@@ -84,3 +84,44 @@
   font-size: 13px;
   border-top: 1px solid $card-border-actual;
 }
+
+// Pie a la derecha: extensión, congelamiento y citas de nutrición con su ícono
+.item-membresia__cupos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 12px 20px;
+}
+
+.item-membresia__cupo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-membresia__cupo-icono {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background-color: $item-hover-actual;
+}
+
+// Días que se sumaron al vencimiento (regalo / congelamiento), en rojo
+.item-membresia__extra {
+  &,
+  * {
+    color: $primary !important;
+  }
+}
+
+// Pie a la izquierda: inicio y vencimiento
+.item-membresia__fechas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+}

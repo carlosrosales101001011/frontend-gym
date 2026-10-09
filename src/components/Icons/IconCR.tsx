@@ -33,7 +33,7 @@ import { MdZoomIn, MdZoomOut, MdRotateLeft, MdRotateRight } from "react-icons/md
 import { MdCardMembership, MdOutlineFolder, MdOutlineComment, MdOutlineContactPhone } from "react-icons/md";
 import { MdOutlineFileDownload, MdOutlineFileUpload } from "react-icons/md";
 import { FaRegFile, FaRegFileExcel, FaRegFileImage, FaRegFilePdf, FaRegFileWord } from "react-icons/fa";
-import { MdStar, MdStarBorder, MdPushPin, MdOutlinePushPin, MdDragIndicator, MdOutlineViewList, MdAccessTime } from "react-icons/md";
+import { MdStar, MdStarBorder, MdPushPin, MdOutlinePushPin, MdDragIndicator, MdOutlineViewList, MdAccessTime, MdCardGiftcard } from "react-icons/md";
 
 export type IconName =
   | "user"
@@ -109,7 +109,8 @@ export type IconName =
   | 'fijadoVacio'
   | 'arrastrar'
   | 'secciones'
-  | 'reloj';
+  | 'reloj'
+  | 'regalo';
 
 const icons: Record<IconName, IconType> = {
   user: FaUser,
@@ -186,6 +187,7 @@ const icons: Record<IconName, IconType> = {
   arrastrar: MdDragIndicator,
   secciones: MdOutlineViewList,
   reloj: MdAccessTime,
+  regalo: MdCardGiftcard,
 };
 
 type Props = {

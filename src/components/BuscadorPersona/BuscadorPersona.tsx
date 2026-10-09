@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { ModalSearching, type ItemResultado } from '@/components/ModalSearching/ModalSearching'
 import { ItemSearching } from '@/components/ModalSearching/ItemSearching'
 import { getBlobUrl } from '@/helpers/blobUrl'
@@ -19,10 +19,19 @@ type BuscadorPersonaProps = {
   onChange?: (e: ChangeEvent<HTMLElement>) => void;
   /** Oculta id, dni, email y telefono del item seleccionado; muestra solo el nombre. */
   soloNombre?: boolean;
+  /** Abre el buscador apenas se muestra, con el cursor listo para escribir (default: false) */
+  abrirAlMontar?: boolean;
 }
 
-export const BuscadorPersona = ({ idTipo, label, placeholder = 'Buscar por nombre, DNI o Telefono', value, onSelect, required = false, onChange, soloNombre = false }: BuscadorPersonaProps) => {
+export const BuscadorPersona = ({ idTipo, label, placeholder = 'Buscar por nombre, DNI o Telefono', value, onSelect, required = false, onChange, soloNombre = false, abrirAlMontar = false }: BuscadorPersonaProps) => {
   const [isOpen, setIsOpen] = useState(false)
+
+  // Se abre después de montar: si va dentro de otro modal, así queda encima de él (los modales se apilan en orden)
+  useEffect(() => {
+    if (!abrirAlMontar) return
+    const espera = setTimeout(() => setIsOpen(true), 0)
+    return () => clearTimeout(espera)
+  }, [])
   const { personas, cargando, buscarPersona } = useBuscarPersona(idTipo)
 
   const items: ItemResultado[] = useMemo(() => personas.map((persona) => ({
@@ -88,6 +97,7 @@ export const BuscadorPersona = ({ idTipo, label, placeholder = 'Buscar por nombr
         onSearch={buscarPersona}
         cargando={cargando}
         onSelect={onSelectPersona}
+        autoFocus={abrirAlMontar}
       />
     </div>
   )
