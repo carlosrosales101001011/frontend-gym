@@ -61,10 +61,12 @@ export const RitmoEquipo = ({ fecha_inicio, fecha_fin }: RitmoEquipoProps) => {
     [ventas, idAsesorSeleccionado, fecha_inicio, fecha_fin, montoMetaObjetivo]
   )
 
+  // Lo que falta para alcanzar la meta (0 si ya se alcanzó)
+  const faltaParaMeta = Math.max(montoMetaObjetivo - ritmo.ventaAcumulada, 0)
   // Anillo: lo vendido (hasta la meta) + lo que falta; si ya se pasó la meta, el anillo queda completo en azul
   const segmentos = [
     { nombre: 'Venta acumulada', valor: Math.min(ritmo.ventaAcumulada, montoMetaObjetivo), color: colores.ventas },
-    { nombre: 'Falta para la meta', valor: Math.max(montoMetaObjetivo - ritmo.ventaAcumulada, 0), color: colores.pendiente },
+    { nombre: 'Falta para la meta', valor: faltaParaMeta, color: colores.pendiente },
   ]
   const porcentajeTexto = `${Math.round(ritmo.porcentaje * 10) / 10}%`
 
@@ -121,8 +123,8 @@ export const RitmoEquipo = ({ fecha_inicio, fecha_fin }: RitmoEquipoProps) => {
             </span>
             <span className="d-inline-flex align-items-center gap-1">
               <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: colores.pendiente, display: 'inline-block' }} />
-              <span className="opacity-75">Meta del periodo:</span>
-              <span className="fw-semibold">{getFormatMoney(montoMetaObjetivo)}</span>
+              <span className="opacity-75">Falta:</span>
+              <span className="fw-semibold">{getFormatMoney(faltaParaMeta)}</span>
             </span>
           </div>
 
