@@ -40,8 +40,10 @@ export const ItemSearching: React.FC<ItemSearchingProps> = ({ id, nombre, dni, a
               {dni.trim().length===0?``:`Dni: ${dni}`}
             </span>
             <span className=''>
+              <span className='opacity-0'>{email}</span>
             {telefono?.trim().length===0?'':`Telefono: ${telefono}`}
             </span>
+
           </p>
         )}
       </div>
