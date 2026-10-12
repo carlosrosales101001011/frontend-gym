@@ -6,11 +6,17 @@ import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
 import { BuscadorPersona } from '@/components/BuscadorPersona/BuscadorPersona'
 import { CardHistorialVentas } from './CardHistorialVentas'
 import { useVentasStore } from '../hook/useVentasStore'
+import { BotonClienteNuevo } from '../components/BotonClienteNuevo'
 
 const ID_TIPO_COLABORADOR = 1
 const ID_TIPO_CLIENTE = 2
 
-export const DetalleVentaApp = () => {
+type DetalleVentaAppProps = {
+  /** "Repetir venta" del historial: la venta quedó cargada (ej. para ir al paso de pago) */
+  onVentaRepetida?: () => void
+}
+
+export const DetalleVentaApp = ({ onVentaRepetida }: DetalleVentaAppProps = {}) => {
   const { cargar: cargarComprobantes, data: dataComprobantes } = useTerminologiaPersona('tipoComprobantes')
   const { cargar: cargarOrigenVenta, data: dataOrigenVenta } = useTerminologiaPersona('origenVenta')
   const { cargar: cargarTipoCliente, data: dataTipoCliente } = useTerminologiaPersona('tipoClienteVenta')
@@ -39,15 +45,19 @@ export const DetalleVentaApp = () => {
               />
             </Col>
             <Col lg={12}>
-              <div className="mt-4">
-                <BuscadorPersona
-                  idTipo={ID_TIPO_CLIENTE}
-                  label='Cliente'
-                  placeholder='Buscar Cliente por nombre, DNI o Telefono'
-                  value={clienteSeleccionado}
-                  onSelect={onSelectCliente}
-                  required
-                />
+              {/* Buscador de cliente y, a su lado, "Cliente nuevo" */}
+              <div className="mt-4 d-flex align-items-end gap-2">
+                <div className="flex-grow-1 min-w-0">
+                  <BuscadorPersona
+                    idTipo={ID_TIPO_CLIENTE}
+                    label='Cliente'
+                    placeholder='Buscar Cliente por nombre, DNI o Telefono'
+                    value={clienteSeleccionado}
+                    onSelect={onSelectCliente}
+                    required
+                  />
+                </div>
+                <BotonClienteNuevo />
               </div>
             </Col>
             <Col lg={12}>
@@ -115,6 +125,7 @@ export const DetalleVentaApp = () => {
               <CardHistorialVentas
                 nombreCliente={clienteSeleccionado?.nombre||''}
                 id_cli={clienteSeleccionado?.id||0}
+                onVentaRepetida={onVentaRepetida}
               />
             </Col>
           </Row>

@@ -8,11 +8,11 @@ type ModalCustomMembresiaProps = {
 
 export const ModalCustomMembresia = ({ show, onHide }: ModalCustomMembresiaProps) => {
   return (
-    <ModalCR show={show} onHide={onHide} size="xl">
+    <ModalCR  show={show} onHide={onHide} size="xl"  position='top'>
       <ModalCR.Header>
         Agregar membresía
       </ModalCR.Header>
-      <ModalCR.Body>
+      <ModalCR.Body style={{ maxHeight: '100vh', overflowY: 'auto' }}>
         <TiendaMembresia onAgregar={onHide} />
       </ModalCR.Body>
     </ModalCR>

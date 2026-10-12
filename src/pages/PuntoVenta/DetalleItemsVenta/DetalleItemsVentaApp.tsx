@@ -10,7 +10,8 @@ export const DetalleItemsVentaApp = () => {
           <InformacionCliente/>
         </Col>
         <Col lg={8} className="h-100">
-          <ResumenVenta/>
+          {/* Solo en este paso se avisa "Verificar la membresía" de una venta repetida */}
+          <ResumenVenta avisoMembresia/>
         </Col>
       </Row>
     </div>

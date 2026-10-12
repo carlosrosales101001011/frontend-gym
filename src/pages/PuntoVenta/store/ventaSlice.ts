@@ -145,7 +145,9 @@ export type PersonaState = {
   idProgramaSeleccionado: number | null,
   productos: ProductoProps[],
   horarios: OpcionesSelect[],
-  dataVentas: DataVentaProps[]
+  dataVentas: DataVentaProps[],
+  /** Venta repetida con membresía: al entrar al paso 2 se avisa "Verificar la membresía" (una sola vez) */
+  avisoVerificarMembresia: boolean
 }
 
 export const initialPersona: PersonaProps = {
@@ -207,7 +209,8 @@ export const initialStateVenta: PersonaState = {
   planes: [],
   idProgramaSeleccionado: null,
   productos: [],
-  dataVentas: []
+  dataVentas: [],
+  avisoVerificarMembresia: false,
 };
 
 export const ventaSlice = createSlice({
@@ -321,6 +324,20 @@ export const ventaSlice = createSlice({
       state.idProgramaSeleccionado = null;
       state.planes = [];
       state.horarios = [];
+      state.avisoVerificarMembresia = false;
+    },
+    /** "Repetir venta": carga la venta armada (mismo cliente) con su asesor y el programa de su membresía */
+    onRepetirVenta: (state, action: PayloadAction<{ venta: VentaProps, asesor: ItemResultado | null }>) => {
+      const { venta, asesor } = action.payload;
+      state.venta = venta;
+      state.asesorSeleccionado = asesor;
+      state.idProgramaSeleccionado = venta.detalleventa_membresias.id_programa || null;
+      state.planes = [];
+      state.horarios = [];
+      state.avisoVerificarMembresia = !!venta.detalleventa_membresias.id_programa;
+    },
+    onOcultarAvisoVerificarMembresia: (state) => {
+      state.avisoVerificarMembresia = false;
     },
     onSetDataVentas: (state, action: PayloadAction<DataVentaProps[]>)=>{
       state.dataVentas = action.payload;
@@ -357,4 +374,6 @@ export const {
   onActualizarPagoVenta,
   onEliminarPagoVenta,
   onResetVenta,
+  onRepetirVenta,
+  onOcultarAvisoVerificarMembresia,
 } = ventaSlice.actions;

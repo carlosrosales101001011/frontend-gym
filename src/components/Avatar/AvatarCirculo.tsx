@@ -15,7 +15,7 @@ type AvatarCirculoProps = {
 }
 
 /** Avatar circular de solo lectura (tablas, listas): foto con su encuadre o la silueta si no tiene */
-export const AvatarCirculo = ({ src, alt = 'Foto', ajuste, tamano = 32, className = '', ampliable = true }: AvatarCirculoProps) => (
+export const AvatarCirculo = ({ src, alt = 'Foto', ajuste, tamano = 40, className = '', ampliable = true }: AvatarCirculoProps) => (
   <span
     className={`d-inline-block flex-shrink-0 overflow-hidden rounded-circle ${className}`}
     style={{ width: tamano, height: tamano }}

@@ -23,12 +23,17 @@ import type { ContactoEmergenciaForm } from '@/components/GestionContactoEmergen
 /** Al dejar de escribir el N° de documento, cuánto se espera antes de verificarlo */
 const ESPERA_VERIFICAR_DOCUMENTO_MS = 4000
 
+/** Cliente recién creado (id del backend + lo que se llenó en el form), para quien abrió el modal */
+export type ClienteCreado = Pick<ClienteProps, 'nombres' | 'apellido_paterno' | 'apellido_materno' | 'numero_documento' | 'telefono' | 'email_personal'> & { id: number }
+
 type props = {
   show: boolean;
   onHide:()=>void;
   id: number;
+  /** Al crear (id 0) y guardar: el cliente nuevo (ej. el punto de venta lo deja elegido en la venta) */
+  onCreado?: (cliente: ClienteCreado) => void;
 }
-export const ModalCustomClientes = ({show, onHide, id}:props) => {
+export const ModalCustomClientes = ({show, onHide, id, onCreado}:props) => {
     const { post, patch, obtenerxID, dataxID, subirAvatar, guardarAjusteAvatar, eliminarAvatar, guardarContactosEmergencia, guardarPrimerComentario, buscarDocumentoRepetido } = useClientesStore()
     const { data:dataGenero, cargar:cargarGenero } = useTerminologiaPersona('GeneroPersona');
     const { data:dataEstadoCivil, cargar:cargarEstadoCivil } = useTerminologiaPersona('EstadoCivilPersona');
@@ -155,6 +160,18 @@ export const ModalCustomClientes = ({show, onHide, id}:props) => {
         const respuesta = await post(payload)
         const uidContactos: string | undefined = respuesta?.data?.uid_contactoEmergencia
         const uidComentario: string | undefined = respuesta?.data?.uid_comentario
+        const idCreado: number | undefined = respuesta?.data?.id
+        if (idCreado) {
+          onCreado?.({
+            id: idCreado,
+            nombres: data.nombres,
+            apellido_paterno: data.apellido_paterno,
+            apellido_materno: data.apellido_materno,
+            numero_documento: data.numero_documento,
+            telefono: data.telefono,
+            email_personal: data.email_personal,
+          })
+        }
         const comentario = primerComentario.trim()
         // El cliente ya quedó creado: si falla lo relacionado, se avisa para agregarlo desde su perfil
         if (uidContactos && contactosEmergencia.length > 0) {

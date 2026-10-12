@@ -3,7 +3,7 @@ import IconCR from '@/components/Icons/IconCR'
 import { FotoEncuadrada } from '@/components/Avatar/FotoEncuadrada'
 import type { AjusteFoto } from '@/components/Avatar/encuadreFoto'
 
-const TAMANO_AVATAR = 40
+const TAMANO_AVATAR = 50
 
 type ItemSearchingProps = {
   id: number;
@@ -33,14 +33,21 @@ export const ItemSearching: React.FC<ItemSearchingProps> = ({ id, nombre, dni, a
         )}
       </div>
       <div className="mx-2 flex-grow-1">
-        <div className="fw-bold color-mode-actual" style={{ fontSize: '14px' }}>{nombre}</div>
+        <div className="fw-bold color-mode-actual" style={{ fontSize: '15px' }}>{nombre}</div>
         {!soloNombre && (
-          <div className=" color-mode-actual" style={{ fontSize: '12px' }}>{dni.trim().length===0?``:`DNI: ${dni}`}, {email?.trim().length===0?'':`Email: ${email}`}, {telefono?.trim().length===0?'':`Telefono: ${telefono}`}</div>
+          <p className=" color-mode-actual d-flex flex-column m-0" style={{ fontSize: '12px' }}>
+            <span className=''>
+              {dni.trim().length===0?``:`Dni: ${dni}`}
+            </span>
+            <span className=''>
+            {telefono?.trim().length===0?'':`Telefono: ${telefono}`}
+            </span>
+          </p>
         )}
       </div>
-      {!soloNombre && (
+      {/* {!soloNombre && (
         <div className=" color-mode-actual" style={{ fontSize: '12px' }}>#{id}</div>
-      )}
+      )} */}
     </div>
   )
 }

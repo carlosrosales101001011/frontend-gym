@@ -12,9 +12,10 @@ type Props={
     /** Sección actual en mantenimiento: en lugar de la página se muestra el aviso (con el menú y el topbar) */
     seccionEnMantenimiento?: string | null;
 }
+const SIDEBAR_BREAKPOINT = 1250
 export const VerticalLayout = ({misSecciones, seccionEnMantenimiento}:Props) => {
     const [isOpenSideBar, setisOpenSideBar] = useState<StateSideBar>(() => ({
-        isOpen: false
+        isOpen: window.innerWidth >= SIDEBAR_BREAKPOINT
     }))
     const onOpenSideBar = ()=>{
         setisOpenSideBar({isOpen: !isOpenSideBar.isOpen})

@@ -7,6 +7,8 @@ import { useAppSelector } from "@/stores/Store";
 import { useDispatch } from "react-redux";
 import type { ItemResultado } from "@/components/ModalSearching/ModalSearching";
 import { errorDescuentoMembresia } from "../helpers/descuentoMembresia";
+import { calcularMontosVenta } from "../helpers/montosVenta";
+import { getFormatMoney } from "@/helpers/getFormatMoney";
 
 const DURACION_MINIMA_LOADING_MS = 1500
 
@@ -134,6 +136,16 @@ export const useVentasStore = () => {
         const errorDescuento = venta.detalleventa_membresias.id_programa ? errorDescuentoMembresia(venta.detalleventa_membresias) : ''
         if (errorDescuento) {
           await Swal.fire({ icon: 'warning', title: 'Descuento de la membresía', text: errorDescuento })
+          return
+        }
+
+        const { total, pagado } = calcularMontosVenta(venta)
+        if (pagado > total) {
+          await Swal.fire({
+            icon: 'warning',
+            title: 'Pago mayor al total',
+            text: `Lo pagado (${getFormatMoney(pagado)}) supera el total de la venta (${getFormatMoney(total)}).`,
+          })
           return
         }
 

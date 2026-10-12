@@ -39,6 +39,8 @@ export interface ModalCRProps {
   showCloseButton?: boolean;
   /** Clase adicional para el contenedor del modal. */
   className?: string;
+  /** Estilos inline para el contenedor del modal. */
+  style?: React.CSSProperties;
   /** Elemento HTML al que se hace el portal. Default: document.body. */
   container?: HTMLElement;
   children: React.ReactNode;
@@ -111,9 +113,10 @@ const Title: React.FC<{
 const Body: React.FC<{
   children: React.ReactNode;
   className?: string;
-}> = ({ children, className }) => {
+  style?: React.CSSProperties;
+}> = ({ children, className, style }) => {
   return (
-    <div className={`${styles["modalcr-body"]} ${className ?? ""}`}>
+    <div className={`${styles["modalcr-body"]} ${className ?? ""}`} style={style}>
       {children}
     </div>
   );
@@ -144,6 +147,7 @@ const ModalCRBase: React.FC<ModalCRProps> = ({
   closeOnBackdrop = true,
   closeOnEsc = true,
   className,
+  style,
   container,
   children,
 }) => {
@@ -250,6 +254,7 @@ const ModalCRBase: React.FC<ModalCRProps> = ({
         aria-modal="true"
         aria-labelledby={`${modalId}-title`}
         tabIndex={-1}
+        style={style}
         className={[
           styles.modalcr,
           styles[`modalcr--${size}`],

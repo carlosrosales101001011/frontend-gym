@@ -220,7 +220,7 @@ export const ItemPrograma = ({ programa, seleccionado, onSelect }: ItemProgramaP
           "d-flex flex-column align-items-center justify-content-center text-center": !imagen,
         })}
       >
-        <Card.Title className={imagen ? "fs-6 fw-bolder" : "fs-2 fw-bolder"}>
+        <Card.Title className={imagen ? "fs-6 fw-bolder" : "fs-4 fw-bolder m-0 p-0"}>
           {programa.nombre}
         </Card.Title>
         <Card.Text className="text-truncate">

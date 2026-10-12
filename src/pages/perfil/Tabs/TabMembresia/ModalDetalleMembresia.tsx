@@ -142,8 +142,8 @@ export const ModalDetalleMembresia = ({ detalle, membresia, show, onHide, onRegi
           )}
 
           {detalle === 'citas'
-            ? <DataTableSimple2 data={citasMembresia} columns={columnasCitas} />
-            : <DataTableSimple2 data={extensionesTipo} columns={columnasExtension} />}
+            ? <DataTableSimple2 mostrarBuscador={false} mostrarPaginacion={false} mostrarTamanoPagina={false} data={citasMembresia} columns={columnasCitas} />
+            : <DataTableSimple2 mostrarBuscador={false} mostrarPaginacion={false} mostrarTamanoPagina={false} data={extensionesTipo} columns={columnasExtension} />}
         </div>
       </ModalCR.Body>
     </ModalCR>

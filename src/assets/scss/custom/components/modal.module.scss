@@ -128,7 +128,8 @@ $modal-muted: #6b7280;
   box-shadow: $modal-shadow;
   color: $modal-ink;
   margin: 8px;
-  max-height: calc(100vh - 10px);
+  // 100% = alto del backdrop menos su padding (varía según position); 16px = margin
+  max-height: calc(100% - 16px);
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     sans-serif;

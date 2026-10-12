@@ -5,9 +5,22 @@ import { TabCR } from '@/components/Tabs/TabCR'
 import { useVentascliStore } from '../hook/useVentascliStore'
 import { DataTableSimple } from '@/components/DataTableSimple/DataTableSimple'
 import type { DataVentaProps } from '../store/ventaSlice'
+import { useRepetirVenta } from '../hook/useRepetirVenta'
 
-export const CardHistorialVentas = ({nombreCliente, id_cli}: {nombreCliente:string, id_cli:number}) => {
+type CardHistorialVentasProps = {
+  nombreCliente: string
+  id_cli: number
+  /** Tras cargar una venta repetida (ej. para ir al paso de pago) */
+  onVentaRepetida?: () => void
+}
+
+export const CardHistorialVentas = ({nombreCliente, id_cli, onVentaRepetida}: CardHistorialVentasProps) => {
   const { obtenerVentasxIdCli, dataVentas } = useVentascliStore(id_cli)
+  const { repetirVenta, repitiendoId } = useRepetirVenta()
+  const repetir = async (id_venta: number) => {
+    if (repitiendoId !== null) return
+    if (await repetirVenta(id_venta)) onVentaRepetida?.()
+  }
   useEffect(() => {
     obtenerVentasxIdCli()
   }, [id_cli])
@@ -66,7 +79,12 @@ export const CardHistorialVentas = ({nombreCliente, id_cli}: {nombreCliente:stri
               {
                   id: 9,
                   header: '',
-                  render: () => <span className='text-decoration-underline text-danger cursor-pointer'>Repetir Venta</span>,
+                  // Copia la venta (membresía desde mañana, mismos precios) y lleva al pago
+                  render: (rowData: DataVentaProps) => (
+                    <span className='text-decoration-underline text-danger cursor-pointer text-nowrap' onClick={() => repetir(rowData.id)}>
+                      {repitiendoId === rowData.id ? 'Cargando…' : 'Repetir Venta'}
+                    </span>
+                  ),
               },
           ]
   return (

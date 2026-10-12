@@ -19,10 +19,7 @@ export const App = () => {
             title: "Detalle de la venta",
         },
         {
-            title: "Membresías y productos",
-        },
-        {
-            title: "Pago",
+            title: "Membresías, productos y pago",
         },
         // {
         //     id: "confirmation",
@@ -63,17 +60,18 @@ export const App = () => {
                 <div className="flex-grow-1 d-flex flex-column p-2" style={{ minHeight: 10}}>
                     {activeStep === 0 && (
                         <div className="h-100 overflow-y-auto overflow-x-hidden">
-                            <DetalleVentaApp/>
+                            {/* "Repetir venta" lleva directo al paso de pago */}
+                            <DetalleVentaApp onVentaRepetida={() => setActiveStep(2)}/>
                         </div>
                     )}
 
-                    {activeStep === 1 && (
+                    {/* {activeStep === 1 && (
                         <div className="flex-grow-1 d-flex flex-column" style={{minHeight: 0}}>
                             <DetalleItemsVentaApp/>
                         </div>
-                    )}
+                    )} */}
 
-                    {activeStep === 2 && (
+                    {activeStep === 1 && (
                         <div className="h-100 overflow-y-auto overflow-x-hidden">
                             <DetallePagosApp/>
                         </div>
