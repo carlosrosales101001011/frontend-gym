@@ -20,9 +20,11 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
   const { programas, obtenerProgramas, idProgramaSeleccionado, onSelectPrograma, planes, obtenerPlanProgramas, venta, onSetMembresia, obtenerHorarios, horarios } = useVentasStore()
   const fechaMinima = format(subDays(new Date(), 7), "yyyy-MM-dd")
 
-  const idPlanSeleccionado = venta.detalleventa_membresias.id_plan || null
-  const idHorarioSeleccionado = venta.detalleventa_membresias.id_horario || null
-  const montoDescuento = venta.detalleventa_membresias.montoDescuento
+  // La membresía del carrito solo se marca si es del programa que se está viendo
+  const membresiaDelPrograma = venta.detalleventa_membresias.id_programa === idProgramaSeleccionado
+  const idPlanSeleccionado = membresiaDelPrograma ? venta.detalleventa_membresias.id_plan || null : null
+  const idHorarioSeleccionado = membresiaDelPrograma ? venta.detalleventa_membresias.id_horario || null : null
+  const montoDescuento = membresiaDelPrograma ? venta.detalleventa_membresias.montoDescuento : 0
   const errorDescuento = idPlanSeleccionado ? errorDescuentoMembresia(venta.detalleventa_membresias) : ""
   const fechaInicio = venta.detalleventa_membresias.fecha_inicio || format(new Date(), "yyyy-MM-dd")
 

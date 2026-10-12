@@ -247,11 +247,13 @@ export const ventaSlice = createSlice({
     onSetDataHorario: (state, action: PayloadAction<OpcionesSelect[]>) => {
       state.horarios = action.payload;
     },
+    // Cambiar de programa no quita la membresía del carrito: solo se reemplaza al elegir
+    // otro plan, o se quita con el tacho (onQuitarMembresiaVenta)
     onSetProgramaSeleccionado: (state, action: PayloadAction<number | null>) => {
+      if (state.idProgramaSeleccionado === action.payload) return;
       state.idProgramaSeleccionado = action.payload;
       state.planes = [];
       state.horarios = [];
-      state.venta.detalleventa_membresias = initialDetalleMembresia;
     },
     onSetDataProductos: (state, action: PayloadAction<ProductoProps[]>) => {
       state.productos = action.payload;
