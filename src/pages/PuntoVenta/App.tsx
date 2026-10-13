@@ -15,9 +15,9 @@ export const App = () => {
         useState(0);
 
     const steps = [
-        {
-            title: "Detalle de la venta",
-        },
+        // {
+        //     title: "Detalle de la venta",
+        // },
         {
             title: "Membresías, productos y pago",
         },
@@ -47,8 +47,10 @@ export const App = () => {
         <div className="page-with-sticky-footer">
           <Loading show={loadingVenta}/>
           <PageBreadCumb title='Nueva venta'/>
-            {/* Mismo stepper que "Agregar usuario"; solo se puede volver a pasos anteriores */}
-            <div className="px-4 pt-3 pb-2">
+          <div className="h-100 overflow-y-auto overflow-x-hidden">
+            <DetallePagosApp/>
+        </div>
+            {/* <div className="px-4 pt-3 pb-2">
                 <Stepper2
                     steps={steps}
                     orientation="horizontal"
@@ -60,29 +62,14 @@ export const App = () => {
                 <div className="flex-grow-1 d-flex flex-column p-2" style={{ minHeight: 10}}>
                     {activeStep === 0 && (
                         <div className="h-100 overflow-y-auto overflow-x-hidden">
-                            {/* "Repetir venta" lleva directo al paso de pago */}
                             <DetalleVentaApp onVentaRepetida={() => setActiveStep(2)}/>
                         </div>
                     )}
-
-                    {/* {activeStep === 1 && (
-                        <div className="flex-grow-1 d-flex flex-column" style={{minHeight: 0}}>
-                            <DetalleItemsVentaApp/>
-                        </div>
-                    )} */}
-
                     {activeStep === 1 && (
                         <div className="h-100 overflow-y-auto overflow-x-hidden">
                             <DetallePagosApp/>
                         </div>
                     )}
-
-                    {/* {activeStep === 3 && (
-                        <div className="h-100 overflow-y-auto overflow-x-hidden">
-                            CONFIRMACIÓN
-                        </div>
-                    )} */}
-
                 </div>
                 <div className='sticky-bottom-1 bg-actual' style={{margin: '0px 70px'}}>
                     {
@@ -106,7 +93,7 @@ export const App = () => {
                             </>
                         )
                     }
-                </div>
+                </div> */}
         </div>
     );
 }

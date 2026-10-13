@@ -5,7 +5,7 @@ import { addDays, addMonths, format } from 'date-fns'
 import httpClient from '@/common/helpers/httpClient'
 import { mensajeError } from '@/helpers/mensajeError'
 import { formatoMoneda } from '../DetalleItemsVenta/Carrito/Carrito'
-import { initialVenta, onRepetirVenta, type PlanProps, type VentaProps } from '../store/ventaSlice'
+import { ID_SUCURSAL_POR_DEFECTO, initialVenta, onRepetirVenta, type PlanProps, type VentaProps } from '../store/ventaSlice'
 
 /** GET /venta/id/:id/detalle (solo lo que se usa para repetirla; los decimales pueden llegar como string) */
 type DetalleVentaApi = {
@@ -103,7 +103,7 @@ export const useRepetirVenta = () => {
         id_cli: venta.id_cli,
         id_empl: venta.id_empl ?? 0,
         id_origen: venta.id_origen ?? 0,
-        id_sucursal: venta.id_sucursal ?? 0,
+        id_sucursal: venta.id_sucursal || ID_SUCURSAL_POR_DEFECTO,
         id_tipo_comprobante: venta.id_tipo_comprobante ?? 0,
         detalleventa_membresias: membresia && plan ? {
           id_programa: membresia.id_programa,

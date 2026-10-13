@@ -183,6 +183,9 @@ const initialDetalleMembresia: DetalleMembresiaVentaProps = {
   max_descuento_plan: 0,
 }
 
+/** Sucursal con la que arranca cada venta nueva (se puede cambiar en el formulario) */
+export const ID_SUCURSAL_POR_DEFECTO = 103
+
 export const initialVenta: VentaProps = {
   id_cli: 0,
   id_empl: 0,
@@ -190,7 +193,7 @@ export const initialVenta: VentaProps = {
   id_tipo_cli: 0,
   n_comprobante: '',
   id_origen: 0,
-  id_sucursal: 0,
+  id_sucursal: ID_SUCURSAL_POR_DEFECTO,
   observacion: '',
   montoTotal: 0,
   detalleventa_membresias: initialDetalleMembresia,
