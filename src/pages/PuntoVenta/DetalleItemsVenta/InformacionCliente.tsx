@@ -14,9 +14,10 @@ export const InformacionCliente = () => {
   const { cargar: cargarComprobantes, data: dataComprobantes } = useTerminologiaPersona('tipoComprobantes')
   const { cargar: cargarOrigenVenta, data: dataOrigenVenta } = useTerminologiaPersona('origenVenta')
   const { cargar: cargarTipoCliente, data: dataTipoCliente } = useTerminologiaPersona('tipoClienteVenta')
-  const { venta, sucursales, clienteSeleccionado, onSelectCliente, asesorSeleccionado, onSelectAsesor, onActualizarVenta } = useVentasStore()
+  const { venta, sucursales, obtenerOpSucursales, clienteSeleccionado, onSelectCliente, asesorSeleccionado, onSelectAsesor, onActualizarVenta } = useVentasStore()
 
   useEffect(() => {
+    obtenerOpSucursales()
     cargarComprobantes()
     cargarOrigenVenta()
     cargarTipoCliente()

@@ -184,7 +184,7 @@ const initialDetalleMembresia: DetalleMembresiaVentaProps = {
 }
 
 /** Sucursal con la que arranca cada venta nueva (se puede cambiar en el formulario) */
-export const ID_SUCURSAL_POR_DEFECTO = 103
+export const ID_SUCURSAL_POR_DEFECTO = 1003
 
 export const initialVenta: VentaProps = {
   id_cli: 0,
