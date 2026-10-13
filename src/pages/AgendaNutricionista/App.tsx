@@ -21,7 +21,7 @@ const MOVER_FECHA: Record<VistaCalendario, (fecha: Date, cantidad: number) => Da
 
 export const App = () => {
   const { eventos, minutosxcli, estados, obtenerEventos, obtenerEstados } = useAgendaNutricionistaStore()
-  const [vista, setVista] = useState<VistaCalendario>('mes')
+  const [vista, setVista] = useState<VistaCalendario>('semana')
   const [fecha, setFecha] = useState(new Date())
   const [modalEvento, setModalEvento] = useState<{ show: boolean, evento: EventoAgendaProps }>({
     show: false,

@@ -1,7 +1,11 @@
+import type { AvatarPersonaApi } from '@/components/Avatar/PersonaConAvatar';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export type DataVentaProps = {
   id:number;
+  /** Fotos del asesor y del cliente (las agrega la búsqueda del backend); null si no tiene */
+  avatar_empl?: AvatarPersonaApi;
+  avatar_cli?: AvatarPersonaApi;
   fecha_venta: string | null;
   label_nombres_apellidos_empl: string,
   label_nombres_apellidos_cli: string,

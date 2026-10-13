@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { AvatarPersonaApi } from '@/components/Avatar/PersonaConAvatar';
 
 /** Asistencia (persona_eventos_asistencia): una marcación de entrada, salida, etc. de una persona */
 export type AsistenciaProps = {
@@ -16,6 +17,9 @@ export type AsistenciaProps = {
   /** Usuario que la registró (lo pone el backend con el token); null en las anteriores */
   id_usercreated?: number | null;
   label_nombres_apellidos_usercreated?: string | null;
+  /** Fotos de la persona y del colaborador de quien la registró (las agrega la búsqueda del backend) */
+  avatar_persona?: AvatarPersonaApi;
+  avatar_usercreated?: AvatarPersonaApi;
 };
 
 export type AsistenciasState = {

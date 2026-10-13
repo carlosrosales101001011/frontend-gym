@@ -5,6 +5,7 @@ import { useAsistenciasStore } from "../hook/useAsistenciasStore"
 import { capitalizeWords } from "@/helpers/strings"
 import { ButtonCR } from "@/components/Button/ButtonCR"
 import IconCR from "@/components/Icons/IconCR"
+import { PersonaConAvatar } from "@/components/Avatar/PersonaConAvatar"
 
 type DataTableAsistenciasProps = {
   onOpenModalCustom?: (id: number) => void
@@ -24,7 +25,7 @@ export const DataTableAsistencias = ({  otrosBotones }: DataTableAsistenciasProp
     {
       id: 1,
       header: 'Persona', campoBusqueda: 'label_nombres_apellidos_persona',
-      render: (rowData: AsistenciaProps) => <span>{capitalizeWords(rowData?.label_nombres_apellidos_persona)}</span>,
+      render: (rowData: AsistenciaProps) => <PersonaConAvatar nombre={capitalizeWords(rowData?.label_nombres_apellidos_persona)} avatar={rowData.avatar_persona} />,
     },
     // {
     //   id: 2,
@@ -40,7 +41,9 @@ export const DataTableAsistencias = ({  otrosBotones }: DataTableAsistenciasProp
       id: 6,
       header: 'Registrado por', campoBusqueda: 'label_nombres_apellidos_usercreated',
       // Las registradas antes de guardar quién las crea no lo tienen
-      render: (rowData: AsistenciaProps) => rowData.label_nombres_apellidos_usercreated || <span className="opacity-50">—</span>,
+      render: (rowData: AsistenciaProps) => rowData.label_nombres_apellidos_usercreated
+        ? <PersonaConAvatar nombre={rowData.label_nombres_apellidos_usercreated} avatar={rowData.avatar_usercreated} />
+        : <span className="opacity-50">—</span>,
     },
     {
       id: 7,

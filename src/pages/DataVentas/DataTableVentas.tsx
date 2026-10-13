@@ -10,6 +10,7 @@ import { getFormatMoney } from "@/helpers/getNumbers"
 import { capitalizeWords } from "@/helpers/strings"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { formatDate } from "@/helpers/FormatDate"
+import { PersonaConAvatar } from "@/components/Avatar/PersonaConAvatar"
 
 export const DataTableVentas = () => {
     const { obtenerVentas } = useVentasStore()
@@ -48,12 +49,12 @@ export const DataTableVentas = () => {
             {
                 id: 1,
                 header: <div style={{width: '150px'}}>Nombres y apellidos<br/> del Asesor / Vendedor</div>, campoBusqueda: 'label_nombres_apellidos_empl',
-                render: (rowData: DataVentaProps) => <span className="">{capitalizeWords(rowData.label_nombres_apellidos_empl)}</span>,
+                render: (rowData: DataVentaProps) => <PersonaConAvatar nombre={capitalizeWords(rowData.label_nombres_apellidos_empl)} avatar={rowData.avatar_empl} />,
             },
             {
                 id: 2,
                 header: <>Nombres y apellidos<br/> del Cliente</>, campoBusqueda: 'label_nombres_apellidos_cli',
-                render: (rowData: DataVentaProps) => <span>{capitalizeWords(rowData.label_nombres_apellidos_cli)}</span>,
+                render: (rowData: DataVentaProps) => <PersonaConAvatar nombre={capitalizeWords(rowData.label_nombres_apellidos_cli)} avatar={rowData.avatar_cli} />,
             },
             {
                 id: 3,
