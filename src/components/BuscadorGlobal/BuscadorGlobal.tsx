@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAppDispatch } from '@/stores/Store'
+import { onSetClienteSeleccionado } from '@/pages/PuntoVenta/store/ventaSlice'
 import IconCR, { type IconName } from '@/components/Icons/IconCR'
 import { AvatarCirculo } from '@/components/Avatar/AvatarCirculo'
 import { ajusteAvatarUltimo } from '@/components/Avatar/encuadreFoto'
@@ -17,6 +19,8 @@ const ESPERA_MS = 300
 const ID_TIPO_CLIENTE = 2
 /** Sección que permite registrar asistencias (url de nav_seccion) */
 const SECCION_ASISTENCIA = 'asistencia'
+/** Sección del punto de venta (url de nav_seccion): "Registrar venta" lleva ahí con el cliente elegido */
+const SECCION_PUNTO_VENTA = 'punto-venta'
 
 /**
  * Por tipo de persona: nombre y, si se puede abrir su perfil desde aquí, la sección que da acceso y la ruta.
@@ -45,11 +49,12 @@ type BuscadorGlobalProps = {
 /**
  * Buscador del Home (grande) y del Topbar (compacto): pantallas (secciones de los módulos del usuario) y personas.
  * Clientes: Enter/click abre su perfil. Colaboradores: no abren perfil. A todos se les puede registrar asistencia
- * (botón, si el usuario tiene la sección de asistencia). Ctrl+K lo enfoca; ↑ ↓ y Enter eligen; Esc cierra.
+ * (botón, si el usuario tiene la sección de asistencia) y a los clientes, "Registrar venta" (si tiene el punto de venta). Ctrl+K lo enfoca; ↑ ↓ y Enter eligen; Esc cierra.
  * Estilos en _BuscadorGlobal.scss.
  */
 export const BuscadorGlobal = ({ compacto = false, autoFocus = false, onCerrar, enModal = false }: BuscadorGlobalProps) => {
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const inputRef = useRef<HTMLInputElement>(null)
   const { pantallas, cargandoPantallas } = useBuscadorGlobal()
   const { personas, cargando: cargandoPersonas, buscarPersona } = useBuscarPersona()
@@ -112,6 +117,8 @@ export const BuscadorGlobal = ({ compacto = false, autoFocus = false, onCerrar, 
     return `${pantalla.ruta.replace(`/${config.seccion}`, '')}/${config.perfil}/${persona.uid}`
   }
   const puedeRegistrarAsistencia = pantallas.some((p) => p.urlSeccion === SECCION_ASISTENCIA)
+  // Solo si el usuario tiene el punto de venta en sus módulos
+  const rutaPuntoVenta = pantallas.find((p) => p.urlSeccion === SECCION_PUNTO_VENTA)?.ruta ?? null
 
   const personasVisibles = buscaPersonas ? personas.slice(0, MAX_PERSONAS) : []
   const resultados: Resultado[] = [
@@ -125,6 +132,37 @@ export const BuscadorGlobal = ({ compacto = false, autoFocus = false, onCerrar, 
     if (!ruta) return
     setAbierto(false)
     navigate(ruta)
+    onCerrar?.()
+  }
+
+  /**
+   * "Registrar asistencia" de una persona: se limpia el campo y se cierra (el modal del Topbar también);
+   * el registro y sus alertas siguen por su cuenta.
+   */
+  const registrarYCerrar = (persona: { id: number, id_tipo?: number }, nombre: string) => {
+    registrarAsistencia(persona.id, nombre, persona.id_tipo === ID_TIPO_CLIENTE)
+    setTexto('')
+    setAbierto(false)
+    inputRef.current?.blur()
+    onCerrar?.()
+  }
+
+  /** "Registrar venta" de un cliente: queda elegido en el punto de venta, se limpia el buscador y se va a la venta */
+  const registrarVenta = (persona: PersonaBuscada, nombre: string) => {
+    if (!rutaPuntoVenta) return
+    dispatch(onSetClienteSeleccionado({
+      id: persona.id,
+      nombre,
+      dni: persona.numero_documento ?? '',
+      telefono: persona.telefono ?? '',
+      email_personal: persona.email_personal ?? '',
+      avatar: getBlobUrl(persona.url_avatar_ultimo),
+      ajusteAvatar: ajusteAvatarUltimo(persona),
+      idTipo: persona.id_tipo,
+    }))
+    setTexto('')
+    setAbierto(false)
+    navigate(rutaPuntoVenta)
     onCerrar?.()
   }
 
@@ -209,13 +247,26 @@ export const BuscadorGlobal = ({ compacto = false, autoFocus = false, onCerrar, 
                       {[config?.nombre, persona.numero_documento, persona.telefono].filter(Boolean).join(' · ')}
                       {sinAccesoPerfil && ' · Sin acceso a su perfil'}
                     </span>
-                  {puedeRegistrarAsistencia && (
-                    <button type="button" className="buscador-global__asistencia" disabled={registrando}
-                      onClick={(e) => { e.stopPropagation(); registrarAsistencia(persona.id, nombre, persona.id_tipo === ID_TIPO_CLIENTE) }}
-                      title={`Registrar asistencia de ${nombre}`}>
-                      <IconCR name="check" size={10} className="" />
-                      {registrando ? 'Registrando…' : 'Registrar asistencia'}
-                    </button>
+                  {(puedeRegistrarAsistencia || (rutaPuntoVenta && persona.id_tipo === ID_TIPO_CLIENTE)) && (
+                    <span className="d-flex flex-wrap gap-1">
+                      {puedeRegistrarAsistencia && (
+                        <button type="button" className="buscador-global__asistencia" disabled={registrando}
+                          onClick={(e) => { e.stopPropagation(); registrarYCerrar(persona, nombre) }}
+                          title={`Registrar asistencia de ${nombre}`}>
+                          <IconCR name="check" size={10} className="" />
+                          {registrando ? 'Registrando…' : 'Registrar asistencia'}
+                        </button>
+                      )}
+                      {/* Solo clientes: abre el punto de venta con el cliente ya elegido */}
+                      {rutaPuntoVenta && persona.id_tipo === ID_TIPO_CLIENTE && (
+                        <button type="button" className="buscador-global__asistencia"
+                          onClick={(e) => { e.stopPropagation(); registrarVenta(persona, nombre) }}
+                          title={`Registrar venta a ${nombre}`}>
+                          <IconCR name="sales" size={10} className="" />
+                          Registrar venta
+                        </button>
+                      )}
+                    </span>
                   )}
                   </span>
                   {ruta && <IconCR name="arrowRight" size={16} className="buscador-global__ir" />}
