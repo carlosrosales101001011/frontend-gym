@@ -5,6 +5,7 @@ import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
 import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
 import { useVentasStore } from '../hook/useVentasStore'
 import { BuscadorPersona } from '@/components/BuscadorPersona/BuscadorPersona'
+import { BotonClienteNuevo } from '../components/BotonClienteNuevo'
 
 const ID_TIPO_COLABORADOR = 1
 const ID_TIPO_CLIENTE = 2
@@ -39,14 +40,18 @@ export const InformacionCliente = () => {
           />
         </div>
 
-        <div className="mb-3">
-          <BuscadorPersona
-            idTipo={ID_TIPO_CLIENTE}
-            label='Cliente'
-            placeholder='Buscar Cliente por nombre, DNI o Telefono'
-            value={clienteSeleccionado}
-            onSelect={onSelectCliente}
-          />
+        {/* Buscador de cliente y, a su lado, "+" para crear uno nuevo */}
+        <div className="mb-3 d-flex align-items-end gap-2">
+          <div className="flex-grow-1 min-w-0">
+            <BuscadorPersona
+              idTipo={ID_TIPO_CLIENTE}
+              label='Cliente'
+              placeholder='Buscar Cliente por nombre, DNI o Telefono'
+              value={clienteSeleccionado}
+              onSelect={onSelectCliente}
+            />
+          </div>
+          <BotonClienteNuevo soloIcono />
         </div>
 
         {/* Mismo formulario que el paso "Detalle de la venta": siempre editable */}

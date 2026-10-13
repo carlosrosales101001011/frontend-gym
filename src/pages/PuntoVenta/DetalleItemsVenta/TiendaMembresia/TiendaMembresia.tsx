@@ -85,13 +85,15 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
   }, [idProgramaSeleccionado])
 
   return (
-    <div className="h-100 overflow-y-auto overflow-x-hidden">
+    // Dos columnas: a la izquierda los programas, a la derecha planes y detalle (cada una con su scroll)
+    <Row className="h-100 g-3">
+    <Col md={3} className="h-100 overflow-y-auto overflow-x-hidden">
     <div className="mb-3">
       <label>Programas disponibles</label>
       <Row className="g-3">
         {programas.filter((programa) => programa.estado)
         .map((programa) => (
-          <Col key={programa.id} md={4}>
+          <Col key={programa.id} md={12}>
             <ItemPrograma
               programa={programa}
               seleccionado={programa.id === idProgramaSeleccionado}
@@ -101,13 +103,15 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
         ))}
       </Row>
     </div>
+    </Col>
+    <Col md={9} className="h-100 overflow-y-auto overflow-x-hidden">
     <div className="mb-3">
       <label>Planes del programa <span className="fw-bolder" style={{fontSize: '15px'}}>{programas.find(f=>f.id===idProgramaSeleccionado)?.nombre}</span></label>
         <div className=" justify-content-center">
           <Row className="g-3">
           {planes.filter((plan) => plan.estado)
           .map((plan) => (
-            <Col key={plan.id} md={2}>
+            <Col key={plan.id} md={3}>
               <ItemPlan
                 plan={plan}
                 seleccionado={plan.id === idPlanSeleccionado}
@@ -194,7 +198,8 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
     <div className="mb-3">
         <ButtonCR label={<span className="mx-5">Agregar membresia</span>} disabled={!idPlanSeleccionado || Boolean(errorDescuento)} onClick={onAgregar}/>
     </div>
-    </div>
+    </Col>
+    </Row>
   )
 }
 

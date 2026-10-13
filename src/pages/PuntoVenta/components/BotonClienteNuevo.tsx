@@ -8,7 +8,12 @@ import { useVentasStore } from '../hook/useVentasStore'
  * Botón "Cliente nuevo" del punto de venta (al lado del buscador de cliente): abre el modal de "Agregar cliente"
  * y, al guardarlo, el cliente recién creado queda elegido en la venta.
  */
-export const BotonClienteNuevo = () => {
+type BotonClienteNuevoProps = {
+  /** Solo el "+" (sin texto), para espacios angostos como "Información de la venta" */
+  soloIcono?: boolean
+}
+
+export const BotonClienteNuevo = ({ soloIcono = false }: BotonClienteNuevoProps = {}) => {
   const { onSelectCliente } = useVentasStore()
   const [abierto, setAbierto] = useState(false)
 
@@ -26,7 +31,7 @@ export const BotonClienteNuevo = () => {
   return (
     <>
       <ButtonCR
-        label="Cliente nuevo"
+        label={soloIcono ? undefined : "Cliente nuevo"}
         icon={<IconCR name="plus" size={14} />}
         className="text-nowrap"
         style={{ height: 40 }}

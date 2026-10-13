@@ -295,9 +295,7 @@ export const ModalCustomClientes = ({show, onHide, id, onCreado}:props) => {
                       })} label="Direccion" messageErrors={errors.direccion?.message}/>
                     </Col>
                     <Col lg={6}>
-                      <InputCR {...register("email_personal", {
-                        required: "Este campo es obligatorio",
-                      })} label="Email personal" messageErrors={errors.email_personal?.message}/>
+                      <InputCR {...register("email_personal")} label="Email personal" messageErrors={errors.email_personal?.message}/>
                     </Col>
                     <Col lg={6}>
                       <InputCR {...register("email_corporativo")} label="Email corporativo" messageErrors={errors.email_corporativo?.message}/>
