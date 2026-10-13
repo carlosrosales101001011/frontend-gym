@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import classNames from 'classnames'
 import { format, isToday } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -12,6 +13,9 @@ import {
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 import { EventoChip } from './EventoChip'
 import { LineaHoraActual } from './LineaHoraActual'
+
+/** Mantener presionada una flecha: cada cuánto vuelve a desplazar */
+const REPETIR_DESPLAZAMIENTO_MS = 250
 
 type VistaSemanaProps = {
   fecha: Date
@@ -28,6 +32,28 @@ export const VistaSemana = ({ fecha, eventos, minutosxcli, onSeleccionarSlot, on
   const dias = diasDeLaSemana(fecha)
   const slots = slotsDelDia(minutosxcli)
 
+  // Flechas de la columna de horas: desplazan 1 hora el contenedor con scroll (el padre de la grilla)
+  const raiz = useRef<HTMLDivElement>(null)
+  const repeticion = useRef<number | undefined>(undefined)
+  const altoHora = (60 / minutosxcli) * ALTO_SLOT
+  const desplazar = (sentido: 1 | -1) => raiz.current?.parentElement?.scrollBy({ top: sentido * altoHora, behavior: 'smooth' })
+  const detener = () => window.clearInterval(repeticion.current)
+  const iniciar = (sentido: 1 | -1) => {
+    detener()
+    desplazar(sentido)
+    repeticion.current = window.setInterval(() => desplazar(sentido), REPETIR_DESPLAZAMIENTO_MS)
+  }
+  useEffect(() => detener, [])
+  const propsFlecha = (sentido: 1 | -1) => ({
+    type: 'button' as const,
+    className: 'agenda__semana-flecha',
+    onPointerDown: () => iniciar(sentido),
+    onPointerUp: detener,
+    onPointerLeave: detener,
+    title: sentido === -1 ? 'Subir 1 hora' : 'Bajar 1 hora',
+    'aria-label': sentido === -1 ? 'Subir 1 hora' : 'Bajar 1 hora',
+  })
+
   /** Posición vertical del evento según su hora de inicio y fin */
   const estiloEvento = (evento: EventoAgendaProps) => {
     const pxPorMinuto = ALTO_SLOT / minutosxcli
@@ -37,8 +63,12 @@ export const VistaSemana = ({ fecha, eventos, minutosxcli, onSeleccionarSlot, on
   }
 
   return (
-    <div className="agenda__semana">
-      <div className="agenda__semana-cabecera" />
+    <div className="agenda__semana" ref={raiz}>
+      {/* Esquina de la columna de horas (al lado del lunes): ▲ y ▼ juntas, fijas arriba */}
+      <div className="agenda__semana-cabecera agenda__semana-cabecera--flecha">
+        <button {...propsFlecha(-1)}>▲</button>
+        <button {...propsFlecha(1)}>▼</button>
+      </div>
       {dias.map((dia) => (
         <button
           key={dia.toISOString()}

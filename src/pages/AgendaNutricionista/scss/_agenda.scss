@@ -177,6 +177,35 @@ $agenda-bg-hoy: rgba(28, 126, 214, 0.12);
   }
 }
 
+// Flechas ▲ ▼ juntas en la esquina de la columna de horas (desplazan 1 hora; mantener presionado sigue desplazando)
+.agenda__semana-cabecera--flecha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 2px;
+}
+
+.agenda__semana-flecha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid $card-border-actual;
+  border-radius: 8px;
+  background-color: $card-actual;
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+
+  &:hover {
+    border-color: $primary;
+    color: $primary !important;
+  }
+}
+
 .agenda__semana-hora {
   padding-right: 6px;
   font-size: 11px;

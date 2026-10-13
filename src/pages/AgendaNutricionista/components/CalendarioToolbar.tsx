@@ -13,9 +13,13 @@ type CalendarioToolbarProps = {
   onHoy: () => void
   /** Contenido centrado en la fila (ej: la leyenda de colores) */
   centro?: ReactNode
+  /** Al lado del título (ej: el buscador de hora de la vista semana) */
+  junto_titulo?: ReactNode
+  /** Después de junto_titulo (ej: "Viendo 09:00 – 12:40") */
+  rango_visible?: ReactNode
 }
 
-export const CalendarioToolbar = ({ vista, fecha, onCambiarVista, onAnterior, onSiguiente, onHoy, centro }: CalendarioToolbarProps) => {
+export const CalendarioToolbar = ({ vista, fecha, onCambiarVista, onAnterior, onSiguiente, onHoy, centro, junto_titulo, rango_visible }: CalendarioToolbarProps) => {
   return (
     // Izquierda y derecha con flex: 1 para que el centro quede centrado de verdad
     <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
@@ -24,6 +28,8 @@ export const CalendarioToolbar = ({ vista, fecha, onCambiarVista, onAnterior, on
         <ButtonCR variant="outline-secondary" label="Hoy" onClick={onHoy} />
         <ButtonCR variant="outline-secondary" onClick={onSiguiente} icon={<IconCR name="arrowRight" size={16} />} />
         <h5 className="fw-bold m-0 ms-2 text-nowrap">{tituloVista(vista, fecha)}</h5>
+        {junto_titulo}
+        {rango_visible}
       </div>
       {centro}
       <div className="d-flex align-items-center justify-content-end flex-grow-1" style={{ flexBasis: 0 }}>

@@ -90,7 +90,7 @@ export const aMinutos = (hora: string) => {
 }
 
 /** minutos desde las 00:00 -> "HH:mm" */
-const aHora = (minutos: number) =>
+export const aHora = (minutos: number) =>
   `${String(Math.floor(minutos / 60)).padStart(2, '0')}:${String(minutos % 60).padStart(2, '0')}`
 
 /** "HH:mm" + minutos -> "HH:mm" (hora de fin de una cita) */

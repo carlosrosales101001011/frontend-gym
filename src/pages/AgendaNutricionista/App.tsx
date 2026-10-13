@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { addDays, addMonths, addWeeks } from "date-fns"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { useAgendaNutricionistaStore } from "./hook/useAgendaNutricionistaStore"
 import { initialStateAgendaNutricionista, type EventoAgendaProps } from "./store/agendaNutricionistaSlice"
-import { aFechaISO, esEventoBloqueado, idEstadoInicial, saltarDomingo, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
+import { aFechaISO, aHora, aMinutos, ALTO_SLOT, esEventoBloqueado, HORA_FIN_AGENDA, HORA_INICIO_AGENDA, idEstadoInicial, saltarDomingo, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
 import { CalendarioToolbar } from "./components/CalendarioToolbar"
 import { LeyendaEstados } from "./components/LeyendaEstados"
 import { VistaMes } from "./components/VistaMes"
@@ -23,6 +23,41 @@ export const App = () => {
   const { eventos, minutosxcli, estados, obtenerEventos, obtenerEstados } = useAgendaNutricionistaStore()
   const [vista, setVista] = useState<VistaCalendario>('semana')
   const [fecha, setFecha] = useState(new Date())
+  // Vista semana: "Ir a la hora" solo desplaza la grilla hasta esa hora (no filtra nada)
+  const contenedorScroll = useRef<HTMLDivElement>(null)
+  const [horaBuscada, setHoraBuscada] = useState('')
+  const irAHora = (valor: string) => {
+    setHoraBuscada(valor)
+    if (!/^\d{2}:\d{2}$/.test(valor)) return
+    const minutos = Math.min(Math.max(aMinutos(valor), HORA_INICIO_AGENDA * 60), HORA_FIN_AGENDA * 60)
+    // La cabecera de días es sticky: con este top el slot de esa hora queda justo debajo de ella
+    contenedorScroll.current?.scrollTo({ top: (minutos - HORA_INICIO_AGENDA * 60) * (ALTO_SLOT / minutosxcli), behavior: 'smooth' })
+  }
+  // Rango de horas que se ve en la grilla (se actualiza al hacer scroll o cambiar el tamaño)
+  const [rangoVisible, setRangoVisible] = useState<{ desde: string, hasta: string } | null>(null)
+  const actualizarRangoVisible = () => {
+    const contenedor = contenedorScroll.current
+    if (!contenedor || vista !== 'semana') return
+    const pxPorMinuto = ALTO_SLOT / minutosxcli
+    // La cabecera de días es sticky y tapa la parte de arriba
+    const altoCabecera = contenedor.querySelector<HTMLElement>('.agenda__semana-cabecera')?.offsetHeight ?? 0
+    const inicio = HORA_INICIO_AGENDA * 60
+    const desde = Math.min(inicio + contenedor.scrollTop / pxPorMinuto, HORA_FIN_AGENDA * 60)
+    const hasta = Math.min(desde + (contenedor.clientHeight - altoCabecera) / pxPorMinuto, HORA_FIN_AGENDA * 60)
+    setRangoVisible({ desde: aHora(Math.round(desde)), hasta: aHora(Math.round(hasta)) })
+  }
+  useEffect(() => {
+    if (vista !== 'semana') return
+    const contenedor = contenedorScroll.current
+    // Después de pintar la grilla
+    const primera = requestAnimationFrame(actualizarRangoVisible)
+    const observador = new ResizeObserver(() => actualizarRangoVisible())
+    if (contenedor) observador.observe(contenedor)
+    return () => {
+      cancelAnimationFrame(primera)
+      observador.disconnect()
+    }
+  }, [vista, minutosxcli])
   const [modalEvento, setModalEvento] = useState<{ show: boolean, evento: EventoAgendaProps }>({
     show: false,
     evento: initialStateAgendaNutricionista.evento,
@@ -80,8 +115,26 @@ export const App = () => {
           onSiguiente={() => setFecha(MOVER_FECHA[vista](fecha, 1))}
           onHoy={() => setFecha(saltarDomingo(new Date()))}
           centro={<LeyendaEstados />}
+          junto_titulo={vista === 'semana' && (
+            <input
+              type="time"
+              className="textfield-input input-mode-actual ms-2"
+              style={{ width: 120, height: 34 }}
+              value={horaBuscada}
+              min={`${String(HORA_INICIO_AGENDA).padStart(2, '0')}:00`}
+              max={`${String(HORA_FIN_AGENDA).padStart(2, '0')}:00`}
+              onChange={(e) => irAHora(e.target.value)}
+              title="Ir a una hora del calendario (solo desplaza)"
+              aria-label="Ir a la hora"
+            />
+          )}
+          rango_visible={vista === 'semana' && rangoVisible && (
+            <span className="small text-nowrap opacity-75 ms-2" title="Horas que se ven en el calendario">
+              Viendo <strong>{rangoVisible.desde}</strong> – <strong>{rangoVisible.hasta}</strong>
+            </span>
+          )}
         />
-        <div className="flex-grow-1 scroll-mode-actual overflow-x-hidden" style={{ minHeight: 0 }}>
+        <div ref={contenedorScroll} onScroll={actualizarRangoVisible} className="flex-grow-1 scroll-mode-actual overflow-x-hidden" style={{ minHeight: 0 }}>
         {vista === 'mes' && (
           <VistaMes
             fecha={fecha}
