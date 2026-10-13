@@ -8,15 +8,16 @@ import { useAppSelector } from '@/stores/Store'
 import { ID_TIPO_MODULO_EMPRESARIAL, type moduloProp } from '@/stores/permisos/permisoSlice'
 
 /**
- * Botón "Mis módulos" del Topbar: al pasar el mouse abre una nube con los mismos módulos del Home
- * (se piden al servidor cada vez que se abre) para saltar de un módulo a otro sin pasar por /home.
+ * Botón "Mis módulos" del Topbar: al pasar el mouse abre una nube con los módulos FIJADOS (chincheta del Home;
+ * se piden al servidor cada vez que se abre) para saltar de un módulo a otro sin pasar por /home.
  */
 export const MisModulos = () => {
   const navigate = useNavigate()
   const entrarAModulo = useIrAModulo()
   const { obtenerModulos, loadingModulos } = usePermisosStore()
   const { modulos } = useAppSelector((state) => state.PERMISO)
-  const empresariales = useMemo(() => modulos.filter((m) => m.modulo?.id_tipo === ID_TIPO_MODULO_EMPRESARIAL), [modulos])
+  // Solo los fijados con la chincheta del Home
+  const fijados = useMemo(() => modulos.filter((m) => m.modulo?.id_tipo === ID_TIPO_MODULO_EMPRESARIAL && m.is_fijado), [modulos])
 
   /** Igual que en el Home: ProtectedRoutes valida el acceso y lleva a la primera sección */
   const irAModulo = (modulo: moduloProp, cerrar: () => void) => {
@@ -40,7 +41,7 @@ export const MisModulos = () => {
       {(cerrar) => (
         <>
           <div className="mis-modulos__grid">
-            {empresariales.map((modulo) => (
+            {fijados.map((modulo) => (
               <button key={modulo.id} type="button" className="mis-modulos__item" onClick={() => irAModulo(modulo, cerrar)}>
                 <span className="mis-modulos__icono icono-modulo">
                   <IconCR name={modulo.modulo.icono || 'no-icon'} size={16} className="" />
@@ -49,8 +50,10 @@ export const MisModulos = () => {
               </button>
             ))}
           </div>
-          {!loadingModulos && empresariales.length === 0 && (
-            <p className="small opacity-75 mb-0 text-center">No tienes módulos asignados.</p>
+          {!loadingModulos && fijados.length === 0 && (
+            <p className="small opacity-75 mb-0 text-center">
+              No tienes módulos fijados. Fíjalos con la chincheta de cada módulo en el inicio.
+            </p>
           )}
           <button type="button" className="btn btn-link btn-sm w-100 mt-2 mis-modulos__home" onClick={() => { cerrar(); navigate('/home') }}>
             Ir al inicio

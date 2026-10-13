@@ -43,7 +43,7 @@ const withExtra = (m: moduloProps) => m as moduloProps & ModuloExtra;
 
 export const ModulosHome: React.FC = () => {
   const [selected, setSelected] = useState<number>(0);
-  const { obtenerModulos, loadingModulos } = usePermisosStore();
+  const { obtenerModulos, loadingModulos, cambiarFijado } = usePermisosStore();
   const { modulos } = useSelector((state: RootState) => state.PERMISO);
 
   useEffect(() => {
@@ -56,7 +56,14 @@ export const ModulosHome: React.FC = () => {
   };
 
   // const favoritos = useMemo(() => modulos.filter((f) => f.is_favorito), [modulos]);
-  const empresariales = useMemo(() => modulos.filter((f) => f.modulo?.id_tipo === ID_TIPO_MODULO_EMPRESARIAL), [modulos]);
+  // Chincheta (se guarda en modulo_x_user.is_fijado): los módulos fijados van primero, manteniendo el orden entre ellos
+  const alternarFijado = (id: number) => {
+    const modulo = modulos.find((m) => m.id === id);
+    if (modulo) cambiarFijado(id, !modulo.is_fijado);
+  };
+  const empresariales = useMemo(() => modulos
+    .filter((f) => f.modulo?.id_tipo === ID_TIPO_MODULO_EMPRESARIAL)
+    .sort((a, b) => Number(!!b.is_fijado) - Number(!!a.is_fijado)), [modulos]);
   // const personales = useMemo(() => modulos.filter((f) => f.modulo?.id_tipo === 2013), [modulos]);
 
   const fechaHoy = useMemo(() => {
@@ -147,7 +154,8 @@ export const ModulosHome: React.FC = () => {
             </div>
             <div className="nk-modulo-grid">
               {empresariales.map((opt) => (
-                <ModuloCard key={opt.id} opt={opt} isActive={selected === opt.id} onClick={irAModulo} />
+                <ModuloCard key={opt.id} opt={opt} isActive={selected === opt.id} onClick={irAModulo}
+                  fijado={!!opt.is_fijado} onAlternarFijado={alternarFijado} />
               ))}
             </div>
           </section>
@@ -201,7 +209,13 @@ type ItemClickProps = {
 //   );
 // };
 
-const ModuloCard: React.FC<ItemClickProps> = ({ opt, isActive, onClick }) => {
+type ModuloCardProps = ItemClickProps & {
+  /** Chincheta negra (fijado) o contorneada */
+  fijado: boolean;
+  onAlternarFijado: (id: number) => void;
+};
+
+const ModuloCard: React.FC<ModuloCardProps> = ({ opt, isActive, onClick, fijado, onAlternarFijado }) => {
   const extra = withExtra(opt);
   const bloqueado = !!extra.sin_acceso;
   return (
@@ -222,6 +236,25 @@ const ModuloCard: React.FC<ItemClickProps> = ({ opt, isActive, onClick }) => {
           opt.modulo.descripcion && <span className="nk-mod-desc">{opt.modulo.descripcion}</span>
         }
       </div>
+      {/* Chincheta al lado derecho (solo en el Home): solo ella fija/desfija, sin entrar al módulo.
+          span (no button): la tarjeta ya es un botón */}
+      <span
+        role="button"
+        tabIndex={0}
+        className={`nk-mod-pin${fijado ? ' is-fijado' : ''}`}
+        title={fijado ? 'Quitar de fijados' : 'Fijar módulo'}
+        aria-label={fijado ? 'Quitar de fijados' : 'Fijar módulo'}
+        aria-pressed={fijado}
+        onClick={(e) => { e.stopPropagation(); onAlternarFijado(opt.id); }}
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          e.stopPropagation();
+          onAlternarFijado(opt.id);
+        }}
+      >
+        <IconCR name={fijado ? 'fijado' : 'fijadoVacio'} size={16} className="" />
+      </span>
     </button>
   );
 };
@@ -330,6 +363,13 @@ const nkStyles = `
 .nk-mod-card.is-active { border-color: #1E7A52; box-shadow: 0 0 0 1px #1E7A52; }
 .nk-mod-card.is-locked { cursor: not-allowed; background: #FBFAF6; color: #A6A192; }
 .nk-mod-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.nk-mod-pin {
+  display: inline-flex; margin: -10px -10px 0 auto; padding: 10px; align-self: flex-start; flex-shrink: 0;
+  border-radius: 8px; color: #9a9a9a; cursor: pointer;
+}
+.nk-mod-pin:hover { background: rgba(0, 0, 0, .06); color: #000; }
+.nk-mod-pin.is-fijado { color: #000; }
+.nk-mod-pin svg { color: inherit !important; }
 .nk-mod-title { font-weight: 700; font-size: 16px; line-height: 1.25; color: var(--bs-primary); }
 .nk-mod-card.is-locked .nk-mod-title { color: inherit; }
 .nk-mod-desc { font-size: 11.5px; color: #8B8B83; }

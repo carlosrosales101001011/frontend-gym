@@ -1,6 +1,8 @@
 import { useDispatch } from "react-redux";
 import httpClient from "@/common/helpers/httpClient";
-import { onSetModulos, onSetSecciones, type moduloProp, type SeccionProp } from "@/stores/permisos/permisoSlice";
+import Swal from "sweetalert2";
+import { mensajeError } from "@/helpers/mensajeError";
+import { onSetModulos, onSetModuloFijado, onSetSecciones, type moduloProp, type SeccionProp } from "@/stores/permisos/permisoSlice";
 import { useRef, useState } from "react";
 
 /** Las url de sección se comparan sin la "/" inicial (en la base se guardan sin ella) */
@@ -44,6 +46,19 @@ export const usePermisosStore = () => {
           setLoadingModulos(false);
         }
       }
+      /**
+       * Chincheta del Home: guarda is_fijado del módulo (id de modulo_x_user). Cambia al instante y,
+       * si el backend falla, vuelve como estaba y avisa.
+       */
+      const cambiarFijado = async (id: number, is_fijado: boolean) => {
+        dispatch(onSetModuloFijado({ id, is_fijado }))
+        try {
+          await httpClient.patch(`/modulo-x-user/me/id/${id}/fijado`, { is_fijado })
+        } catch (error) {
+          dispatch(onSetModuloFijado({ id, is_fijado: !is_fijado }))
+          await Swal.fire({ icon: 'error', title: 'No se pudo guardar la chincheta', html: mensajeError(error) })
+        }
+      }
       /** Secciones del módulo (uid de modulo_x_user); el backend solo las devuelve si el módulo es del usuario */
       const obtenerSeccionesxUidModulo = async(uid_modulo:string)=>{
         const peticion = ++ultimaPeticionSecciones.current;
@@ -62,6 +77,7 @@ export const usePermisosStore = () => {
       }
   return {
     obtenerModulos,
+    cambiarFijado,
     obtenerSeccionesxUidModulo,
     obtenerEntidades,
     hasSeccionxURL,

@@ -81,6 +81,11 @@ export const permisoSlice = createSlice({
         onSetModulos: (state, action:PayloadAction<moduloProp[]>)=>{
         state.modulos =action.payload
         },
+        /** Chincheta del Home: cambia is_fijado de un módulo del usuario */
+        onSetModuloFijado: (state, action:PayloadAction<{ id: number, is_fijado: boolean }>)=>{
+        const modulo = state.modulos.find((m) => m.id === action.payload.id)
+        if (modulo) modulo.is_fijado = action.payload.is_fijado
+        },
         onSetSecciones: (state, action:PayloadAction<SeccionProp[]>)=>{
         state.secciones = action.payload
         },
@@ -93,4 +98,4 @@ export const permisoSlice = createSlice({
     },
 });
 
-export const { onSetModulos, onSetSecciones, onSetEntidades, onSetModuloActual } = permisoSlice.actions;
+export const { onSetModulos, onSetModuloFijado, onSetSecciones, onSetEntidades, onSetModuloActual } = permisoSlice.actions;
