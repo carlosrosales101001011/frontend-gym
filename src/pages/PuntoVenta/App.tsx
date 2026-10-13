@@ -50,50 +50,7 @@ export const App = () => {
           <div className="h-100 overflow-y-auto overflow-x-hidden">
             <DetallePagosApp/>
         </div>
-            {/* <div className="px-4 pt-3 pb-2">
-                <Stepper2
-                    steps={steps}
-                    orientation="horizontal"
-                    currentStep={activeStep}
-                    onChangeStep={setActiveStep}
-                    soloAnterioresClickeables
-                />
-            </div>
-                <div className="flex-grow-1 d-flex flex-column p-2" style={{ minHeight: 10}}>
-                    {activeStep === 0 && (
-                        <div className="h-100 overflow-y-auto overflow-x-hidden">
-                            <DetalleVentaApp onVentaRepetida={() => setActiveStep(2)}/>
-                        </div>
-                    )}
-                    {activeStep === 1 && (
-                        <div className="h-100 overflow-y-auto overflow-x-hidden">
-                            <DetallePagosApp/>
-                        </div>
-                    )}
-                </div>
-                <div className='sticky-bottom-1 bg-actual' style={{margin: '0px 70px'}}>
-                    {
-                        activeStep!==(steps.length-1)? (
-                            <>
-                                {
-                                    activeStep!==0 && (
-                                        <ButtonCR style={{width: '50px'}} label={<div style={{width: '180px'}}>{'<---'} Volver</div>} className='' onClick={()=>onStepBefore()}/>
-                                    )
-                                }
-                                <div className='float-end'>
-                                    <ButtonCR label={<div style={{width: '180px'}}>Siguiente {'--->'}</div>} onClick={()=>onStepLast()}/>
-                                </div>
-                            </>
-                        ): (
-                            <>
-                                <ButtonCR label={<div style={{width: '180px'}}>{'<---'} Volver</div>} onClick={()=>onStepBefore()}/>
-                                <div className='float-end'>
-                                    <ButtonCR label={'Registrar venta'} onClick={()=>onSubmit()}/>
-                                </div>
-                            </>
-                        )
-                    }
-                </div> */}
+                <ButtonCR label={'Registrar venta'} onClick={()=>onSubmit()}/>
         </div>
     );
 }
