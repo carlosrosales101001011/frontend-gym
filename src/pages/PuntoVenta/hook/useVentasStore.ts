@@ -2,7 +2,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import httpClient from "@/common/helpers/httpClient";
 import { useCrudhook } from "@/hook/usecrudhook";
-import { onSetDataOpcionesSucursales, onSetClienteSeleccionado, onSetAsesorSeleccionado, onActualizarVentaCampo, onSetDataProgramas, onSetDataPlanes, onSetProgramaSeleccionado, onSetDataProductos, onSetMembresiaVenta, onQuitarMembresiaVenta, onAgregarProductoVenta, onSumarProductoVenta, onRestarProductoVenta, onQuitarProductoVenta, onAgregarPagoVenta, onActualizarPagoVenta, onEliminarPagoVenta, onResetVenta, type SucursalProps, type ProgramaProps, type ProductoProps, type DetalleMembresiaVentaProps, type DetallePagoVentaProps, type VentaProps, onSetDataHorario, type HorariosProps, type DetalleProductoVentaProps, type DataVentaProps } from "../store/ventaSlice";
+import { onSetDataOpcionesSucursales, onSetClienteSeleccionado, onSetAsesorSeleccionado, onActualizarVentaCampo, onSetDataProgramas, onSetDataPlanes, onSetProgramaSeleccionado, onSetDataProductos, onSetMembresiaVenta, onQuitarMembresiaVenta, onAgregarProductoVenta, onSumarProductoVenta, onRestarProductoVenta, onQuitarProductoVenta, onAgregarPagoVenta, onActualizarPagoVenta, onEliminarPagoVenta, onResetVenta, type SucursalProps, type ProgramaProps, type ProductoProps, type DetalleMembresiaVentaProps, type DetallePagoVentaProps, type VentaProps, onSetDataHorario, type HorariosProps, type DetalleProductoVentaProps, type DataVentaProps, type PersonaProps } from "../store/ventaSlice";
 import { useAppSelector } from "@/stores/Store";
 import { useDispatch } from "react-redux";
 import type { ItemResultado } from "@/components/ModalSearching/ModalSearching";
@@ -83,6 +83,27 @@ export const useVentasStore = () => {
       }
       const onSelectAsesor = (asesor: ItemResultado | null) => {
         dispatch(onSetAsesorSeleccionado(asesor))
+      }
+      /**
+       * Asesor por defecto: el colaborador vinculado al usuario logueado (users.id_empl), solo si todavía no hay
+       * uno elegido. Se puede cambiar en el buscador como siempre.
+       */
+      const asignarAsesorDeSesion = async () => {
+        if (asesorSeleccionado) return
+        try {
+          const { data: empleado }: { data: PersonaProps | null } = await httpClient.get('/user/me/empleado')
+          if (!empleado) return
+          dispatch(onSetAsesorSeleccionado({
+            id: empleado.id,
+            nombre: [empleado.nombres, empleado.apellido_paterno, empleado.apellido_materno].filter(Boolean).join(' ').trim(),
+            dni: empleado.numero_documento ?? '',
+            telefono: empleado.telefono ?? '',
+            email_personal: empleado.email_personal ?? '',
+            idTipo: 1,
+          }))
+        } catch (error) {
+          console.log(error);
+        }
       }
       const onActualizarVenta = (name: 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'id_tipo_cli' | 'n_comprobante' | 'observacion', value: VentaProps[typeof name]) => {
         dispatch(onActualizarVentaCampo({ name, value }))
@@ -225,6 +246,7 @@ export const useVentasStore = () => {
     onSelectCliente,
     asesorSeleccionado,
     onSelectAsesor,
+    asignarAsesorDeSesion,
     onActualizarVenta,
     venta,
     onSetMembresia,
