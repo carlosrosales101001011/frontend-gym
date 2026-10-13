@@ -97,7 +97,8 @@ export const BuscadorPersona = ({ idTipo, label, placeholder = 'Buscar por nombr
         onSearch={buscarPersona}
         cargando={cargando}
         onSelect={onSelectPersona}
-        autoFocus={abrirAlMontar}
+        // Siempre con el cursor en el campo de búsqueda al abrir
+        autoFocus
       />
     </div>
   )
