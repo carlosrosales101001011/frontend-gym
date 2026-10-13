@@ -3,6 +3,7 @@ import { Card } from "react-bootstrap"
 import { BsPlusLg, BsTrash } from "react-icons/bs"
 import { useTerminologiaPersona } from "@/hook/usePropiedadesStore"
 import { useVentasStore } from "../hook/useVentasStore"
+import { ButtonCR } from "@/components/Button/ButtonCR"
 import { ModalCustomPago } from "./ModalCustomPago"
 import type { DetallePagoVentaProps } from "../store/ventaSlice"
 
@@ -23,17 +24,7 @@ export const ItemsPagos = () => {
 
   return (
     <div className="d-flex flex-column gap-2">
-      <Card
-        role="button"
-        tabIndex={0}
-        className="add-item-card"
-        onClick={() => setShowModalPago(true)}
-      >
-        <div className="d-flex align-items-center gap-2">
-          <BsPlusLg size={18} />
-          <span>Agregar pago</span>
-        </div>
-      </Card>
+      <ButtonCR className="btn-agregar-item" icon={<BsPlusLg size={16} />} label="Agregar pago" onClick={() => setShowModalPago(true)} />
       {detalleventa_pagos.map((pago, index) => (
         <ItemPago
           key={index}

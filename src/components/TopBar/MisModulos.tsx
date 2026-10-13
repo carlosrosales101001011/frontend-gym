@@ -26,7 +26,7 @@ export const MisModulos = () => {
   return (
     <NubeCR
       titulo="Mis módulos"
-      ancho={300}
+      ancho={460}
       onAbrir={obtenerModulos}
       cargando={loadingModulos}
       textoCargando="Cargando módulos"

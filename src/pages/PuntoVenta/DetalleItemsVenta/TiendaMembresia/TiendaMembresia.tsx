@@ -103,18 +103,20 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
     </div>
     <div className="mb-3">
       <label>Planes del programa <span className="fw-bolder" style={{fontSize: '15px'}}>{programas.find(f=>f.id===idProgramaSeleccionado)?.nombre}</span></label>
-        <Row className="g-3">
-        {planes.filter((plan) => plan.estado)
-        .map((plan) => (
-          <Col key={plan.id} md={4}>
-            <ItemPlan
-              plan={plan}
-              seleccionado={plan.id === idPlanSeleccionado}
-              onSelect={() => actualizarMembresia(plan.id, fechaInicio, idHorarioSeleccionado, plan.id === idPlanSeleccionado ? montoDescuento : 0)}
-            />
-          </Col>
-        ))}
-      </Row>
+        <div className=" justify-content-center">
+          <Row className="g-3">
+          {planes.filter((plan) => plan.estado)
+          .map((plan) => (
+            <Col key={plan.id} md={2}>
+              <ItemPlan
+                plan={plan}
+                seleccionado={plan.id === idPlanSeleccionado}
+                onSelect={() => actualizarMembresia(plan.id, fechaInicio, idHorarioSeleccionado, plan.id === idPlanSeleccionado ? montoDescuento : 0)}
+              />
+            </Col>
+          ))}
+        </Row>
+        </div>
     </div>
     <div className="mb-3">
         <label>Detalle de la membresia</label>
@@ -262,7 +264,6 @@ export const ItemPlan = ({ plan, seleccionado, onSelect }: ItemPlanProps) => {
           <br/>
           {formatoMoneda.format(plan.precioTotal)}
           <br/>
-          {plan.label_tipo_tarifa}
           {Number(plan.max_descuento) > 0 && (
             <div className="small fw-normal">Desc. máx: {formatoMoneda.format(Number(plan.max_descuento))}</div>
           )}

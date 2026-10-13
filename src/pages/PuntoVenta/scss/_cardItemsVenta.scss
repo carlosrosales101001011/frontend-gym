@@ -19,3 +19,14 @@
     height: 100%;
   }
 }
+
+// Botones "Agregar membresía / productos / pago" (ButtonCR primario): pastilla sólida
+.btn-agregar-item {
+  min-height: 40px;
+  border-radius: 999px;
+  font-weight: 600;
+
+  > div {
+    font-size: 14px !important;
+  }
+}

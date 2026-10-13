@@ -10,6 +10,7 @@ import { ModalCustomMembresia } from './ModalCustomMembresia'
 import { ModalCustomProductos } from './ModalCustomProductos'
 import { calcularMontosVenta } from '../helpers/montosVenta'
 import { getFormatMoney } from '@/helpers/getFormatMoney'
+import { ButtonCR } from '@/components/Button/ButtonCR'
 
 /** Cuánto se ve el aviso "Verificar la membresía" de una venta repetida */
 const DURACION_AVISO_MEMBRESIA_MS = 5000
@@ -53,18 +54,8 @@ export const ResumenVenta = ({ avisoMembresia = false }: ResumenVentaProps) => {
               </div>
             {/* Mismo estilo que "Agregar pago" */}
             <div className="d-flex gap-2 mt-1 mb-1">
-              <Card role="button" tabIndex={0} className="add-item-card flex-fill " onClick={() => setShowModalMembresia(true)}>
-                <span className="d-flex align-items-center gap-2">
-                  <BsPlusLg size={18} />
-                  <span>Agregar membresía</span>
-                </span>
-              </Card>
-              <Card role="button" tabIndex={0} className="add-item-card flex-fill" onClick={() => setShowModalProductos(true)}>
-                <span className="d-flex align-items-center gap-2">
-                  <BsPlusLg size={18} />
-                  <span>Agregar productos</span>
-                </span>
-              </Card>
+              <ButtonCR className="btn-agregar-item flex-fill" icon={<BsPlusLg size={16} />} label="Agregar membresía" onClick={() => setShowModalMembresia(true)} />
+              {/* <ButtonCR className="btn-agregar-item flex-fill" icon={<BsPlusLg size={16} />} label="Agregar productos" onClick={() => setShowModalProductos(true)} /> */}
             </div>
             <Carrito/>
           </Card.Body>
