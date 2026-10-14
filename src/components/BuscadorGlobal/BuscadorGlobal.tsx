@@ -8,7 +8,7 @@ import { ajusteAvatarUltimo } from '@/components/Avatar/encuadreFoto'
 import { useBuscarPersona, type PersonaBuscada } from '@/components/BuscadorPersona/useBuscarPersona'
 import { getBlobUrl } from '@/helpers/blobUrl'
 import { normalizeText } from '@/helpers/strings'
-import { useRegistrarAsistencia } from '@/pages/GestionAsistencias/hook/useRegistrarAsistencia'
+import { useRegistrarAsistencia } from '@/hook/useRegistrarAsistencia'
 import { useBuscadorGlobal, type PantallaBuscable } from './useBuscadorGlobal'
 
 const MAX_PANTALLAS = 8

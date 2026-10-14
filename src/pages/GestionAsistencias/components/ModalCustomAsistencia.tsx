@@ -11,7 +11,7 @@ import { BuscadorPersona } from "@/components/BuscadorPersona/BuscadorPersona";
 import type { ItemResultado } from "@/components/ModalSearching/ModalSearching";
 import { useAsistenciasStore } from "../hook/useAsistenciasStore";
 import { useMembresiaActual } from "../hook/useMembresiaActual";
-import { TIPO_EVENTO_MANUAL } from "../hook/useRegistrarAsistencia";
+import { TIPO_EVENTO_MANUAL } from "@/hook/useRegistrarAsistencia";
 import { CardMembresiaAsistencia } from "./CardMembresiaAsistencia";
 
 const ID_TIPO_COLABORADOR = 1

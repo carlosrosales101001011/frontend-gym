@@ -3,7 +3,7 @@ import type { SweetAlertOptions } from 'sweetalert2'
 import { formatDate } from '@/helpers/FormatDate'
 import { getFormatMoney } from '@/helpers/getFormatMoney'
 import { diasVencidos } from '@/helpers/diasMembresia'
-import type { MembresiaActualProps } from '../hook/useMembresiaActual'
+import type { MembresiaActualProps } from '@/types/membresiaActual'
 
 /** Colores fuertes de la alerta (fondo) */
 const VERDE = '#146c43'
@@ -39,7 +39,7 @@ export const alertaMembresia = (nombre: string, membresia: MembresiaActualProps 
     timer: DURACION_ALERTA_MS,
     timerProgressBar: true,
     showConfirmButton: false,
-    // Texto blanco sobre el fondo fuerte (el * global del tema lo pintaría oscuro); ver _cardMembresiaAsistencia.scss
+    // Texto blanco sobre el fondo fuerte (el * global del tema lo pintaría oscuro); ver GestionAsistencias/scss/_cardMembresiaAsistencia.scss
     customClass: { popup: 'alerta-membresia' },
   }
   const vigente = membresiaVigente(membresia)

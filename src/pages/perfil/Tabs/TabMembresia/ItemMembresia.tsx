@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { format, parseISO, subDays } from 'date-fns'
 import IconCR, { type IconName } from '@/components/Icons/IconCR'
 import { formatDate } from '@/helpers/FormatDate'
-import { diasVencidos, sesionesDisponibles } from '@/helpers/diasMembresia'
+import { diasMembresia, diasVencidos, sesionesDisponibles } from '@/helpers/diasMembresia'
 import type { MembresiaDetalleProps } from './types'
 import { ModalDetalleMembresia, type DetalleMembresia } from './ModalDetalleMembresia'
 
@@ -35,9 +35,9 @@ const textoPlan = (label_plan: string | null) => {
 /**
  * Card de una membresía del gym: estado (activa / por vencer / vencida), días de entrenamiento
  * que le quedan (o hace cuánto venció), "[programa], [plan]" como título con el horario debajo,
- * congelamiento y citas de nutrición (disponibles / regalados) extensión actual y, en el pie, inicio y vencimiento
- * (con días sumados: "fin de la venta + días" en gris sobre el vencimiento).
- * Regalo, congelamiento y citas abren un modal con su detalle (congelamiento y regalo se pueden registrar ahí).
+ * congelamiento y citas de nutrición (disponibles / regalados), asistencias (días asistidos / días de la membresía),
+ * extensión actual y, en el pie, inicio y vencimiento (con días sumados: "fin de la venta + días" en gris sobre el vencimiento).
+ * Regalo, congelamiento, citas y asistencias abren un modal con su detalle (congelamiento y regalo se pueden registrar ahí).
  */
 export const ItemMembresia = ({ membresia, onCambio }: ItemMembresiaProps) => {
   const [detalleAbierto, setDetalleAbierto] = useState<DetalleMembresia | null>(null)
@@ -102,6 +102,21 @@ export const ItemMembresia = ({ membresia, onCambio }: ItemMembresiaProps) => {
               <div>{membresia.label_extension_actual}</div>
             </div>
           )}
+          {/* Asistencias: días asistidos (empieza en 0 y sube con cada día que asiste) de los días de la membresía */}
+          <button type="button" className="item-membresia__cupo" onClick={() => setDetalleAbierto('asistencias')} title="Ver asistencias de la membresía">
+            <span className="item-membresia__cupo-icono">
+              <IconCR name="calendar" size={14} />
+            </span>
+            <div>
+              <div className="item-membresia__etiqueta">Asistencias</div>
+              <div>
+                <strong>{membresia.dias_asistidos}</strong>
+                {membresia.fecha_inicio
+                  ? <> / {diasMembresia(membresia.fecha_inicio, membresia.fecha_vencimiento)} días</>
+                  : ` ${plural(membresia.dias_asistidos)}`}
+              </div>
+            </div>
+          </button>
           {/* Siempre a la vista: desde su modal se registra el primer regalo */}
           <button type="button" className="item-membresia__cupo" onClick={() => setDetalleAbierto('regalo')} title="Ver y registrar regalos">
             <span className="item-membresia__cupo-icono">

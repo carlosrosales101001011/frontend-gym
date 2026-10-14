@@ -269,9 +269,9 @@ export const ItemPlan = ({ plan, seleccionado, onSelect }: ItemPlanProps) => {
           <br/>
           {formatoMoneda.format(plan.precioTotal)}
           <br/>
-          {Number(plan.max_descuento) > 0 && (
+          {/* {Number(plan.max_descuento) > 0 && (
             <div className="small fw-normal">Desc. máx: {formatoMoneda.format(Number(plan.max_descuento))}</div>
-          )}
+          )} */}
       </Card.Body>
     </Card>
   )

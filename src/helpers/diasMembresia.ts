@@ -7,6 +7,10 @@ import { addDays, differenceInCalendarDays, isSunday, parseISO } from 'date-fns'
 export const diasVencidos = (fecha_vencimiento: string) =>
     differenceInCalendarDays(new Date(), parseISO(fecha_vencimiento))
 
+/** Días calendario de la membresía, de su inicio a su vencimiento (ambos incluidos; ej. 1 al 31 de octubre = 31) */
+export const diasMembresia = (fecha_inicio: string, fecha_vencimiento: string) =>
+    differenceInCalendarDays(parseISO(fecha_vencimiento), parseISO(fecha_inicio)) + 1
+
 /** Cuenta los días de (desde, hasta] sin contar los domingos; 0 si hasta <= desde */
 const contarDiasSinDomingo = (desde: Date, hasta: Date) => {
     const total = differenceInCalendarDays(hasta, desde)

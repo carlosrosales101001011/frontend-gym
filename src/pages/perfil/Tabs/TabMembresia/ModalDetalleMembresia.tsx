@@ -7,9 +7,12 @@ import { ButtonCR } from '@/components/Button/ButtonCR'
 import IconCR from '@/components/Icons/IconCR'
 import { InputCR } from '@/components/TextFields/InputCR'
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
+import { PersonaConAvatar } from '@/components/Avatar/PersonaConAvatar'
 import { formatDate } from '@/helpers/FormatDate'
+import { diasMembresia } from '@/helpers/diasMembresia'
 import { MAX_DIAS_REGALO } from '@/pages/GestionExtensionRegalos/store/extRegaloSlice'
 import type { MembresiaDetalleProps } from './types'
+import type { AsistenciaClienteProps } from '../TabAsistencia/useAsistenciasCliente'
 import {
   ID_EXTENSION_CONGELAMIENTO,
   ID_EXTENSION_REGALO,
@@ -19,13 +22,14 @@ import {
   type NuevaExtension,
 } from './useDetalleMembresia'
 
-/** Qué se ve en el modal: congelamientos y regalos se pueden registrar; las citas son solo para ver */
-export type DetalleMembresia = 'congelamiento' | 'regalo' | 'citas'
+/** Qué se ve en el modal: congelamientos y regalos se pueden registrar; citas y asistencias son solo para ver */
+export type DetalleMembresia = 'congelamiento' | 'regalo' | 'citas' | 'asistencias'
 
 const TITULO: Record<DetalleMembresia, string> = {
   congelamiento: 'Congelamientos',
   regalo: 'Días de regalo',
   citas: 'Citas con la nutricionista',
+  asistencias: 'Asistencias',
 }
 
 const fecha = (valor: string) => formatDate(valor, 'yyyy-mm-dd', 'dd/mm/yyyy')
@@ -58,6 +62,21 @@ const columnasCitas: ColumnaSimple2<CitaNutricionProps>[] = [
   },
 ]
 
+const columnasAsistencias: ColumnaSimple2<AsistenciaClienteProps>[] = [
+  {
+    id: 'fecha', header: 'Fecha y hora',
+    render: (a) => formatDate(new Date(a.fecha_registro), 'yyyy-mm-dd', 'dd/mm/yyyy hh:mm'),
+    sortValue: (a) => a.fecha_registro,
+  },
+  {
+    id: 'registrado-por', header: 'Registrado por',
+    // Las registradas antes de guardar quién las crea no lo tienen
+    render: (a) => a.label_nombres_apellidos_usercreated
+      ? <PersonaConAvatar nombre={a.label_nombres_apellidos_usercreated} avatar={a.avatar_usercreated} />
+      : <span className="opacity-50">—</span>,
+  },
+]
+
 type ModalDetalleMembresiaProps = {
   detalle: DetalleMembresia
   membresia: MembresiaDetalleProps
@@ -69,14 +88,16 @@ type ModalDetalleMembresiaProps = {
 
 /**
  * Detalle de una membresía del perfil en una tabla: congelamientos o regalos de su venta (con su botón para registrar
- * uno nuevo) o las citas de nutrición del cliente dentro de la membresía (solo vista).
+ * uno nuevo), o las citas de nutrición o asistencias del cliente dentro de la membresía (solo vista).
  */
 export const ModalDetalleMembresia = ({ detalle, membresia, show, onHide, onRegistrado }: ModalDetalleMembresiaProps) => {
-  const { extensiones, citas, cargando, guardando, obtenerExtensiones, obtenerCitas, registrarExtension } = useDetalleMembresia()
+  const { extensiones, citas, asistencias, cargando, guardando, obtenerExtensiones, obtenerCitas, obtenerAsistencias, registrarExtension } = useDetalleMembresia()
   const [formAbierto, setFormAbierto] = useState(false)
 
   const cargar = () => {
     if (detalle === 'citas') obtenerCitas(membresia.id_cli)
+    // Solo las de la membresía: de su inicio a su vencimiento (el backend filtra por días de Perú)
+    else if (detalle === 'asistencias') obtenerAsistencias(membresia.id_cli, membresia.fecha_inicio, membresia.fecha_vencimiento)
     else obtenerExtensiones(membresia.id_venta)
   }
 
@@ -117,7 +138,16 @@ export const ModalDetalleMembresia = ({ detalle, membresia, show, onHide, onRegi
             </p>
           )}
 
-          {detalle !== 'citas' && (
+          {detalle === 'asistencias' && (
+            <p className="small mb-2">
+              Asistió <strong>{dias(membresia.dias_asistidos)}</strong>
+              {membresia.fecha_inicio && (
+                <> de <strong>{diasMembresia(membresia.fecha_inicio, membresia.fecha_vencimiento)}</strong> ({fecha(membresia.fecha_inicio)} al {fecha(membresia.fecha_vencimiento)})</>
+              )}.
+            </p>
+          )}
+
+          {(detalle === 'congelamiento' || detalle === 'regalo') && (
             formAbierto ? (
               <FormExtension
                 detalle={detalle}
@@ -143,6 +173,8 @@ export const ModalDetalleMembresia = ({ detalle, membresia, show, onHide, onRegi
 
           {detalle === 'citas'
             ? <DataTableSimple2 mostrarBuscador={false} mostrarPaginacion={false} mostrarTamanoPagina={false} data={citasMembresia} columns={columnasCitas} />
+            : detalle === 'asistencias'
+            ? <DataTableSimple2 mostrarBuscador={false} data={asistencias} columns={columnasAsistencias} />
             : <DataTableSimple2 mostrarBuscador={false} mostrarPaginacion={false} mostrarTamanoPagina={false} data={extensionesTipo} columns={columnasExtension} />}
         </div>
       </ModalCR.Body>

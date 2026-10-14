@@ -2,7 +2,7 @@ import IconCR from "@/components/Icons/IconCR"
 import { formatDate } from "@/helpers/FormatDate"
 import { getFormatMoney } from "@/helpers/getFormatMoney"
 import { diasVencidos } from "@/helpers/diasMembresia"
-import type { MembresiaActualProps } from "../hook/useMembresiaActual"
+import type { MembresiaActualProps } from "@/types/membresiaActual"
 
 type CardMembresiaAsistenciaProps = {
   membresia: MembresiaActualProps | null

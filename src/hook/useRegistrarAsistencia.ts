@@ -5,8 +5,8 @@ import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
 import { normalizeText } from '@/helpers/strings'
 import { formatDate } from '@/helpers/FormatDate'
 import { mensajeError } from '@/helpers/mensajeError'
-import { alertaMembresia, membresiaVigente } from '../helpers/alertaMembresia'
-import type { MembresiaActualProps } from './useMembresiaActual'
+import { alertaMembresia, membresiaVigente } from '@/helpers/alertaMembresia'
+import type { MembresiaActualProps } from '@/types/membresiaActual'
 
 /** Tipo de evento de una asistencia registrada a mano (terminología persona/asistencia/tipo) */
 export const TIPO_EVENTO_MANUAL = 'manual'

@@ -25,4 +25,6 @@ export type MembresiaDetalleProps = {
   citas_disponibles: number
   /** Días de las extensiones "Regalo" de la venta (0 = sin regalo) */
   dias_regalo: number
+  /** Días distintos con asistencia del cliente entre el inicio y el vencimiento */
+  dias_asistidos: number
 }
