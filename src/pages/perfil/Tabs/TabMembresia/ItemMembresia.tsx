@@ -48,8 +48,8 @@ export const ItemMembresia = ({ membresia, onCambio }: ItemMembresiaProps) => {
   const plural = (n: number) => (n === 1 ? 'día' : 'días')
   // Días que se sumaron a la fecha fin de la venta para llegar al vencimiento (regalo + congelamientos)
   const diasSumados = membresia.dias_regalo + membresia.dias_congelados
-  // vencimiento = fecha fin de la venta + días corridos de las extensiones -> se resta para obtenerla
-  const fechaFinVenta = format(subDays(parseISO(membresia.fecha_vencimiento), diasSumados), 'yyyy-MM-dd')
+  // Fecha fin de la membresía vendida (la que se extiende); sin ella se deduce: vencimiento - días sumados
+  const fechaFinVenta = membresia.fecha_fin ?? format(subDays(parseISO(membresia.fecha_vencimiento), diasSumados), 'yyyy-MM-dd')
 
   return (
     <div className={`item-membresia item-membresia--${estado} card-mode-actual`}>

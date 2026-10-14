@@ -13,6 +13,8 @@ export type MembresiaDetalleProps = {
   label_horario: string | null
   /** yyyy-mm-dd (null si la venta no tiene detalle de membresía) */
   fecha_inicio: string | null
+  /** yyyy-mm-dd: fecha fin de la membresía vendida (base del vencimiento, sin extensiones) */
+  fecha_fin: string | null
   /** Días de congelamiento que regala el plan y los que quedan (membresia_seguimiento.dias_congelamiento_disponibles) */
   congelamiento_regalados: number
   congelamiento_disponibles: number
