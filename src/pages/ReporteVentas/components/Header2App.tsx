@@ -3,8 +3,10 @@ import { Col, Row } from 'react-bootstrap'
 import IconCR, { type IconName } from '@/components/Icons/IconCR'
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
 import { getFormatMoney } from '@/helpers/getFormatMoney'
+import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
 import { useReporteVentasStore } from '../hook/useReporteVentasStore'
 import { calcularResumenVentas } from '../helpers/resumenVentas'
+import { resumirPorTipoCliente } from '../helpers/ventasPorTipoCliente'
 import type { VentaReporteVentasProps } from '../store/reporteVentasSlice'
 
 type CardResumenProps = {
@@ -32,6 +34,11 @@ export const Header2App = () => {
   const [ventas, setVentas] = useState<VentaReporteVentasProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const { cargar: cargarTiposCliente, data: tiposCliente } = useTerminologiaPersona('tipoClienteVenta')
+
+  useEffect(() => {
+    cargarTiposCliente()
+  }, [cargarTiposCliente])
 
   // Ventas del rango (se ignora la respuesta de un rango anterior)
   useEffect(() => {
@@ -59,12 +66,19 @@ export const Header2App = () => {
     [ventas, idAsesorSeleccionado, idSucursalSeleccionada, filtroMembresia, idOrigenSeleccionado]
   )
 
+  // Nuevos, renovaciones y reinscripciones: monto y cantidad de ventas (con los mismos filtros del header)
+  const porTipoCliente = useMemo(
+    () => resumirPorTipoCliente(tiposCliente, filtrarVentas(ventas), filtroMembresia),
+    [tiposCliente, ventas, idAsesorSeleccionado, idSucursalSeleccionada, filtroMembresia, idOrigenSeleccionado]
+  )
+
   if (!rangoValido) return null
 
   const valor = (texto: string) => <div className="fs-4 fw-bold">{error ? '—' : texto}</div>
   const detalle = (texto: string) => <div className="small opacity-75">{error ? 'No se pudieron cargar las ventas' : texto}</div>
 
   return (
+    <>
     <Row className="g-3 mb-3">
       <Col lg={3} md={6}>
         <CardResumen icono="sales" titulo="Total vendido" cargando={loading}>
@@ -94,5 +108,16 @@ export const Header2App = () => {
         </CardResumen>
       </Col>
     </Row>
+    <Row className="g-3 mb-3">
+      {porTipoCliente.map((tipo) => (
+        <Col key={tipo.id_tipo_cli} lg={4} md={6}>
+          <CardResumen icono="users" titulo={tipo.label} cargando={loading}>
+            {valor(getFormatMoney(tipo.montoTotal))}
+            {detalle(`${tipo.cantidad} ${tipo.cantidad === 1 ? 'venta' : 'ventas'} en el rango`)}
+          </CardResumen>
+        </Col>
+      ))}
+    </Row>
+    </>
   )
 }

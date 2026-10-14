@@ -33,6 +33,8 @@ export type VentaReporteVentasProps = {
   id_sucursal: number,
   id_origen: number,
   label_origen: string,
+  /** Tipo de cliente de la venta: Nuevo, Renovación, Reinscripción (terminología venta/cliente/tipo) */
+  id_tipo_cli: number | null,
   montoTotal_membresia: number | string,
   montoTotal_productos: number | string,
   montoPagos: number | string,

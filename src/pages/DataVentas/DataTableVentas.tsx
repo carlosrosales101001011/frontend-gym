@@ -44,7 +44,7 @@ export const DataTableVentas = () => {
             {
                 id: 10,
                 header: 'Fecha de registro',
-                render: (rowData: DataVentaProps) => <span>{rowData.fecha_venta ? formatDate(new Date(rowData.fecha_venta), 'yyyy-mm-dd', 'd MMMM yyyy') : ''}</span>,
+                render: (rowData: DataVentaProps) => <span>{rowData.fecha_venta ? formatDate(new Date(rowData.fecha_venta), 'yyyy-mm-dd', 'd MMMM yyyy, hh:mmam') : ''}</span>,
             },
             {
                 id: 1,
