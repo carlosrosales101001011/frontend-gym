@@ -3,9 +3,11 @@ import { Col, Row } from 'react-bootstrap'
 import IconCR, { type IconName } from '@/components/Icons/IconCR'
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
 import { formatDate } from '@/helpers/FormatDate'
+import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
 import { getFormatMoney } from '@/helpers/getFormatMoney'
 import { useReporteMetaStore } from '../hook/useReporteMetaStore'
 import { calcularResumenMeta } from '../helpers/resumenMeta'
+import { resumirPorTipoCliente } from '../helpers/ventasPorTipoCliente'
 import type { VentaReporteProps } from '../store/reporteMetaSlice'
 
 type CardResumenProps = {
@@ -36,10 +38,15 @@ export const Header2App = () => {
   const [ventas, setVentas] = useState<VentaReporteProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const { cargar: cargarTiposCliente, data: tiposCliente } = useTerminologiaPersona('tipoClienteVenta')
   const fecha_inicio = metaSeleccionada?.fecha_inicio ?? ''
   const fecha_fin = metaSeleccionada?.fecha_fin ?? ''
 
   // Ventas del periodo de la meta (se ignora la respuesta de un periodo anterior)
+  useEffect(() => {
+    cargarTiposCliente()
+  }, [cargarTiposCliente])
+
   useEffect(() => {
     if (!fecha_inicio || !fecha_fin) return
     let vigente = true
@@ -66,9 +73,16 @@ export const Header2App = () => {
     [ventas, idAsesorSeleccionado, fecha_inicio, fecha_fin, montoMetaObjetivo]
   )
 
+  // Nuevos, renovaciones y reinscripciones: monto y cantidad de ventas (con el mismo filtro de asesor)
+  const porTipoCliente = useMemo(
+    () => resumirPorTipoCliente(tiposCliente, filtrarVentasPorAsesor(ventas)),
+    [tiposCliente, ventas, idAsesorSeleccionado]
+  )
+
   if (!resumen) return null
 
   return (
+    <>
     <Row className="g-3 mb-3">
       <Col lg={3} md={6}>
         <CardResumen
@@ -110,5 +124,19 @@ export const Header2App = () => {
         />
       </Col>
     </Row>
+    <Row className="g-3 mb-3">
+      {porTipoCliente.map((tipo) => (
+        <Col key={tipo.id_tipo_cli} lg={4} md={6}>
+          <CardResumen
+            icono="users"
+            titulo={tipo.label}
+            valor={error ? '—' : getFormatMoney(tipo.montoTotal)}
+            detalle={error ? 'No se pudieron cargar las ventas' : `${tipo.cantidad} ${tipo.cantidad === 1 ? 'venta' : 'ventas'} en el periodo`}
+            cargando={loading}
+          />
+        </Col>
+      ))}
+    </Row>
+    </>
   )
 }

@@ -10,6 +10,8 @@ export type VentaReporteProps = {
   fecha_venta: string,
   id_empl: number,
   montoTotal_membresia: number | string,
+  /** Tipo de cliente de la venta: Nuevo, Renovación, Reinscripción (terminología venta/cliente/tipo) */
+  id_tipo_cli: number | null,
 };
 
 /** Valor del seleccionable de asesor que significa "Todos" */
