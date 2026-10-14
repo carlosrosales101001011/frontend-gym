@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react"
 import classNames from "classnames"
 import { Card, Col, Row } from "react-bootstrap"
 import { BsCheckCircleFill } from "react-icons/bs"
-import { addMonths, format, subDays } from "date-fns"
+import { addMonths, format } from "date-fns"
 import { getBlobUrl } from "@/helpers/blobUrl"
 import { useVentasStore } from "../../hook/useVentasStore"
 import type { PlanProps, ProgramaProps } from "../../store/ventaSlice"
@@ -18,7 +18,7 @@ type TiendaMembresiaProps = {
 
 export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
   const { programas, obtenerProgramas, idProgramaSeleccionado, onSelectPrograma, planes, obtenerPlanProgramas, venta, onSetMembresia, obtenerHorarios, horarios } = useVentasStore()
-  const fechaMinima = format(subDays(new Date(), 7), "yyyy-MM-dd")
+  // const fechaMinima = format(subDays(new Date(), 7), "yyyy-MM-dd")
 
   // La membresía del carrito solo se marca si es del programa que se está viendo
   const membresiaDelPrograma = venta.detalleventa_membresias.id_programa === idProgramaSeleccionado
@@ -131,7 +131,6 @@ export const TiendaMembresia = ({ onAgregar }: TiendaMembresiaProps = {}) => {
               label="Fecha de inicio"
               value={fechaInicio}
               onChange={(e) => actualizarMembresia(idPlanSeleccionado, e.target.value)}
-              min={fechaMinima}
               style={{ paddingTop: "5px", paddingBottom: "5px" }}
             />
           </Col>
