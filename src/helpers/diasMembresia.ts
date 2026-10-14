@@ -11,6 +11,10 @@ export const diasVencidos = (fecha_vencimiento: string) =>
 export const diasMembresia = (fecha_inicio: string, fecha_vencimiento: string) =>
     differenceInCalendarDays(parseISO(fecha_vencimiento), parseISO(fecha_inicio)) + 1
 
+/** Día en curso de una extensión (congelamiento / regalo) que empezó en fecha_inicio: el primer día es 1 */
+export const diaEnCurso = (fecha_inicio: string) =>
+    differenceInCalendarDays(new Date(), parseISO(fecha_inicio)) + 1
+
 /** Cuenta los días de (desde, hasta] sin contar los domingos; 0 si hasta <= desde */
 const contarDiasSinDomingo = (desde: Date, hasta: Date) => {
     const total = differenceInCalendarDays(hasta, desde)

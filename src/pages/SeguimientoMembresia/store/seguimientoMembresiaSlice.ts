@@ -3,6 +3,8 @@ export type SeguimientoMembresiaProps = {
   // id, id_cli, id_venta y label_venta ya los devuelve el backend (los usa GestionExtensionRegalos)
   id?: number;
   id_cli?: number;
+  /** uid de la persona del cliente: link a su perfil (lo agrega el backend) */
+  uid_cli?: string | null;
   id_venta?: number;
   label_venta?: string;
   label_nombres_apellidos_cli: string;
@@ -13,6 +15,13 @@ export type SeguimientoMembresiaProps = {
   email_cli: string,
   label_distrito_cli: string,
   label_extension_actual: string;
+  /** Su extensión en curso hoy es un congelamiento (lo calcula el backend) */
+  es_congelado?: boolean;
+  /** Su extensión en curso hoy es un regalo de días (lo calcula el backend) */
+  es_regalo?: boolean;
+  /** Extensión en curso hoy: su inicio (yyyy-mm-dd) y sus días (null si no hay) */
+  fecha_inicio_extension_actual?: string | null;
+  dias_extension_actual?: number | null;
   sesiones_pendientes: string;
   fecha_vencimiento: string;
 };

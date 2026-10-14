@@ -47,6 +47,14 @@ $card-border-actual: var(--cr-card-border);
     --cr-input-bg: #171717;
     --cr-border: #{$border-light};
     --cr-card-border: #474747;
+    // Azul hielo: membresías con un congelamiento en curso
+    --cr-hielo-bg: #12313d;
+    --cr-hielo-color: #bdeeff;
+    --cr-hielo-border: #4fc3e8;
+    // Rojo: membresías con un regalo de días en curso
+    --cr-regalo-bg: #3d1216;
+    --cr-regalo-color: #ffc9cc;
+    --cr-regalo-border: #e8545c;
 }
 
 :root[data-theme="light"] {
@@ -60,6 +68,12 @@ $card-border-actual: var(--cr-card-border);
     --cr-input-bg: #{$bg-light};
     --cr-border: #ced4da;
     --cr-card-border: #dee2e6;
+    --cr-hielo-bg: #e3f6fd;
+    --cr-hielo-color: #0b5a73;
+    --cr-hielo-border: #7fd3ef;
+    --cr-regalo-bg: #fde4e5;
+    --cr-regalo-color: #8a1c22;
+    --cr-regalo-border: #ef8a90;
 }
 .bg-actual {
     background-color: $bg-actual !important;
@@ -84,6 +98,38 @@ $card-border-actual: var(--cr-card-border);
 .tbody-actual{
     background-color: $table-actual !important;
     color: $color-actual !important;
+}
+
+// Fila de una membresía congelada (azul hielo); más específica que .tbody-actual
+.tbody-actual.fila-congelada{
+    background-color: var(--cr-hielo-bg) !important;
+    color: var(--cr-hielo-color) !important;
+}
+.tbody-actual.fila-congelada *{
+    color: var(--cr-hielo-color) !important;
+}
+.badge-congelado{
+    display: inline-block;
+    padding: 0 6px;
+    font-size: 11px;
+    border-radius: 4px;
+    border: 1px solid var(--cr-hielo-border);
+}
+
+// Fila de una membresía con regalo en curso (rojo)
+.tbody-actual.fila-regalo{
+    background-color: var(--cr-regalo-bg) !important;
+    color: var(--cr-regalo-color) !important;
+}
+.tbody-actual.fila-regalo *{
+    color: var(--cr-regalo-color) !important;
+}
+.badge-regalo{
+    display: inline-block;
+    padding: 0 6px;
+    font-size: 11px;
+    border-radius: 4px;
+    border: 1px solid var(--cr-regalo-border);
 }
 
 .tfoot-actual{

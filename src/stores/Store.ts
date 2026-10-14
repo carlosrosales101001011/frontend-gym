@@ -35,6 +35,7 @@ import { dataVentaSlice } from "@/pages/DataVentas/store/dataVentaSlice";
 import { SeguimientoMembresiaSlice } from "@/pages/SeguimientoMembresia/store/seguimientoMembresiaSlice";
 import { agendaNutricionistaSlice } from "@/pages/AgendaNutricionista/store/agendaNutricionistaSlice";
 import { extRegaloSlice } from "@/pages/GestionExtensionRegalos/store/extRegaloSlice";
+import { extCongelamientoSlice } from "@/pages/GestionExtensionCongelamiento/store/extCongelamientoSlice";
 import { planEntrenamientoSlice } from "@/pages/GestionPlanesEntrenamiento/store/planEntrenamientoSlice";
 import { metaSlice } from "@/pages/GestionMeta/store/metaSlice";
 import { reporteMetaSlice } from "@/pages/ReporteMeta/store/reporteMetaSlice";
@@ -80,6 +81,7 @@ export const store = configureStore({
     SEGUIMIENTO_MEMBRESIA: SeguimientoMembresiaSlice.reducer,
     AGENDA_NUTRICIONISTA: agendaNutricionistaSlice.reducer,
     EXT_REGALO: extRegaloSlice.reducer,
+    EXT_CONGELAMIENTO: extCongelamientoSlice.reducer,
     PLAN_ENTRENAMIENTO: planEntrenamientoSlice.reducer,
     META: metaSlice.reducer,
     REPORTE_META: reporteMetaSlice.reducer,
