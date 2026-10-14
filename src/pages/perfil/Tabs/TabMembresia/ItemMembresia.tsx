@@ -96,12 +96,12 @@ export const ItemMembresia = ({ membresia, onCambio }: ItemMembresiaProps) => {
         </div>
         <div className="item-membresia__cupos">
           {/* La de regalo ya se ve en "Regalo" */}
-          {membresia.label_extension_actual && membresia.label_extension_actual !== 'Regalo' && (
+          {/* {membresia.label_extension_actual && membresia.label_extension_actual !== 'Regalo' && (
             <div className="text-end">
-              <div className="item-membresia__etiqueta">Extensión</div>
+              <div className="item-membresia__etiqueta">Extensiónactual</div>
               <div>{membresia.label_extension_actual}</div>
             </div>
-          )}
+          )} */}
           {/* Asistencias: días asistidos (empieza en 0 y sube con cada día que asiste) de los días de la membresía */}
           <button type="button" className="item-membresia__cupo" onClick={() => setDetalleAbierto('asistencias')} title="Ver asistencias de la membresía">
             <span className="item-membresia__cupo-icono">

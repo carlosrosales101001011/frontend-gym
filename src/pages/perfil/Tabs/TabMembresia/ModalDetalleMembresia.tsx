@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
-import { differenceInCalendarDays, parseISO } from 'date-fns'
+import { differenceInCalendarDays, format, parseISO } from 'date-fns'
 import ModalCR from '@/components/Modal/ModalCR'
 import { DataTableSimple2, type ColumnaSimple2 } from '@/components/DataTableSimple/DataTableSimple2'
 import { ButtonCR } from '@/components/Button/ButtonCR'
@@ -154,6 +154,10 @@ export const ModalDetalleMembresia = ({ detalle, membresia, show, onHide, onRegi
                 diasMaximos={detalle === 'congelamiento'
                   ? Math.max(0, membresia.congelamiento_regalados - membresia.dias_congelados)
                   : MAX_DIAS_REGALO}
+                // Mismas reglas que el backend: desde hoy (y no antes del inicio de la membresía) hasta su vencimiento
+                inicioMinimo={[format(new Date(), 'yyyy-MM-dd'), membresia.fecha_inicio ?? ''].sort().at(-1)!}
+                inicioMaximo={membresia.fecha_vencimiento}
+                congelamientos={extensionesTipo}
                 guardando={guardando}
                 onCancelar={() => setFormAbierto(false)}
                 onGuardar={async (extension) => {
@@ -187,12 +191,17 @@ type FormExtensionProps = {
   /** Congelamiento: días que le quedan; regalo: máximo por extensión */
   diasMaximos: number
   guardando: boolean
+  /** Congelamiento: primer y último día en que puede empezar (yyyy-mm-dd) */
+  inicioMinimo: string
+  inicioMaximo: string
+  /** Congelamientos ya registrados: el nuevo no se puede cruzar con ellos */
+  congelamientos: ExtensionMembresiaProps[]
   onCancelar: () => void
   onGuardar: (extension: NuevaExtension) => void
 }
 
 /** Formulario de un congelamiento (desde / hasta) o un regalo (días); ambos con observación */
-const FormExtension = ({ detalle, diasMaximos, guardando, onCancelar, onGuardar }: FormExtensionProps) => {
+const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMaximo, congelamientos, onCancelar, onGuardar }: FormExtensionProps) => {
   const [desde, setDesde] = useState('')
   const [hasta, setHasta] = useState('')
   const [diasRegalo, setDiasRegalo] = useState('')
@@ -201,9 +210,13 @@ const FormExtension = ({ detalle, diasMaximos, guardando, onCancelar, onGuardar 
 
   // Congelamiento: días corridos de desde a hasta, ambos incluidos
   const diasCongelamiento = desde && hasta ? differenceInCalendarDays(parseISO(hasta), parseISO(desde)) + 1 : 0
+  const cruce = desde && hasta ? congelamientos.find((c) => c.fecha_inicio <= hasta && c.fecha_fin >= desde) : undefined
   const errores = detalle === 'congelamiento'
     ? {
-        desde: !desde ? 'Indica desde cuándo' : '',
+        desde: !desde ? 'Indica desde cuándo'
+          : desde < inicioMinimo ? `Debe empezar desde el ${fecha(inicioMinimo)}`
+          : desde > inicioMaximo ? `Debe empezar a más tardar el ${fecha(inicioMaximo)} (vencimiento)`
+          : cruce ? `Se cruza con el congelamiento del ${fecha(cruce.fecha_inicio)} al ${fecha(cruce.fecha_fin)}` : '',
         hasta: !hasta ? 'Indica hasta cuándo'
           : diasCongelamiento < 1 ? 'Debe ser igual o posterior a "Desde"'
           : diasCongelamiento > diasMaximos ? `Le quedan ${dias(diasMaximos)} de congelamiento` : '',
@@ -230,10 +243,12 @@ const FormExtension = ({ detalle, diasMaximos, guardando, onCancelar, onGuardar 
         {detalle === 'congelamiento' ? (
           <>
             <Col md={6}>
-              <InputCR type="date" label="Desde" value={desde} onChange={(e) => setDesde(e.target.value)} messageErrors={mostrar(errores.desde ?? '')} />
+              <InputCR type="date" label="Desde" value={desde} min={inicioMinimo} max={inicioMaximo}
+                onChange={(e) => setDesde(e.target.value)} messageErrors={mostrar(errores.desde ?? '')} />
             </Col>
             <Col md={6}>
-              <InputCR type="date" label="Hasta" value={hasta} onChange={(e) => setHasta(e.target.value)} messageErrors={mostrar(errores.hasta ?? '')} />
+              <InputCR type="date" label="Hasta" value={hasta} min={desde || inicioMinimo}
+                onChange={(e) => setHasta(e.target.value)} messageErrors={mostrar(errores.hasta ?? '')} />
             </Col>
             {diasCongelamiento > 0 && (
               <Col xs={12} className="small">
