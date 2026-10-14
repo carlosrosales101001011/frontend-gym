@@ -9,6 +9,7 @@ import type { ItemResultado } from "@/components/ModalSearching/ModalSearching";
 import { errorDescuentoMembresia } from "../helpers/descuentoMembresia";
 import { calcularMontosVenta } from "../helpers/montosVenta";
 import { getFormatMoney } from "@/helpers/getFormatMoney";
+import { mensajeError } from "@/helpers/mensajeError";
 
 const DURACION_MINIMA_LOADING_MS = 1500
 
@@ -172,16 +173,20 @@ export const useVentasStore = () => {
 
         setLoadingVenta(true)
         const inicio = Date.now()
+        // El popup (verde / rojo) se muestra cuando ya se quitó el loading
+        let id_venta = 0
+        let dataVenta
+        let errorRegistro: unknown = null
         try {
           const { detalleventa_membresias, detalleventa_productos, detalleventa_pagos, montoTotal, id_tipo_cli, id_tipo_comprobante, n_comprobante, ...ventaData } = venta
           // Tipo de cliente y comprobante son opcionales: sin elegir (o vacíos) no se envían
-          const dataVenta = await postVenta({
+          dataVenta = await postVenta({
             ...ventaData,
             ...(id_tipo_cli ? { id_tipo_cli } : {}),
             ...(id_tipo_comprobante ? { id_tipo_comprobante } : {}),
             ...(n_comprobante.trim() ? { n_comprobante: n_comprobante.trim() } : {}),
           })
-          const id_venta = dataVenta?.data?.id
+          id_venta = dataVenta?.data?.id
 
           if (detalleventa_membresias.id_programa) {
             const { label_horario, label_nmeses, label_precio, label_programa, max_descuento_plan, ...membresiaData } = detalleventa_membresias
@@ -218,8 +223,8 @@ export const useVentasStore = () => {
           await patchVenta({ montoTotal_membresia, montoTotal_productos, montoPagos }, id_venta)
 
           dispatch(onResetVenta())
-
-          return dataVenta
+        } catch (error) {
+          errorRegistro = error
         } finally {
           const transcurrido = Date.now() - inicio
           const restante = DURACION_MINIMA_LOADING_MS - transcurrido
@@ -228,6 +233,28 @@ export const useVentasStore = () => {
           }
           setLoadingVenta(false)
         }
+
+        if (errorRegistro) {
+          // Si la venta llegó a crearse, se avisa: quedó registrada sin completar (membresía, productos o pagos)
+          const ventaIncompleta = id_venta
+            ? `La venta N° ${id_venta} se creó, pero falló un paso del registro. Revísala en Ventas.<br/><br/>`
+            : ''
+          await Swal.fire({
+            icon: 'error',
+            title: 'No se pudo registrar la venta',
+            html: ventaIncompleta + mensajeError(errorRegistro),
+            confirmButtonColor: '#dc3545',
+          })
+          return
+        }
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Venta registrada',
+          text: id_venta ? `La venta N° ${id_venta} se registró correctamente.` : 'La venta se registró correctamente.',
+          confirmButtonColor: '#198754',
+        })
+        return dataVenta
       }
   return {
     horarios,
