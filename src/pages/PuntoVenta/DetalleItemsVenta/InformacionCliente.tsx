@@ -97,7 +97,6 @@ export const InformacionCliente = () => {
               label='Comprobante'
               value={venta.n_comprobante}
               onChange={(e) => onActualizarVenta('n_comprobante', e.target.value)}
-              maxLength={25}
             />
           </Col>
           <Col lg={12}>
