@@ -9,6 +9,8 @@ export const querys = {
     fechaInicio: 'fecha_inicio',
     fechaFin: 'fecha_fin',
 }
+/** Zona horaria del negocio (Perú, UTC-5, sin horario de verano), en minutos respecto a UTC */
+export const OFFSET_UTC_NEGOCIO = -5 * 60
 export const models={
     user:'user',
 

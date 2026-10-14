@@ -3,7 +3,7 @@ import { ButtonCR } from '@/components/Button/ButtonCR'
 import IconCR from '@/components/Icons/IconCR'
 import { InputCR } from '@/components/TextFields/InputCR'
 import { useQueryParams } from '@/hook/useQueryParams'
-import { querys } from '@/types/parametros'
+import { OFFSET_UTC_NEGOCIO, querys } from '@/types/parametros'
 import { formatDate } from '@/helpers/FormatDate'
 
 /**
@@ -13,7 +13,9 @@ import { formatDate } from '@/helpers/FormatDate'
  */
 export const FiltroFechasAsistencias = () => {
   const { get, set } = useQueryParams()
-  const hoy = formatDate(new Date(), 'yyyy-mm-dd', 'yyyy-mm-dd')
+  // Hoy en UTC-5 (Perú) aunque el navegador esté en otra zona: se corre la hora para que sus campos locales sean los de UTC-5
+  const ahora = new Date()
+  const hoy = formatDate(new Date(ahora.getTime() + (ahora.getTimezoneOffset() + OFFSET_UTC_NEGOCIO) * 60_000), 'yyyy-mm-dd', 'yyyy-mm-dd')
   const urlInicio = get(querys.fechaInicio)
   const urlFin = get(querys.fechaFin)
   const sinFechasEnUrl = !urlInicio && !urlFin
