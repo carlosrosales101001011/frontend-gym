@@ -14,15 +14,25 @@ import { formatDate } from '@/helpers/FormatDate'
 export const FiltroFechasAsistencias = () => {
   const { get, set } = useQueryParams()
   const hoy = formatDate(new Date(), 'yyyy-mm-dd', 'yyyy-mm-dd')
-  const sinFechasEnUrl = !get(querys.fechaInicio) && !get(querys.fechaFin)
+  const urlInicio = get(querys.fechaInicio)
+  const urlFin = get(querys.fechaFin)
+  const sinFechasEnUrl = !urlInicio && !urlFin
   // Lo escrito; se aplica recién con "Buscar"
-  const [fechaInicio, setFechaInicio] = useState(sinFechasEnUrl ? hoy : get(querys.fechaInicio))
-  const [fechaFin, setFechaFin] = useState(sinFechasEnUrl ? hoy : get(querys.fechaFin))
+  const [fechaInicio, setFechaInicio] = useState(sinFechasEnUrl ? hoy : urlInicio)
+  const [fechaFin, setFechaFin] = useState(sinFechasEnUrl ? hoy : urlFin)
 
-  // Al entrar sin fechas en la URL se aplica el día de hoy (la tabla espera a esto, ver App)
+  // Los inputs siguen a la URL (atrás/adelante, links). Sin fechas en la URL se aplica hoy (la tabla espera a esto,
+  // ver App); con replace para que "atrás" no vuelva a la URL sin fechas
   useEffect(() => {
-    if (sinFechasEnUrl) set({ [querys.fechaInicio]: hoy, [querys.fechaFin]: hoy })
-  }, [])
+    if (sinFechasEnUrl) {
+      setFechaInicio(hoy)
+      setFechaFin(hoy)
+      set({ [querys.fechaInicio]: hoy, [querys.fechaFin]: hoy }, { replace: true })
+      return
+    }
+    setFechaInicio(urlInicio)
+    setFechaFin(urlFin)
+  }, [urlInicio, urlFin])
   const rangoInvalido = !!fechaInicio && !!fechaFin && fechaInicio > fechaFin
 
   const buscar = () => {

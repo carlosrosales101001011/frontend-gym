@@ -19,7 +19,7 @@ type PersonaConAvatarProps = {
 }
 
 /** Nombre de una persona con su foto al lado (o la silueta si no tiene), para celdas de tablas */
-export const PersonaConAvatar = ({ nombre, avatar, tamano = 28 }: PersonaConAvatarProps) => (
+export const PersonaConAvatar = ({ nombre, avatar, tamano = 40 }: PersonaConAvatarProps) => (
   <span className="d-inline-flex align-items-center gap-2">
     <AvatarCirculo src={getBlobUrl(avatar?.url_avatar_ultimo)} ajuste={ajusteAvatarUltimo(avatar)} tamano={tamano} />
     <span>{nombre}</span>

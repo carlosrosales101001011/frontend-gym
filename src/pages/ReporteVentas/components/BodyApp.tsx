@@ -23,7 +23,7 @@ export const BodyApp = () => {
         <Col lg={4}>
           <VentasPorPrograma fecha_inicio={fecha_inicio} fecha_fin={fecha_fin} />
         </Col>
-        <Col lg={4}>
+        <Col lg={8}>
           <VentasPorPlan fecha_inicio={fecha_inicio} fecha_fin={fecha_fin} />
         </Col>
       </Row>

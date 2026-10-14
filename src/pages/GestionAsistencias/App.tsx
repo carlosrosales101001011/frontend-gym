@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { ButtonCR } from "@/components/Button/ButtonCR"
 import IconCR from "@/components/Icons/IconCR"
@@ -25,13 +25,9 @@ export const App = () => {
   const show = Number(get(querys.show))
   const fechaInicio = get(querys.fechaInicio)
   const fechaFin = get(querys.fechaFin)
-  // Al entrar sin fechas el filtro pone la de hoy en la URL: se espera a eso para no pedir todo y luego hoy
-  const esperandoFechaInicial = useRef(!fechaInicio && !fechaFin)
   useEffect(() => {
-    if (esperandoFechaInicial.current) {
-      if (!fechaInicio && !fechaFin) return
-      esperandoFechaInicial.current = false
-    }
+    // Sin fechas el filtro pone la de hoy en la URL: se espera a eso para no pedir todo y luego hoy
+    if (!fechaInicio && !fechaFin) return
     const ctrl = new AbortController()
     searcher(ctrl.signal).catch(e => {
       if (e.name !== 'CanceledError') console.error(e)

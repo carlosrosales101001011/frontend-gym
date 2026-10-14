@@ -5,7 +5,8 @@ export const useQueryParams = () => {
 
   const get = (key: string) => searchParams.get(key) || "";
 
-  const set = (params: Record<string, unknown>) => {
+  /** replace: cambia la URL sin agregar una entrada al historial (ej. valores por defecto) */
+  const set = (params: Record<string, unknown>, { replace = false }: { replace?: boolean } = {}) => {
     const newParams = new URLSearchParams(searchParams);
 
     Object.entries(params).forEach(([key, value]) => {
@@ -16,7 +17,7 @@ export const useQueryParams = () => {
       }
     });
 
-    setSearchParams(newParams);
+    setSearchParams(newParams, { replace });
   };
   const clearQuery = () => {
     setSearchParams({});
