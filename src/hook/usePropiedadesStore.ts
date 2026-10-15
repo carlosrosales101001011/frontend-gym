@@ -82,6 +82,7 @@ const TERMINOLOGIAS = {
   categoriaPrograma: ['programa', 'categoria', 'tipo'],
   origenVenta: ['venta', 'origen', 'tipo'],
   formaPagoVenta: ['venta', 'forma-pago', 'tipo'],
+  subtipoCliente: ['persona', 'cliente', 'subtipo'], //persona.id_subtipo de los clientes
   tipoClienteVenta: ['venta', 'cliente', 'tipo'], //Nuevo, Renovación... (venta.id_tipo_cli)
   tipoEventoAsistencia: ['persona', 'asistencia', 'tipo'], //Entrada, Salida (persona_eventos_asistencia)
   distritosLima: ['persona', 'distrito', 'Lima'],

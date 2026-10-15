@@ -16,6 +16,9 @@ export type ClienteProps = {
   direccion: string;
   id_estado: number;
   id_tipo: number;
+  /** Subtipo de cliente (terminología persona/cliente/subtipo); 0 = sin subtipo */
+  id_subtipo: number;
+  label_subtipo?: string;
   uid_avatar?: string;
   /** Ubicación de sus contactos de emergencia (lo crea el backend) */
   uid_contactoEmergencia?: string;
@@ -45,6 +48,9 @@ export type ClienteState={
     cliente: ClienteProps
 }
 
+/** Subtipo con el que arranca un cliente nuevo: "Cliente" (terminología persona/cliente/subtipo) */
+export const ID_SUBTIPO_CLIENTE_POR_DEFECTO = 6139
+
 const initialCliente={
   uid: '',
   id: 0,
@@ -58,6 +64,7 @@ const initialCliente={
   direccion: '',
   id_estado: 0,
   id_tipo: 2,
+  id_subtipo: ID_SUBTIPO_CLIENTE_POR_DEFECTO,
   uid_avatar: '',
   url_avatar: '',
 

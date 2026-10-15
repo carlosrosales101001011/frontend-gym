@@ -13,20 +13,6 @@ export const App = () => {
         if (!asesorSeleccionado) asignarAsesorDeSesion()
     }, [asesorSeleccionado])
 
-    // const [activeStep, setActiveStep] =
-    //     useState(0);
-
-    // const steps = [
-    //     {
-    //         title: "Membresías, productos y pago",
-    //     },
-    // ];
-    // const onStepLast = ()=>{
-    //     setActiveStep(activeStep+1)
-    // }
-    // const onStepBefore = ()=>{
-    //     setActiveStep(activeStep-1)
-    // }
     const onSubmit = async ()=>{
         try {
             // const dataVenta = 

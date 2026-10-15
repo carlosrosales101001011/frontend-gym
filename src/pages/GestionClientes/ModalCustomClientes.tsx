@@ -40,6 +40,7 @@ export const ModalCustomClientes = ({show, onHide, id, onCreado}:props) => {
     const { data:dataTipoDocumento, cargar:cargarTipoDocumento } = useTerminologiaPersona('TipoDeDocumentoPersona');
     const { data:dataDistritoLima, cargar:cargarDistritoLima } = useTerminologiaPersona('distritosLima');
     const { data:dataDistritoCallao, cargar:cargarDistritoCallao } = useTerminologiaPersona('distritosCallao');
+    const { data:dataSubtipo, cargar:cargarSubtipo } = useTerminologiaPersona('subtipoCliente');
     const { register, formState: { errors }, handleSubmit, reset, getValues } = useForm<ClienteProps>({mode: "onTouched", defaultValues: initialStateClientes.cliente})
     // N° de documento: se verifica al salir del campo o a los 4 s de dejar de escribir; repetido = no se puede guardar
     const [verificandoDocumento, setVerificandoDocumento] = useState(false)
@@ -117,6 +118,7 @@ export const ModalCustomClientes = ({show, onHide, id, onCreado}:props) => {
         cargarTipoDocumento()
         cargarDistritoLima()
         cargarDistritoCallao()
+        cargarSubtipo()
       }
     }, [show])
     useEffect(() => {
@@ -151,6 +153,7 @@ export const ModalCustomClientes = ({show, onHide, id, onCreado}:props) => {
         ...val,
         id_nacionalidad: Number(val.id_nacionalidad),
         id_distrito: Number(val.id_distrito),
+        id_subtipo: Number(val.id_subtipo),
         fecha_nacimiento: new Date(data.fecha_nacimiento),
         ...(nuevoUidAvatar ? { uid_avatar: nuevoUidAvatar } : {})
       }
@@ -252,12 +255,18 @@ export const ModalCustomClientes = ({show, onHide, id, onCreado}:props) => {
                         required: "Este campo es obligatorio"
                       })} label="Telefono" messageErrors={errors.telefono?.message}/>
                     </Col>
-                    <Col lg={6}>
+                    <Col lg={4}>
+                      <InputSelectCR {...register("id_subtipo", {
+                        // 0 = sin elegir (required no lo cuenta como vacío)
+                        validate: (valor) => Number(valor) > 0 || "Este campo es obligatorio"
+                      })} label="Tipo" options={dataSubtipo} required messageErrors={errors.id_subtipo?.message}/>
+                    </Col>
+                    <Col lg={4}>
                       <InputSelectCR {...register("id_genero", {
                         required: "Este campo es obligatorio"
                       })} label="Genero" options={dataGenero} messageErrors={errors.id_genero?.message}/>
                     </Col>
-                    <Col lg={6}>
+                    <Col lg={4}>
                       <InputSelectCR {...register("id_estado_civil", {
                         required: "Este campo es obligatorio"
                       })} label="Estado civil" options={dataEstadoCivil} messageErrors={errors.id_estado_civil?.message}/>

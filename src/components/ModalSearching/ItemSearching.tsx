@@ -22,7 +22,7 @@ type ItemSearchingProps = {
 export const ItemSearching: React.FC<ItemSearchingProps> = ({ id, nombre, dni, avatar, ajusteAvatar, email, telefono, onClick, soloNombre = false }) => {
   return (
     <div
-      className={`d-flex align-items-center w-100 p-2 rounded-2 item-hover-actual ${email}`}
+      className={`d-flex align-items-center w-100 p-1 rounded-2 item-hover-actual ${email}`}
       onClick={() => onClick?.(id)}
     >
       <div className="d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: TAMANO_AVATAR, height: TAMANO_AVATAR, borderRadius: '50%', overflow: 'hidden', backgroundColor: 'var(--cr-input-bg)' }}>
