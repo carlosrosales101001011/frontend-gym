@@ -3,8 +3,8 @@ import classNames from 'classnames'
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
 
 type NubeCRProps = {
-  /** Botón que abre la nube; recibe si está abierta y los props de accesibilidad para el <button> */
-  trigger: (props: { abierta: boolean, ariaProps: Record<string, string | boolean> }) => ReactNode
+  /** Botón que abre la nube; recibe si está abierta, los props de accesibilidad para el <button> y `alternar` (para el onClick con abrirCon='click') */
+  trigger: (props: { abierta: boolean, ariaProps: Record<string, string | boolean>, alternar: () => void }) => ReactNode
   titulo?: ReactNode
   /** Contenido de la nube (módulos, notificaciones, ...); como función recibe `cerrar` */
   children: ReactNode | ((cerrar: () => void) => ReactNode)
@@ -16,6 +16,8 @@ type NubeCRProps = {
   /** Lado del trigger al que se alinea la nube */
   alinear?: 'inicio' | 'fin'
   ancho?: number
+  /** 'hover': se abre al pasar el mouse o llegar con Tab; 'click': se abre y cierra con el click del trigger (`alternar`) */
+  abrirCon?: 'hover' | 'click'
 }
 
 /** Tiempo para cruzar del botón a la nube sin que se cierre */
@@ -23,10 +25,10 @@ const RETRASO_CIERRE_MS = 200
 
 /**
  * Nube flotante (popover) que se abre al pasar el mouse por su trigger (o al llegar con Tab) y se cierra
- * al salir el mouse, con Escape, con click fuera o cuando el foco sale de ella. No tiene contenido propio: cada uso pone el suyo
+ * al salir el mouse (o, con abrirCon='click', se abre y cierra con el click del trigger), con Escape, con click fuera o cuando el foco sale de ella. No tiene contenido propio: cada uso pone el suyo
  * (Mis módulos, notificaciones, ...). Estilos en _NubeCR.scss.
  */
-export const NubeCR = ({ trigger, titulo, children, onAbrir, cargando = false, textoCargando = 'Cargando', alinear = 'fin', ancho = 360 }: NubeCRProps) => {
+export const NubeCR = ({ trigger, titulo, children, onAbrir, cargando = false, textoCargando = 'Cargando', alinear = 'fin', ancho = 360, abrirCon = 'hover' }: NubeCRProps) => {
   const [abierta, setAbierta] = useState(false)
   const contenedorRef = useRef<HTMLDivElement>(null)
   const temporizadorCierre = useRef<number | undefined>(undefined)
@@ -45,6 +47,12 @@ export const NubeCR = ({ trigger, titulo, children, onAbrir, cargando = false, t
     cancelarCierre()
     temporizadorCierre.current = window.setTimeout(() => setAbierta(false), RETRASO_CIERRE_MS)
   }
+  // Modo click: sin temporizador de cierre (no toca refs, se puede pasar al trigger)
+  const alternar = () => {
+    setAbierta(!abierta)
+    if (!abierta) onAbrir?.()
+  }
+  const porHover = abrirCon === 'hover'
 
   useEffect(() => cancelarCierre, [])
 
@@ -69,16 +77,16 @@ export const NubeCR = ({ trigger, titulo, children, onAbrir, cargando = false, t
     <div
       ref={contenedorRef}
       className="nube-cr"
-      onMouseEnter={abrir}
-      onMouseLeave={cerrarConRetraso}
+      onMouseEnter={porHover ? abrir : undefined}
+      onMouseLeave={porHover ? cerrarConRetraso : undefined}
       // Con teclado: se abre al llegar con Tab (con el mouse ya se abrió al pasar por encima)
-      onFocus={abrir}
+      onFocus={porHover ? abrir : undefined}
       // Se cierra cuando el foco se va a algo fuera de la nube (ej. Tab)
       onBlur={(e) => {
         if (e.relatedTarget && !contenedorRef.current?.contains(e.relatedTarget as Node)) cerrar()
       }}
     >
-      {trigger({ abierta, ariaProps: { 'aria-haspopup': 'dialog', 'aria-expanded': abierta, 'aria-controls': idNube } })}
+      {trigger({ abierta, ariaProps: { 'aria-haspopup': 'dialog', 'aria-expanded': abierta, 'aria-controls': idNube }, alternar })}
       {abierta && (
         <div
           id={idNube}

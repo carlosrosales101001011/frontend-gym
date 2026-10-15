@@ -228,3 +228,107 @@
     color: $primary !important;
   }
 }
+
+// Campanita de notificaciones (Notificaciones.tsx): contador rojo de no leídas y lista dentro de la nube
+.notificaciones__campana {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+
+  &--abierta {
+    background-color: $item-hover-actual;
+    opacity: 1;
+  }
+}
+
+.notificaciones__contador {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background-color: $primary;
+  color: #fff !important;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+.notificaciones__marcar {
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.notificaciones__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notificaciones__item {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  border: 1px solid $card-border-actual;
+  border-radius: 10px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $item-hover-actual;
+  }
+
+  &--no-leida {
+    border-left: 3px solid $primary;
+  }
+}
+
+.notificaciones__icono {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background-color: rgba($primary, .1);
+
+  &,
+  & * {
+    color: $primary !important;
+  }
+}
+
+.notificaciones__texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.notificaciones__titulo {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.notificaciones__mensaje {
+  font-size: 12px;
+}
+
+.notificaciones__fecha {
+  font-size: 11px;
+  opacity: 0.6;
+}

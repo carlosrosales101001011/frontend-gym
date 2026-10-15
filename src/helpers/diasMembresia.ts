@@ -1,4 +1,4 @@
-import { addDays, differenceInCalendarDays, isSunday, parseISO } from 'date-fns'
+import { differenceInCalendarDays, parseISO, subDays } from 'date-fns'
 
 /**
  * Días transcurridos desde la fecha de vencimiento hasta hoy (cuenta domingos).
@@ -15,16 +15,14 @@ export const diasMembresia = (fecha_inicio: string, fecha_vencimiento: string) =
 export const diaEnCurso = (fecha_inicio: string) =>
     differenceInCalendarDays(new Date(), parseISO(fecha_inicio)) + 1
 
-/** Cuenta los días de (desde, hasta] sin contar los domingos; 0 si hasta <= desde */
-const contarDiasSinDomingo = (desde: Date, hasta: Date) => {
-    const total = differenceInCalendarDays(hasta, desde)
-    let dias = 0
-    for (let i = 1; i <= total; i++) {
-        if (!isSunday(addDays(desde, i))) dias++
-    }
-    return dias
+/**
+ * Días de entrenamiento que quedan hasta la fecha de vencimiento (incluida; cuenta domingos).
+ * Si la membresía aún no empieza (fecha_inicio futura) se cuentan desde su inicio y no desde hoy,
+ * así coincide con diasMembresia; 0 si ya venció.
+ */
+export const sesionesDisponibles = (fecha_vencimiento: string, fecha_inicio?: string | null) => {
+    const hoy = new Date()
+    const inicio = fecha_inicio ? subDays(parseISO(fecha_inicio), 1) : hoy
+    const desde = inicio > hoy ? inicio : hoy
+    return Math.max(differenceInCalendarDays(parseISO(fecha_vencimiento), desde), 0)
 }
-
-/** Días de entrenamiento que quedan desde hoy hasta la fecha de vencimiento (sin domingos) */
-export const sesionesDisponibles = (fecha_vencimiento: string) =>
-    contarDiasSinDomingo(new Date(), parseISO(fecha_vencimiento))

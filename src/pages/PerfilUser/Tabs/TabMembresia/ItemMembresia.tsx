@@ -33,7 +33,7 @@ export const ItemMembresia = ({ membresia }: ItemMembresiaProps) => {
     <div className={`item-membresia item-membresia--${estado} card-mode-actual`}>
       <div className="item-membresia__encabezado">
         <span className="item-membresia__icono">
-          <IconCR name="apple" size={16} />
+          <IconCR name="membresia" size={16} />
         </span>
         <div className="flex-grow-1 overflow-hidden">
           <div className="item-membresia__titulo">Membresía gym</div>

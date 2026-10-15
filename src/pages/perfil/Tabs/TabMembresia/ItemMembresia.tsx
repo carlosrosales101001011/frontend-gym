@@ -42,7 +42,7 @@ const textoPlan = (label_plan: string | null) => {
 export const ItemMembresia = ({ membresia, onCambio }: ItemMembresiaProps) => {
   const [detalleAbierto, setDetalleAbierto] = useState<DetalleMembresia | null>(null)
   const vencidaHace = diasVencidos(membresia.fecha_vencimiento)
-  const diasRestantes = sesionesDisponibles(membresia.fecha_vencimiento)
+  const diasRestantes = sesionesDisponibles(membresia.fecha_vencimiento, membresia.fecha_inicio)
   const estado: EstadoMembresia = vencidaHace > 0 ? 'vencida' : diasRestantes <= DIAS_AVISO ? 'por-vencer' : 'activa'
   const numero = estado === 'vencida' ? vencidaHace : diasRestantes
   const plural = (n: number) => (n === 1 ? 'día' : 'días')
@@ -55,7 +55,7 @@ export const ItemMembresia = ({ membresia, onCambio }: ItemMembresiaProps) => {
     <div className={`item-membresia item-membresia--${estado} card-mode-actual`}>
       <div className="item-membresia__encabezado">
         <span className="item-membresia__icono">
-          <IconCR name="apple" size={16} />
+          <IconCR name="membresia" size={16} />
         </span>
         <div className="flex-grow-1 overflow-hidden">
           <div className="item-membresia__titulo">
