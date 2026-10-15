@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react"
 import { addDays, addMonths, addWeeks } from "date-fns"
+import Swal from "sweetalert2"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { useAgendaNutricionistaStore } from "./hook/useAgendaNutricionistaStore"
+import { useAgendaTiempoReal } from "./hook/useAgendaTiempoReal"
 import { initialStateAgendaNutricionista, type EventoAgendaProps } from "./store/agendaNutricionistaSlice"
 import { aFechaISO, aHora, aMinutos, ALTO_SLOT, esEventoBloqueado, HORA_FIN_AGENDA, HORA_INICIO_AGENDA, idEstadoInicial, saltarDomingo, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
 import { CalendarioToolbar } from "./components/CalendarioToolbar"
@@ -89,6 +91,20 @@ export const App = () => {
   const onCerrarModal = () => {
     setModalEvento((prev) => ({ ...prev, show: false }))
   }
+
+  // Si la cita abierta en el modal fue editada o eliminada (por cualquier usuario), se cierra y se avisa
+  useAgendaTiempoReal((cambio) => {
+    if (cambio.accion === 'crear') return
+    if (!modalEvento.show || modalEvento.evento.id !== cambio.id) return
+    onCerrarModal()
+    Swal.fire({
+      icon: 'info',
+      title: cambio.accion === 'eliminar' ? 'La cita fue eliminada' : 'La cita fue modificada',
+      text: cambio.accion === 'eliminar'
+        ? 'Otro usuario eliminó esta cita.'
+        : 'Otro usuario modificó esta cita. Vuelve a abrirla para ver los cambios.',
+    })
+  })
   const onVerDia = (dia: Date) => {
     setFecha(dia)
     setVista('dia')

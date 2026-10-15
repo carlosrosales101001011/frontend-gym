@@ -76,12 +76,11 @@ export const useAgendaNutricionistaStore = () => {
       }
     }
 
-    /** Crea o edita según el id. Devuelve true si se guardó. */
+    /** Crea o edita según el id. Devuelve true si se guardó. El calendario lo recarga el aviso del socket (useAgendaTiempoReal). */
     const guardarEvento = async (evento: EventoAgendaProps) => {
       try {
         if (evento.id !== 0) await httpClient.patch(`/agenda-nutricionista/id/${evento.id}`, haciaApi(evento))
         else await httpClient.post('/agenda-nutricionista', haciaApi(evento))
-        await obtenerEventos()
         return true
       } catch (e) {
         await Swal.fire({ icon: 'error', title: 'No se pudo guardar', html: mensajeError(e) })
@@ -89,7 +88,7 @@ export const useAgendaNutricionistaStore = () => {
       }
     }
 
-    /** Pide confirmación y elimina (borrado lógico). Devuelve true si se eliminó. */
+    /** Pide confirmación y elimina (borrado lógico). Devuelve true si se eliminó. El calendario lo recarga el aviso del socket. */
     const eliminarEvento = async (id: number) => {
       const { isConfirmed } = await Swal.fire({
         icon: 'warning',
@@ -102,7 +101,6 @@ export const useAgendaNutricionistaStore = () => {
       if (!isConfirmed) return false
       try {
         await httpClient.delete(`/agenda-nutricionista/id/${id}`)
-        await obtenerEventos()
         return true
       } catch (e) {
         await Swal.fire({ icon: 'error', title: 'No se pudo eliminar', html: mensajeError(e) })
