@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
+import { parseISO, set } from "date-fns";
 import httpClient from "@/common/helpers/httpClient";
 import { useCrudhook } from "@/hook/usecrudhook";
-import { onSetDataOpcionesSucursales, onSetClienteSeleccionado, onSetAsesorSeleccionado, onActualizarVentaCampo, onSetDataProgramas, onSetDataPlanes, onSetProgramaSeleccionado, onSetDataProductos, onSetMembresiaVenta, onQuitarMembresiaVenta, onAgregarProductoVenta, onSumarProductoVenta, onRestarProductoVenta, onQuitarProductoVenta, onAgregarPagoVenta, onActualizarPagoVenta, onEliminarPagoVenta, onResetVenta, type SucursalProps, type ProgramaProps, type ProductoProps, type DetalleMembresiaVentaProps, type DetallePagoVentaProps, type VentaProps, onSetDataHorario, type HorariosProps, type DetalleProductoVentaProps, type DataVentaProps, type PersonaProps } from "../store/ventaSlice";
+import { onSetDataOpcionesSucursales, onSetClienteSeleccionado, onSetAsesorSeleccionado, onActualizarVentaCampo, onSetDataProgramas, onSetDataPlanes, onSetProgramaSeleccionado, onSetDataProductos, onSetMembresiaVenta, onQuitarMembresiaVenta, onAgregarProductoVenta, onSumarProductoVenta, onRestarProductoVenta, onQuitarProductoVenta, onAgregarPagoVenta, onActualizarPagoVenta, onEliminarPagoVenta, onResetVenta, type SucursalProps, type ProgramaProps, type ProductoProps, type DetalleMembresiaVentaProps, type DetallePagoVentaProps, type VentaProps, onSetDataHorario, type HorariosProps, type DetalleProductoVentaProps, type DataVentaProps, type PersonaProps, type CampoVenta } from "../store/ventaSlice";
 import { useAppSelector } from "@/stores/Store";
 import { useDispatch } from "react-redux";
 import type { ItemResultado } from "@/components/ModalSearching/ModalSearching";
@@ -106,7 +107,7 @@ export const useVentasStore = () => {
           console.log(error);
         }
       }
-      const onActualizarVenta = (name: 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'id_tipo_cli' | 'n_comprobante' | 'observacion', value: VentaProps[typeof name]) => {
+      const onActualizarVenta = (name: CampoVenta, value: VentaProps[typeof name]) => {
         dispatch(onActualizarVentaCampo({ name, value }))
       }
       const onSelectPrograma = (id_programa: number) => {
@@ -141,6 +142,7 @@ export const useVentasStore = () => {
       }
       const onRegistrarVenta = async () => {
         const camposFaltantes = [
+          !venta.fecha_venta && 'Fecha de venta',
           !venta.id_cli && 'Cliente',
           !venta.id_empl && 'Asesor / Vendedor',
           !venta.id_sucursal && 'Sucursal',
@@ -178,10 +180,14 @@ export const useVentasStore = () => {
         let dataVenta
         let errorRegistro: unknown = null
         try {
-          const { detalleventa_membresias, detalleventa_productos, detalleventa_pagos, montoTotal, id_tipo_cli, id_tipo_comprobante, n_comprobante, ...ventaData } = venta
+          const { detalleventa_membresias, detalleventa_productos, detalleventa_pagos, montoTotal, id_tipo_cli, id_tipo_comprobante, n_comprobante, fecha_venta, ...ventaData } = venta
+          // Fecha elegida + hora actual (en ISO: el backend guarda el mismo instante, sin desfase de zona horaria); los pagos usan la misma
+          const ahora = new Date()
+          const fechaVenta = set(parseISO(fecha_venta), { hours: ahora.getHours(), minutes: ahora.getMinutes(), seconds: ahora.getSeconds() })
           // Tipo de cliente y comprobante son opcionales: sin elegir (o vacíos) no se envían
           dataVenta = await postVenta({
             ...ventaData,
+            fecha_venta: fechaVenta.toISOString(),
             ...(id_tipo_cli ? { id_tipo_cli } : {}),
             ...(id_tipo_comprobante ? { id_tipo_comprobante } : {}),
             ...(n_comprobante.trim() ? { n_comprobante: n_comprobante.trim() } : {}),
@@ -209,7 +215,7 @@ export const useVentasStore = () => {
                 ...productoData,
                 monto: productoData.montoPagos,
                 id_venta,
-                fecha_pago: new Date(),
+                fecha_pago: fechaVenta,
                 observacion: ''
               }))]
             )

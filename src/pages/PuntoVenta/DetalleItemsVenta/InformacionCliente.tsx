@@ -31,6 +31,16 @@ export const InformacionCliente = () => {
         </Card.Title>
 
         <div className="mb-3">
+          <InputCR
+            type='date'
+            label='Fecha de venta'
+            value={venta.fecha_venta}
+            onChange={(e) => onActualizarVenta('fecha_venta', e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-3">
           <BuscadorPersona
             idTipo={ID_TIPO_COLABORADOR}
             label='Asesor / Vendedor'

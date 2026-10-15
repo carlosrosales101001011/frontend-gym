@@ -5,7 +5,7 @@ import { addDays, addMonths, format } from 'date-fns'
 import httpClient from '@/common/helpers/httpClient'
 import { mensajeError } from '@/helpers/mensajeError'
 import { formatoMoneda } from '../DetalleItemsVenta/Carrito/Carrito'
-import { ID_SUCURSAL_POR_DEFECTO, initialVenta, onRepetirVenta, type PlanProps, type VentaProps } from '../store/ventaSlice'
+import { ID_SUCURSAL_POR_DEFECTO, initialVenta, onRepetirVenta, ventaNueva, type PlanProps, type VentaProps } from '../store/ventaSlice'
 
 /** GET /venta/id/:id/detalle (solo lo que se usa para repetirla; los decimales pueden llegar como string) */
 type DetalleVentaApi = {
@@ -99,7 +99,7 @@ export const useRepetirVenta = () => {
       // La membresía nueva empieza mañana (la venta se registra hoy) y dura los meses de su plan
       const fechaInicio = addDays(new Date(), 1)
       const nuevaVenta: VentaProps = {
-        ...initialVenta,
+        ...ventaNueva(),
         id_cli: venta.id_cli,
         id_empl: venta.id_empl ?? 0,
         id_origen: venta.id_origen ?? 0,

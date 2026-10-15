@@ -1,5 +1,6 @@
 import type { OpcionesSelect } from "@/types/props";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { format } from "date-fns";
 import type { ItemResultado } from "@/components/ModalSearching/ModalSearching";
 
 export type PersonaProps = {
@@ -54,6 +55,8 @@ export type DetallePagoVentaProps = {
 }
 
 export type VentaProps ={
+  /** Fecha de la venta (yyyy-MM-dd); por defecto hoy. Al registrar se le suma la hora actual */
+  fecha_venta: string;
   id_cli: number;
   /** Tipo de cliente (terminología venta/cliente/tipo); 0 = sin elegir */
   id_tipo_cli: number;
@@ -187,6 +190,7 @@ const initialDetalleMembresia: DetalleMembresiaVentaProps = {
 export const ID_SUCURSAL_POR_DEFECTO = 1003
 
 export const initialVenta: VentaProps = {
+  fecha_venta: '',
   id_cli: 0,
   id_empl: 0,
   id_tipo_comprobante: 0,
@@ -200,10 +204,16 @@ export const initialVenta: VentaProps = {
   detalleventa_productos: [],
   detalleventa_pagos: [],
 }
+/** Venta vacía con la fecha de hoy (se calcula al momento: la página puede quedar abierta de un día a otro) */
+export const ventaNueva = (): VentaProps => ({ ...initialVenta, fecha_venta: format(new Date(), 'yyyy-MM-dd') })
+
+/** Campos simples de la venta que se editan en "Información de la venta" */
+export type CampoVenta = 'fecha_venta' | 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'id_tipo_cli' | 'n_comprobante' | 'observacion'
+
 export const initialStateVenta: PersonaState = {
   personas: [],
   persona: initialPersona,
-  venta: initialVenta,
+  venta: ventaNueva(),
   sucursales: [],
   clienteSeleccionado: null,
   asesorSeleccionado: null,
@@ -237,7 +247,7 @@ export const ventaSlice = createSlice({
       state.asesorSeleccionado = action.payload;
       state.venta.id_empl = action.payload?.id ?? 0;
     },
-    onActualizarVentaCampo: (state, action: PayloadAction<{ name: 'id_origen' | 'id_sucursal' | 'id_tipo_comprobante' | 'id_tipo_cli' | 'n_comprobante' | 'observacion', value: string | number }>) => {
+    onActualizarVentaCampo: (state, action: PayloadAction<{ name: CampoVenta, value: string | number }>) => {
       const { name, value } = action.payload;
       (state.venta[name] as string | number) = value;
     },
@@ -323,7 +333,7 @@ export const ventaSlice = createSlice({
       state.venta.detalleventa_pagos.splice(action.payload, 1);
     },
     onResetVenta: (state) => {
-      state.venta = initialVenta;
+      state.venta = ventaNueva();
       state.clienteSeleccionado = null;
       state.asesorSeleccionado = null;
       state.idProgramaSeleccionado = null;
