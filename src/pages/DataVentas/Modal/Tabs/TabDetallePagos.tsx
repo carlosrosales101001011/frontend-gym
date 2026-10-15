@@ -1,15 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Col, Row, Table } from 'react-bootstrap'
 import { BsPlusLg } from 'react-icons/bs'
 import { ButtonCR } from '@/components/Button/ButtonCR'
 import { CardEditable } from '@/components/CardEditable/CardEditable'
 import { ResumenMontos } from '@/components/ResumenMontos/ResumenMontos'
-import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
-import type { OpcionesSelect } from '@/types/props'
 import type { UseVentaDetalle } from '../../hook/useVentaDetalle'
+import { useFormasPago } from '../../hook/useFormasPago'
 import type { DetallePagoProps, VentaInfoProps } from '../../types'
 import { ModalFormPago } from '../Forms/ModalFormPago'
-import { aNumero, formatearFecha, formatearMoneda, redondear2 } from '../../helpers'
+import { aNumero, formatearFecha, formatearMoneda, redondear2, totalVenta } from '../../helpers'
 import { AccionesItem } from './TabDetalleVenta'
 
 type FormAbierto = { show: boolean; detalle: DetallePagoProps | null }
@@ -23,16 +22,9 @@ type TabDetallePagosProps = {
 export const TabDetallePagos = ({ venta, pagos, guardarPago, eliminarPago }: TabDetallePagosProps) => {
   const [editando, setEditando] = useState(false)
   const [formPago, setFormPago] = useState<FormAbierto>(cerrado)
-  const { cargar: cargarFormaPago, data: dataFormaPago } = useTerminologiaPersona('formaPagoVenta')
-  const formasPago = dataFormaPago as OpcionesSelect[]
+  const { formasPago, labelFormaPago } = useFormasPago()
 
-  useEffect(() => {
-    cargarFormaPago()
-  }, [cargarFormaPago])
-
-  const labelFormaPago = (id: number) => formasPago.find((f) => f.value === id)?.label ?? `#${id}`
-
-  const total = aNumero(venta.montoTotal_membresia) + aNumero(venta.montoTotal_productos)
+  const total = totalVenta(venta)
   const pagado = pagos.reduce((acc, p) => acc + aNumero(p.monto), 0)
   const saldo = redondear2(Math.max(0, total - pagado))
 

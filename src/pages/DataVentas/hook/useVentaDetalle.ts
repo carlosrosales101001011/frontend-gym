@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import httpClient from '@/common/helpers/httpClient'
-import type { MembresiaForm, PagoForm, ProductoForm, VentaDetalleProps, VentaEditablePayload } from '../types'
+import type { MembresiaForm, PagoForm, ProductoForm, VentaDetalleProps, VentaEditablePayload, VentaRelacionadosProps } from '../types'
 
 const mensajeError = (error: unknown) =>
   Array.isArray(error) ? error.join('<br/>') : String(error)
@@ -41,15 +41,18 @@ export const useVentaDetalle = (id: number, onCambio?: () => void) => {
     return () => ctrl.abort()
   }, [id, cargar])
 
-  // Ejecuta una mutación; devuelve true si salió bien.
-  const ejecutar = async (accion: () => Promise<unknown>) => {
+  // Ejecuta una mutación; devuelve true si salió bien. Sin recargarDetalle cuando la venta ya no existe (ej. al eliminarla).
+  const ejecutar = async (
+    accion: () => Promise<unknown>,
+    { tituloError = 'No se pudo guardar', recargarDetalle = true } = {},
+  ) => {
     try {
       await accion()
-      await cargar()
+      if (recargarDetalle) await cargar()
       onCambio?.()
       return true
     } catch (e) {
-      await Swal.fire({ icon: 'error', title: 'No se pudo guardar', html: mensajeError(e) })
+      await Swal.fire({ icon: 'error', title: tituloError, html: mensajeError(e) })
       return false
     }
   }
@@ -73,7 +76,7 @@ export const useVentaDetalle = (id: number, onCambio?: () => void) => {
 
   const eliminarDetalle = async (modelo: string, idDetalle: number, texto: string) => {
     if (!(await confirmarEliminar(texto))) return false
-    return ejecutar(() => httpClient.delete(`${modelo}/id/${idDetalle}`))
+    return ejecutar(() => httpClient.delete(`${modelo}/id/${idDetalle}`), { tituloError: 'No se pudo eliminar' })
   }
 
   return {
@@ -83,6 +86,19 @@ export const useVentaDetalle = (id: number, onCambio?: () => void) => {
     recargar: cargar,
     actualizarVenta: (values: VentaEditablePayload) =>
       ejecutar(() => httpClient.patch(`/venta/id/${id}`, values)),
+    /** Todo lo conectado a la venta (detalle, pagos, extensiones y seguimientos); null si no se pudo cargar */
+    obtenerRelacionados: async () => {
+      try {
+        const { data } = await httpClient.get(`/venta/id/${id}/relacionados`)
+        return data as VentaRelacionadosProps
+      } catch (e) {
+        await Swal.fire({ icon: 'error', title: 'No se pudo cargar la venta', html: mensajeError(e) })
+        return null
+      }
+    },
+    /** Borrado lógico de la venta con todo lo conectado (lo hace el backend en una transacción). La confirmación la hace ModalEliminarVenta. */
+    eliminarVenta: () =>
+      ejecutar(() => httpClient.delete(`/venta/id/${id}`), { tituloError: 'No se pudo eliminar', recargarDetalle: false }),
     guardarMembresia: (values: MembresiaForm, idDetalle?: number) =>
       guardarDetalle('/detalleventa-membresias', values, idDetalle),
     eliminarMembresia: (idDetalle: number) =>

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import ModalCR from '@/components/Modal/ModalCR'
 import type { modalCustom } from '@/types/props'
 import { TabsCR } from '@/components/Tabs/TabsCR'
@@ -5,6 +6,7 @@ import { TabCR } from '@/components/Tabs/TabCR'
 import { TabInfoVenta } from './Modal/Tabs/TabInfoVenta'
 import { TabDetalleVenta } from './Modal/Tabs/TabDetalleVenta'
 import { TabDetallePagos } from './Modal/Tabs/TabDetallePagos'
+import { ModalEliminarVenta } from './Modal/ModalEliminarVenta'
 import { useVentaDetalle } from './hook/useVentaDetalle'
 
 type ModalInfoVentasProps = modalCustom & {
@@ -15,6 +17,12 @@ type ModalInfoVentasProps = modalCustom & {
 export const ModalInfoVentas = ({ show, onHide, id, onCambio }: ModalInfoVentasProps) => {
   const ventaDetalle = useVentaDetalle(show ? id : 0, onCambio)
   const { data, loading, error, recargar } = ventaDetalle
+  const [showEliminar, setShowEliminar] = useState(false)
+  // La tabla se refresca con onCambio (dentro de eliminarVenta); aquí solo se cierran los modales
+  const onVentaEliminada = () => {
+    setShowEliminar(false)
+    onHide()
+  }
 
   return (
     <ModalCR show={show} onHide={onHide} size="xl">
@@ -38,6 +46,7 @@ export const ModalInfoVentas = ({ show, onHide, id, onCambio }: ModalInfoVentasP
                         key={data.venta.id}
                         venta={data.venta}
                         actualizarVenta={ventaDetalle.actualizarVenta}
+                        onEliminar={() => setShowEliminar(true)}
                       />
                   </TabCR>
                   <TabCR eventKey="detalle" title="Detalle de la venta">
@@ -61,6 +70,13 @@ export const ModalInfoVentas = ({ show, onHide, id, onCambio }: ModalInfoVentasP
               </TabsCR>
             )}
         </ModalCR.Body>
+        <ModalEliminarVenta
+          show={showEliminar}
+          onHide={() => setShowEliminar(false)}
+          onEliminada={onVentaEliminada}
+          obtenerRelacionados={ventaDetalle.obtenerRelacionados}
+          eliminarVenta={ventaDetalle.eliminarVenta}
+        />
     </ModalCR>
   )
 }

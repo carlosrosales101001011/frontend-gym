@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import { CardEditable } from '@/components/CardEditable/CardEditable'
+import { ButtonCR } from '@/components/Button/ButtonCR'
 import { FieldGrid } from '@/components/FieldText/FieldGrid'
 import { ResumenMontos } from '@/components/ResumenMontos/ResumenMontos'
 import type { ItemResultado } from '@/components/ModalSearching/ModalSearching'
@@ -12,7 +13,7 @@ import { BuscadorPersona } from '@/components/BuscadorPersona/BuscadorPersona'
 import type { UseVentaDetalle } from '../../hook/useVentaDetalle'
 import { useOpcionesVenta } from '../../hook/useOpcionesVenta'
 import type { VentaEditableForm, VentaInfoProps } from '../../types'
-import { aFechaHoraLocal, aNumero, formatearFechaHora } from '../../helpers'
+import { aFechaHoraLocal, aNumero, formatearFechaHora, totalVenta } from '../../helpers'
 
 const ID_TIPO_COLABORADOR = 1
 const ID_TIPO_CLIENTE = 2
@@ -33,9 +34,11 @@ const aFormulario = (venta: VentaInfoProps): VentaEditableForm => ({
 type TabInfoVentaProps = {
   venta: VentaInfoProps
   actualizarVenta: UseVentaDetalle['actualizarVenta']
+  /** Abre la confirmación con todo lo que se eliminará junto con la venta */
+  onEliminar: () => void
 }
 
-export const TabInfoVenta = ({ venta, actualizarVenta }: TabInfoVentaProps) => {
+export const TabInfoVenta = ({ venta, actualizarVenta, onEliminar }: TabInfoVentaProps) => {
   const [editando, setEditando] = useState(false)
   const [guardando, setGuardando] = useState(false)
   const [form, setForm] = useState<VentaEditableForm>(() => aFormulario(venta))
@@ -83,7 +86,7 @@ export const TabInfoVenta = ({ venta, actualizarVenta }: TabInfoVentaProps) => {
   const montoMembresia = aNumero(venta.montoTotal_membresia)
   const montoProductos = aNumero(venta.montoTotal_productos)
   const montoPagos = aNumero(venta.montoPagos)
-  const total = montoMembresia + montoProductos
+  const total = totalVenta(venta)
 
   return (
     <Row className="g-3 pt-2">
@@ -188,6 +191,13 @@ export const TabInfoVenta = ({ venta, actualizarVenta }: TabInfoVentaProps) => {
             { label: 'Pagado', monto: montoPagos },
             { label: 'Saldo pendiente', monto: Math.max(0, total - montoPagos), tipo: 'resaltado' },
           ]}
+        />
+        <ButtonCR
+          label="Eliminar venta"
+          variant="danger"
+          className="w-100 mt-3"
+          onClick={onEliminar}
+          disabled={editando}
         />
       </Col>
     </Row>

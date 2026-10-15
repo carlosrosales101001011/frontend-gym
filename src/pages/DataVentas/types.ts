@@ -67,6 +67,26 @@ export type VentaDetalleProps = {
   pagos: DetallePagoProps[]
 }
 
+export type ExtensionVentaProps = {
+  id: number
+  label_tipo_extension: string
+  fecha_inicio: string
+  fecha_fin: string
+  dias_habiles: number
+}
+
+export type SeguimientoVentaProps = {
+  id: number
+  fecha_vencimiento: string
+  sesiones_pendientes: number
+}
+
+/** GET /venta/id/:id/relacionados: todo lo que se elimina junto con la venta */
+export type VentaRelacionadosProps = VentaDetalleProps & {
+  extensiones: ExtensionVentaProps[]
+  seguimientos: SeguimientoVentaProps[]
+}
+
 // Payloads que acepta el backend (forbidNonWhitelisted: solo estos campos).
 export type VentaEditableForm = {
   id_cli: number
