@@ -22,7 +22,7 @@ export const useAgendaTiempoReal = (onCambio: (cambio: CambioAgenda) => void) =>
   })
 
   useEffect(() => {
-    const socket = crearSocket('/agenda-nutricionista')
+    const socket = crearSocket('agenda-nutricionista')
     socket.on('agenda:cambio', (cambio: CambioAgenda) => alCambiar(cambio))
     socket.io.on('reconnect', () => alReconectar())
     socket.connect()
