@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { addDays, addMonths, addWeeks, parseISO } from "date-fns"
 import { Spinner } from "react-bootstrap"
-import Swal from "sweetalert2"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { ContadorCoincidencias } from "@/components/SinResultados/ContadorCoincidencias"
 import { InputCR } from "@/components/TextFields/InputCR"
@@ -133,7 +132,7 @@ export const App = () => {
     setModalEvento((prev) => ({ ...prev, show: false }))
   }
 
-  // Si la cita abierta en el modal fue editada o eliminada (por cualquier usuario), se cierra; solo se avisa si se eliminó
+  // Si la cita abierta en el modal fue editada o eliminada (por cualquier usuario), el modal se cierra sin avisar
   // Al cambiar cualquier cita se recarga lo que se ve: el rango y, si se está buscando, las citas del cliente
   // Sin skeleton: es una recarga en segundo plano y no debe parpadear
   const recargarAgenda = () => {
@@ -144,9 +143,6 @@ export const App = () => {
     if (cambio.accion === 'crear') return
     if (!modalEvento.show || modalEvento.evento.id !== cambio.id) return
     onCerrarModal()
-    if (cambio.accion === 'eliminar') {
-      Swal.fire({ icon: 'info', title: 'La cita fue eliminada', text: 'Otro usuario eliminó esta cita.' })
-    }
   })
   const onVerDia = (dia: Date) => {
     setFecha(dia)

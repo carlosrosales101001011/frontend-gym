@@ -30,7 +30,7 @@ export type EstadoEvento = {
 
 /** Color (y si bloquea el evento) de cada estado, por su nombre en la terminología agenda / cita / estado */
 const ESTILO_ESTADO: Record<string, { color: string, bloqueado?: boolean }> = {
-  'pendiente': { color: '#f59f00' },
+  'reprogramada': { color: '#f59f00' },
   'confirmado': { color: '#1c7ed6' },
   'atendido': { color: '#2f9e44' },
   'no asistio': { color: '#e03131' },
@@ -54,9 +54,9 @@ export const esEventoBloqueado = (estados: EstadoEvento[], evento: EventoAgendaP
 /** Estados que el nutricionista puede asignar en el formulario (los bloqueados no) */
 export const estadosSeleccionables = (estados: EstadoEvento[]) => estados.filter((estado) => !estado.bloqueado)
 
-/** Estado con el que nace una cita: Pendiente (o el primero que se pueda elegir) */
+/** Estado con el que nace una cita: Reprogramada (o el primero que se pueda elegir) */
 export const idEstadoInicial = (estados: EstadoEvento[]) =>
-  (estados.find((estado) => normalizeText(estado.label) === 'pendiente') ?? estadosSeleccionables(estados)[0])?.value ?? 0
+  (estados.find((estado) => normalizeText(estado.label) === 'reprogramada') ?? estadosSeleccionables(estados)[0])?.value ?? 0
 
 export const TEXTO_EVENTO_BLOQUEADO = 'Evento importante'
 
