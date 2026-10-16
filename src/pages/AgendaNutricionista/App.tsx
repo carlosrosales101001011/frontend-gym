@@ -1,11 +1,17 @@
 import { useEffect, useRef, useState } from "react"
-import { addDays, addMonths, addWeeks } from "date-fns"
+import { addDays, addMonths, addWeeks, parseISO } from "date-fns"
+import { Spinner } from "react-bootstrap"
 import Swal from "sweetalert2"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
+import { ContadorCoincidencias } from "@/components/SinResultados/ContadorCoincidencias"
+import { InputCR } from "@/components/TextFields/InputCR"
+import { ButtonCR } from "@/components/Button/ButtonCR"
+import IconCR from "@/components/Icons/IconCR"
+import { normalizeText } from "@/helpers/strings"
 import { useAgendaNutricionistaStore } from "./hook/useAgendaNutricionistaStore"
 import { useAgendaTiempoReal } from "./hook/useAgendaTiempoReal"
 import { initialStateAgendaNutricionista, type EventoAgendaProps } from "./store/agendaNutricionistaSlice"
-import { aFechaISO, aHora, aMinutos, ALTO_SLOT, esEventoBloqueado, HORA_FIN_AGENDA, HORA_INICIO_AGENDA, idEstadoInicial, saltarDomingo, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
+import { aFechaISO, aMinutos, ALTO_SLOT, esEventoBloqueado, HORA_FIN_AGENDA, HORA_INICIO_AGENDA, idEstadoInicial, saltarDomingo, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
 import { CalendarioToolbar } from "./components/CalendarioToolbar"
 import { LeyendaEstados } from "./components/LeyendaEstados"
 import { VistaMes } from "./components/VistaMes"
@@ -21,6 +27,9 @@ const MOVER_FECHA: Record<VistaCalendario, (fecha: Date, cantidad: number) => Da
   dia: (fecha, cantidad) => saltarDomingo(addDays(fecha, cantidad), cantidad > 0 ? 1 : -1),
 }
 
+/** Cuánto después de dejar de escribir se aplica la búsqueda de clientes */
+const MS_APLICAR_BUSQUEDA = 400
+
 export const App = () => {
   const { eventos, minutosxcli, estados, obtenerEventos, obtenerEstados } = useAgendaNutricionistaStore()
   const [vista, setVista] = useState<VistaCalendario>('semana')
@@ -28,38 +37,64 @@ export const App = () => {
   // Vista semana: "Ir a la hora" solo desplaza la grilla hasta esa hora (no filtra nada)
   const contenedorScroll = useRef<HTMLDivElement>(null)
   const [horaBuscada, setHoraBuscada] = useState('')
-  const irAHora = (valor: string) => {
-    setHoraBuscada(valor)
-    if (!/^\d{2}:\d{2}$/.test(valor)) return
-    const minutos = Math.min(Math.max(aMinutos(valor), HORA_INICIO_AGENDA * 60), HORA_FIN_AGENDA * 60)
+  /** Desplaza la grilla de la vista semana hasta esa hora (HH:mm) */
+  const desplazarAHora = (hora: string) => {
+    const minutos = Math.min(Math.max(aMinutos(hora), HORA_INICIO_AGENDA * 60), HORA_FIN_AGENDA * 60)
     // La cabecera de días es sticky: con este top el slot de esa hora queda justo debajo de ella
     contenedorScroll.current?.scrollTo({ top: (minutos - HORA_INICIO_AGENDA * 60) * (ALTO_SLOT / minutosxcli), behavior: 'smooth' })
   }
-  // Rango de horas que se ve en la grilla (se actualiza al hacer scroll o cambiar el tamaño)
-  const [rangoVisible, setRangoVisible] = useState<{ desde: string, hasta: string } | null>(null)
-  const actualizarRangoVisible = () => {
-    const contenedor = contenedorScroll.current
-    if (!contenedor || vista !== 'semana') return
-    const pxPorMinuto = ALTO_SLOT / minutosxcli
-    // La cabecera de días es sticky y tapa la parte de arriba
-    const altoCabecera = contenedor.querySelector<HTMLElement>('.agenda__semana-cabecera')?.offsetHeight ?? 0
-    const inicio = HORA_INICIO_AGENDA * 60
-    const desde = Math.min(inicio + contenedor.scrollTop / pxPorMinuto, HORA_FIN_AGENDA * 60)
-    const hasta = Math.min(desde + (contenedor.clientHeight - altoCabecera) / pxPorMinuto, HORA_FIN_AGENDA * 60)
-    setRangoVisible({ desde: aHora(Math.round(desde)), hasta: aHora(Math.round(hasta)) })
+  const irAHora = (valor: string) => {
+    setHoraBuscada(valor)
+    if (/^\d{2}:\d{2}$/.test(valor)) desplazarAHora(valor)
   }
-  useEffect(() => {
-    if (vista !== 'semana') return
-    const contenedor = contenedorScroll.current
-    // Después de pintar la grilla
-    const primera = requestAnimationFrame(actualizarRangoVisible)
-    const observador = new ResizeObserver(() => actualizarRangoVisible())
-    if (contenedor) observador.observe(contenedor)
-    return () => {
-      cancelAnimationFrame(primera)
-      observador.disconnect()
-    }
-  }, [vista, minutosxcli])
+
+  // Buscador de clientes: solo se ven sus citas y el calendario va a la más reciente
+  const [busquedaCliente, setBusquedaCliente] = useState('')
+  // Lo que filtra: se aplica a los ms de dejar de escribir; mientras tanto se muestra el loading
+  const [textoBuscado, setTextoBuscado] = useState('')
+  const [buscandoCliente, setBuscandoCliente] = useState(false)
+  const temporizadorBusqueda = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => () => clearTimeout(temporizadorBusqueda.current), [])
+  /** Citas cuyo cliente coincide, la de fecha más reciente primero (sin texto: todas) */
+  const citasDelClienteBuscado = (texto: string) => texto
+    ? eventos
+      .filter((evento) => normalizeText(evento.label_cliente ?? '').includes(texto))
+      .sort((a, b) => `${b.fecha} ${b.hora_inicio}`.localeCompare(`${a.fecha} ${a.hora_inicio}`))
+    : eventos
+  const eventosVisibles = citasDelClienteBuscado(textoBuscado)
+  // Coincidencia en la que está el calendario (las flechas la mueven); se ajusta si el socket quitó citas
+  const [indiceCoincidencia, setIndiceCoincidencia] = useState(0)
+  const indiceActual = Math.min(indiceCoincidencia, Math.max(eventosVisibles.length - 1, 0))
+  // Cita en la que está el buscador: se pinta con borde brillante
+  const idResaltado = textoBuscado ? eventosVisibles[indiceActual]?.id : undefined
+  /** Lleva el calendario a la fecha (y en la vista semana, a la hora) de la cita */
+  const irACita = (cita: EventoAgendaProps) => {
+    setFecha(saltarDomingo(parseISO(cita.fecha)))
+    // Después de pintar la semana de esa fecha
+    if (vista === 'semana') requestAnimationFrame(() => desplazarAHora(cita.hora_inicio))
+  }
+  /** Flechas: -1 = coincidencia anterior (más reciente), 1 = siguiente; al llegar al final vuelve al inicio */
+  const moverCoincidencia = (paso: 1 | -1) => {
+    const total = eventosVisibles.length
+    if (!total) return
+    const nuevo = (indiceActual + paso + total) % total
+    setIndiceCoincidencia(nuevo)
+    irACita(eventosVisibles[nuevo])
+  }
+  const onBuscarCliente = (valor: string) => {
+    setBusquedaCliente(valor)
+    setBuscandoCliente(true)
+    clearTimeout(temporizadorBusqueda.current)
+    temporizadorBusqueda.current = setTimeout(() => {
+      const texto = normalizeText(valor)
+      setTextoBuscado(texto)
+      setBuscandoCliente(false)
+      setIndiceCoincidencia(0)
+      // Solo al buscar (no cuando el socket recarga las citas): el calendario va a la cita de fecha más reciente
+      const masReciente = texto && citasDelClienteBuscado(texto)[0]
+      if (masReciente) irACita(masReciente)
+    }, MS_APLICAR_BUSQUEDA)
+  }
   const [modalEvento, setModalEvento] = useState<{ show: boolean, evento: EventoAgendaProps }>({
     show: false,
     evento: initialStateAgendaNutricionista.evento,
@@ -92,18 +127,14 @@ export const App = () => {
     setModalEvento((prev) => ({ ...prev, show: false }))
   }
 
-  // Si la cita abierta en el modal fue editada o eliminada (por cualquier usuario), se cierra y se avisa
+  // Si la cita abierta en el modal fue editada o eliminada (por cualquier usuario), se cierra; solo se avisa si se eliminó
   useAgendaTiempoReal((cambio) => {
     if (cambio.accion === 'crear') return
     if (!modalEvento.show || modalEvento.evento.id !== cambio.id) return
     onCerrarModal()
-    Swal.fire({
-      icon: 'info',
-      title: cambio.accion === 'eliminar' ? 'La cita fue eliminada' : 'La cita fue modificada',
-      text: cambio.accion === 'eliminar'
-        ? 'Otro usuario eliminó esta cita.'
-        : 'Otro usuario modificó esta cita. Vuelve a abrirla para ver los cambios.',
-    })
+    if (cambio.accion === 'eliminar') {
+      Swal.fire({ icon: 'info', title: 'La cita fue eliminada', text: 'Otro usuario eliminó esta cita.' })
+    }
   })
   const onVerDia = (dia: Date) => {
     setFecha(dia)
@@ -144,34 +175,54 @@ export const App = () => {
               aria-label="Ir a la hora"
             />
           )}
-          rango_visible={vista === 'semana' && rangoVisible && (
-            <span className="small text-nowrap opacity-75 ms-2" title="Horas que se ven en el calendario">
-              Viendo <strong>{rangoVisible.desde}</strong> – <strong>{rangoVisible.hasta}</strong>
-            </span>
+          buscador={(
+            <div className="d-flex align-items-center gap-2 ms-2">
+              <div style={{ width: 220 }}>
+                <InputCR
+                  label="Buscar cliente"
+                  value={busquedaCliente}
+                  onChange={(e) => onBuscarCliente(e.target.value)}
+                  aria-label="Buscar citas de un cliente"
+                />
+              </div>
+              {buscandoCliente && <Spinner animation="border" size="sm" role="status" aria-label="Buscando" />}
+              {!buscandoCliente && textoBuscado && eventosVisibles.length === 0 && <ContadorCoincidencias total={0} />}
+              {!buscandoCliente && textoBuscado && eventosVisibles.length > 0 && (
+                <div className="d-flex align-items-center gap-1">
+                  <ButtonCR variant="outline-secondary" className="btn-sm" onClick={() => moverCoincidencia(-1)} icon={<IconCR name="arrowUp" size={14} />} title="Coincidencia anterior (más reciente)" />
+                  <ButtonCR variant="outline-secondary" className="btn-sm" onClick={() => moverCoincidencia(1)} icon={<IconCR name="arrowDown" size={14} />} title="Coincidencia siguiente" />
+                  <span className="small text-nowrap" role="status" aria-live="polite">
+                    <strong>{indiceActual + 1}</strong>/{eventosVisibles.length}
+                  </span>
+                </div>
+              )}
+            </div>
           )}
         />
-        <div ref={contenedorScroll} onScroll={actualizarRangoVisible} className="flex-grow-1 scroll-mode-actual overflow-x-hidden" style={{ minHeight: 0 }}>
+        <div ref={contenedorScroll} className="flex-grow-1 scroll-mode-actual overflow-x-hidden" style={{ minHeight: 0 }}>
         {vista === 'mes' && (
           <VistaMes
             fecha={fecha}
-            eventos={eventos}
+            eventos={eventosVisibles}
             onSeleccionarDia={onVerSemana}
             onSeleccionarEvento={onAbrirEvento}
             onVerDia={onVerDia}
+            idResaltado={idResaltado}
           />
         )}
         {vista === 'semana' && (
           <VistaSemana
             fecha={fecha}
-            eventos={eventos}
+            eventos={eventosVisibles}
             minutosxcli={minutosxcli}
             onSeleccionarSlot={onAgendarSlot}
             onSeleccionarEvento={onAbrirEvento}
             onVerDia={onVerDia}
+            idResaltado={idResaltado}
           />
         )}
         {vista === 'dia' && (
-          <VistaDia fecha={fecha} eventos={eventos} onSeleccionarEvento={onAbrirEvento} />
+          <VistaDia fecha={fecha} eventos={eventosVisibles} onSeleccionarEvento={onAbrirEvento} idResaltado={idResaltado} />
         )}
         </div>
       </div>

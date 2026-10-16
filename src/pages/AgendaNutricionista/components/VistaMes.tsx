@@ -15,9 +15,11 @@ type VistaMesProps = {
   onSeleccionarDia: (dia: Date) => void
   onSeleccionarEvento: (evento: EventoAgendaProps) => void
   onVerDia: (dia: Date) => void
+  /** Cita con borde brillante (coincidencia actual del buscador) */
+  idResaltado?: number
 }
 
-export const VistaMes = ({ fecha, eventos, onSeleccionarDia, onSeleccionarEvento, onVerDia }: VistaMesProps) => {
+export const VistaMes = ({ fecha, eventos, onSeleccionarDia, onSeleccionarEvento, onVerDia, idResaltado }: VistaMesProps) => {
   return (
     <div className="agenda__mes">
       {diasDeLaSemana(fecha).map((dia) => (
@@ -47,7 +49,7 @@ export const VistaMes = ({ fecha, eventos, onSeleccionarDia, onSeleccionarEvento
               {format(dia, 'd')}
             </button>
             {eventosDia.slice(0, MAX_EVENTOS_POR_DIA).map((evento) => (
-              <EventoChip key={evento.id} evento={evento} onClick={onSeleccionarEvento} />
+              <EventoChip key={evento.id} evento={evento} onClick={onSeleccionarEvento} resaltado={evento.id === idResaltado} />
             ))}
             {ocultos > 0 && (
               <button

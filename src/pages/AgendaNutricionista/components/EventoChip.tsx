@@ -11,17 +11,19 @@ type EventoChipProps = {
   style?: CSSProperties
   /** Horario arriba y nombre del cliente abajo (vista semana); si no, todo en una línea (vista mes) */
   dosLineas?: boolean
+  /** Borde brillante: es la coincidencia actual del buscador de clientes */
+  resaltado?: boolean
 }
 
 /** Evento dentro del calendario, pintado con el color de su estado */
-export const EventoChip = ({ evento, onClick, style, dosLineas = false }: EventoChipProps) => {
+export const EventoChip = ({ evento, onClick, style, dosLineas = false, resaltado = false }: EventoChipProps) => {
   const { estados } = useAppSelector((state) => state.AGENDA_NUTRICIONISTA)
   const estado = obtenerEstado(estados, evento.id_estado)
   const bloqueado = esEventoBloqueado(estados, evento)
   return (
     <button
       type="button"
-      className={classNames('agenda__evento', { 'agenda__evento--bloqueado': bloqueado, 'agenda__evento--dos-lineas': dosLineas })}
+      className={classNames('agenda__evento', { 'agenda__evento--bloqueado': bloqueado, 'agenda__evento--dos-lineas': dosLineas, 'agenda__evento--resaltado': resaltado })}
       style={{ backgroundColor: estado.color, ...style }}
       title={bloqueado
         ? `${evento.hora_inicio} - ${evento.hora_fin} · ${TEXTO_EVENTO_BLOQUEADO} (no editable)`

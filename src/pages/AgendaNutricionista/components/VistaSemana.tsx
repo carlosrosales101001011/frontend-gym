@@ -26,9 +26,11 @@ type VistaSemanaProps = {
   onSeleccionarSlot: (dia: Date, hora: string) => void
   onSeleccionarEvento: (evento: EventoAgendaProps) => void
   onVerDia: (dia: Date) => void
+  /** Cita con borde brillante (coincidencia actual del buscador) */
+  idResaltado?: number
 }
 
-export const VistaSemana = ({ fecha, eventos, minutosxcli, onSeleccionarSlot, onSeleccionarEvento, onVerDia }: VistaSemanaProps) => {
+export const VistaSemana = ({ fecha, eventos, minutosxcli, onSeleccionarSlot, onSeleccionarEvento, onVerDia, idResaltado }: VistaSemanaProps) => {
   const dias = diasDeLaSemana(fecha)
   const slots = slotsDelDia(minutosxcli)
 
@@ -112,6 +114,7 @@ export const VistaSemana = ({ fecha, eventos, minutosxcli, onSeleccionarSlot, on
               evento={evento}
               onClick={onSeleccionarEvento}
               dosLineas
+              resaltado={evento.id === idResaltado}
               style={{ position: 'absolute', left: 2, right: 2, ...estiloEvento(evento) }}
             />
           ))}

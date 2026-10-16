@@ -8,10 +8,12 @@ type VistaDiaProps = {
   fecha: Date
   eventos: EventoAgendaProps[]
   onSeleccionarEvento: (evento: EventoAgendaProps) => void
+  /** Cita con borde brillante (coincidencia actual del buscador) */
+  idResaltado?: number
 }
 
 /** Lista de los eventos del día ordenados por hora */
-export const VistaDia = ({ fecha, eventos, onSeleccionarEvento }: VistaDiaProps) => {
+export const VistaDia = ({ fecha, eventos, onSeleccionarEvento, idResaltado }: VistaDiaProps) => {
   const { estados } = useAppSelector((state) => state.AGENDA_NUTRICIONISTA)
   const eventosDia = eventosDelDia(eventos, fecha)
 
@@ -27,7 +29,7 @@ export const VistaDia = ({ fecha, eventos, onSeleccionarEvento }: VistaDiaProps)
         return (
           <div
             key={evento.id}
-            className={classNames('agenda__dia-item card-mode-actual', { 'item-hover-actual': !bloqueado, 'agenda__dia-item--bloqueado': bloqueado })}
+            className={classNames('agenda__dia-item card-mode-actual', { 'item-hover-actual': !bloqueado, 'agenda__dia-item--bloqueado': bloqueado, 'agenda__dia-item--resaltado': evento.id === idResaltado })}
             style={{ borderLeftColor: estado.color }}
             onClick={() => onSeleccionarEvento(evento)}
           >
