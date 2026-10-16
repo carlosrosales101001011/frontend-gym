@@ -27,6 +27,13 @@ export const DataTableAsistencias = ({  otrosBotones }: DataTableAsistenciasProp
       header: 'Persona', campoBusqueda: 'label_nombres_apellidos_persona',
       render: (rowData: AsistenciaProps) => <PersonaConAvatar nombre={capitalizeWords(rowData?.label_nombres_apellidos_persona)} avatar={rowData.avatar_persona} />,
     },
+    {
+      id: 8,
+      header: 'Tipo', campoBusqueda: 'label_subtipo',
+      render: (rowData: AsistenciaProps) => rowData.label_subtipo
+        ? <span>{rowData.label_subtipo}</span>
+        : <span className="opacity-50">—</span>,
+    },
     // {
     //   id: 2,
     //   header: 'Tipo de evento', campoBusqueda: 'label_tipo_evento',

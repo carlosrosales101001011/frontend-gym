@@ -9,6 +9,8 @@ export type GuardarAsistenciaProps = {
   id: number
   id_persona: number
   id_tipo_evento: number
+  /** Tipo de asistencia (Entrada, Salida...) */
+  id_subtipo: number
   deviceSN: string
 }
 

@@ -7,6 +7,10 @@ export type AsistenciaProps = {
   id_persona: number;
   /** Lo arma el backend con los nombres de la persona */
   label_nombres_apellidos_persona: string;
+  /** Tipo de asistencia: Entrada, Salida, Refrigerio... (terminología asistencia/tipo/persona); por defecto Entrada */
+  id_subtipo: number;
+  /** Lo arma el backend con el valor de la terminología */
+  label_subtipo: string;
   id_tipo_evento: number;
   /** Lo arma el backend con el valor de la terminología */
   label_tipo_evento?: string | null;
@@ -21,6 +25,9 @@ export type AsistenciaProps = {
   avatar_persona?: AvatarPersonaApi;
   avatar_usercreated?: AvatarPersonaApi;
 };
+
+/** Tipo con el que arranca una asistencia nueva: "Entrada" (terminología asistencia/tipo/persona) */
+export const ID_SUBTIPO_ASISTENCIA_POR_DEFECTO = 6141
 
 export type AsistenciasState = {
   asistencias: AsistenciaProps[];

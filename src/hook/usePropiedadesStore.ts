@@ -84,7 +84,8 @@ const TERMINOLOGIAS = {
   formaPagoVenta: ['venta', 'forma-pago', 'tipo'],
   subtipoCliente: ['persona', 'cliente', 'subtipo'], //persona.id_subtipo de los clientes
   tipoClienteVenta: ['venta', 'cliente', 'tipo'], //Nuevo, Renovación... (venta.id_tipo_cli)
-  tipoEventoAsistencia: ['persona', 'asistencia', 'tipo'], //Entrada, Salida (persona_eventos_asistencia)
+  tipoEventoAsistencia: ['persona', 'asistencia', 'tipo'], //Manual, Huella, Facial (persona_eventos_asistencia.id_tipo_evento)
+  subtipoAsistencia: ['asistencia', 'tipo', 'persona'], //Entrada, Salida, Refrigerio... (persona_eventos_asistencia.id_subtipo)
   distritosLima: ['persona', 'distrito', 'Lima'],
   distritosCallao: ['persona', 'distrito', 'Callao'],
   
