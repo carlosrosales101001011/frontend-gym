@@ -2,8 +2,8 @@ import Swal from 'sweetalert2'
 import httpClient from '@/common/helpers/httpClient'
 import { mensajeError } from '@/helpers/mensajeError'
 import { useAppDispatch, useAppSelector } from '@/stores/Store'
-import { onSetDataEventos, onSetEstadosCita, type EventoAgendaProps } from '../store/agendaNutricionistaSlice'
-import { armarEstados, duracionEvento, sumarMinutos } from '../helpers/agendaHelpers'
+import { onSetCargandoEventos, onSetDataEventos, onSetEstadosCita, onSetEventosBuscados, type EventoAgendaProps } from '../store/agendaNutricionistaSlice'
+import { armarEstados, duracionEvento, sumarMinutos, type RangoAgenda } from '../helpers/agendaHelpers'
 
 /** Cita tal como la devuelve /agenda-nutricionista */
 type CitaApi = {
@@ -53,15 +53,50 @@ const haciaApi = (evento: EventoAgendaProps) => ({
 /** Citas de la agenda del nutricionista y sus estados (terminología agenda / cita / estado) */
 export const useAgendaNutricionistaStore = () => {
     const dispatch = useAppDispatch()
-    const { eventos, minutosxcli, estados } = useAppSelector(e=>e.AGENDA_NUTRICIONISTA)
+    const { eventos, eventosBuscados, cargandoEventos, minutosxcli, estados } = useAppSelector(e=>e.AGENDA_NUTRICIONISTA)
 
-    /** Todas las citas (el calendario las necesita todas para mostrar y validar cruces) */
-    const obtenerEventos = async () => {
+    /**
+     * Citas del rango que se ve en el calendario (signal: se cancela si el rango cambia antes de responder).
+     * conSkeleton: false en la recarga del socket, para que el calendario no parpadee.
+     */
+    const obtenerEventos = async (rango: RangoAgenda, signal?: AbortSignal, conSkeleton = true) => {
+      if (conSkeleton) dispatch(onSetCargandoEventos(true))
       try {
-        const { data } = await httpClient.get('/agenda-nutricionista')
+        const { data } = await httpClient.get('/agenda-nutricionista/rango', { params: rango, signal })
         dispatch(onSetDataEventos((data.lista as CitaApi[]).map(desdeApi)))
       } catch (e) {
+        if (signal?.aborted) return
         await Swal.fire({ icon: 'error', title: 'No se pudo cargar la agenda', html: mensajeError(e) })
+      } finally {
+        // Si se canceló, la petición que la reemplazó apaga el skeleton
+        if (conSkeleton && !signal?.aborted) dispatch(onSetCargandoEventos(false))
+      }
+    }
+
+    /** Todas las citas (de cualquier fecha) de los clientes cuyo nombre contiene q; las devuelve además de guardarlas */
+    const buscarCitasCliente = async (q: string, conSkeleton = true) => {
+      if (conSkeleton) dispatch(onSetCargandoEventos(true))
+      try {
+        const { data } = await httpClient.get('/agenda-nutricionista/rango', { params: { q } })
+        const citas = (data.lista as CitaApi[]).map(desdeApi)
+        dispatch(onSetEventosBuscados(citas))
+        return citas
+      } catch (e) {
+        await Swal.fire({ icon: 'error', title: 'No se pudo buscar al cliente', html: mensajeError(e) })
+        return []
+      } finally {
+        if (conSkeleton) dispatch(onSetCargandoEventos(false))
+      }
+    }
+
+    /** Historial del modal: todas las citas activas de un cliente */
+    const obtenerCitasDeCliente = async (id_cli: number, signal?: AbortSignal): Promise<EventoAgendaProps[]> => {
+      try {
+        const { data } = await httpClient.get(`/agenda-nutricionista/id_cli/${id_cli}`, { signal })
+        return (data as CitaApi[]).map(desdeApi)
+      } catch (e) {
+        if (!signal?.aborted) console.log(e)
+        return []
       }
     }
 
@@ -110,9 +145,13 @@ export const useAgendaNutricionistaStore = () => {
 
   return {
     eventos,
+    eventosBuscados,
+    cargandoEventos,
     minutosxcli,
     estados,
     obtenerEventos,
+    buscarCitasCliente,
+    obtenerCitasDeCliente,
     obtenerEstados,
     guardarEvento,
     eliminarEvento,

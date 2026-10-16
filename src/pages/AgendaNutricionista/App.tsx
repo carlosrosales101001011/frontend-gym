@@ -11,7 +11,7 @@ import { normalizeText } from "@/helpers/strings"
 import { useAgendaNutricionistaStore } from "./hook/useAgendaNutricionistaStore"
 import { useAgendaTiempoReal } from "./hook/useAgendaTiempoReal"
 import { initialStateAgendaNutricionista, type EventoAgendaProps } from "./store/agendaNutricionistaSlice"
-import { aFechaISO, aMinutos, ALTO_SLOT, esEventoBloqueado, HORA_FIN_AGENDA, HORA_INICIO_AGENDA, idEstadoInicial, saltarDomingo, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
+import { aFechaISO, aMinutos, ALTO_SLOT, esEventoBloqueado, HORA_FIN_AGENDA, HORA_INICIO_AGENDA, idEstadoInicial, rangoDeVista, saltarDomingo, sumarMinutos, type VistaCalendario } from "./helpers/agendaHelpers"
 import { CalendarioToolbar } from "./components/CalendarioToolbar"
 import { LeyendaEstados } from "./components/LeyendaEstados"
 import { VistaMes } from "./components/VistaMes"
@@ -31,9 +31,16 @@ const MOVER_FECHA: Record<VistaCalendario, (fecha: Date, cantidad: number) => Da
 const MS_APLICAR_BUSQUEDA = 400
 
 export const App = () => {
-  const { eventos, minutosxcli, estados, obtenerEventos, obtenerEstados } = useAgendaNutricionistaStore()
+  const { eventos, eventosBuscados, cargandoEventos, minutosxcli, estados, obtenerEventos, buscarCitasCliente, obtenerEstados } = useAgendaNutricionistaStore()
   const [vista, setVista] = useState<VistaCalendario>('semana')
   const [fecha, setFecha] = useState(new Date())
+  // Solo se piden las citas de lo que se ve (mes, semana o día); se vuelve a pedir al cambiar de vista o de fecha
+  const rango = rangoDeVista(vista, fecha)
+  useEffect(() => {
+    const ctrl = new AbortController()
+    obtenerEventos(rango, ctrl.signal)
+    return () => ctrl.abort()
+  }, [rango.fecha_inicio, rango.fecha_fin])
   // Vista semana: "Ir a la hora" solo desplaza la grilla hasta esa hora (no filtra nada)
   const contenedorScroll = useRef<HTMLDivElement>(null)
   const [horaBuscada, setHoraBuscada] = useState('')
@@ -55,13 +62,11 @@ export const App = () => {
   const [buscandoCliente, setBuscandoCliente] = useState(false)
   const temporizadorBusqueda = useRef<ReturnType<typeof setTimeout>>(undefined)
   useEffect(() => () => clearTimeout(temporizadorBusqueda.current), [])
-  /** Citas cuyo cliente coincide, la de fecha más reciente primero (sin texto: todas) */
-  const citasDelClienteBuscado = (texto: string) => texto
-    ? eventos
-      .filter((evento) => normalizeText(evento.label_cliente ?? '').includes(texto))
-      .sort((a, b) => `${b.fecha} ${b.hora_inicio}`.localeCompare(`${a.fecha} ${a.hora_inicio}`))
-    : eventos
-  const eventosVisibles = citasDelClienteBuscado(textoBuscado)
+  /** Citas del cliente buscado (de cualquier fecha, las trae el backend), la de fecha más reciente primero */
+  const ordenarMasRecientePrimero = (citas: EventoAgendaProps[]) =>
+    [...citas].sort((a, b) => `${b.fecha} ${b.hora_inicio}`.localeCompare(`${a.fecha} ${a.hora_inicio}`))
+  // Buscando: solo las citas del cliente; sin texto: las del rango que se ve
+  const eventosVisibles = textoBuscado ? ordenarMasRecientePrimero(eventosBuscados) : eventos
   // Coincidencia en la que está el calendario (las flechas la mueven); se ajusta si el socket quitó citas
   const [indiceCoincidencia, setIndiceCoincidencia] = useState(0)
   const indiceActual = Math.min(indiceCoincidencia, Math.max(eventosVisibles.length - 1, 0))
@@ -85,13 +90,15 @@ export const App = () => {
     setBusquedaCliente(valor)
     setBuscandoCliente(true)
     clearTimeout(temporizadorBusqueda.current)
-    temporizadorBusqueda.current = setTimeout(() => {
+    temporizadorBusqueda.current = setTimeout(async () => {
       const texto = normalizeText(valor)
+      // Las citas del cliente se piden al backend (todas sus fechas); sin texto se vuelve a las del rango
+      const citas = texto ? await buscarCitasCliente(valor.trim()) : []
       setTextoBuscado(texto)
       setBuscandoCliente(false)
       setIndiceCoincidencia(0)
       // Solo al buscar (no cuando el socket recarga las citas): el calendario va a la cita de fecha más reciente
-      const masReciente = texto && citasDelClienteBuscado(texto)[0]
+      const masReciente = ordenarMasRecientePrimero(citas)[0]
       if (masReciente) irACita(masReciente)
     }, MS_APLICAR_BUSQUEDA)
   }
@@ -102,7 +109,6 @@ export const App = () => {
 
   useEffect(() => {
     obtenerEstados()
-    obtenerEventos()
   }, [])
 
   /** Las citas solo se agendan desde un slot de la vista semana: el slot define fecha y horario */
@@ -128,7 +134,13 @@ export const App = () => {
   }
 
   // Si la cita abierta en el modal fue editada o eliminada (por cualquier usuario), se cierra; solo se avisa si se eliminó
-  useAgendaTiempoReal((cambio) => {
+  // Al cambiar cualquier cita se recarga lo que se ve: el rango y, si se está buscando, las citas del cliente
+  // Sin skeleton: es una recarga en segundo plano y no debe parpadear
+  const recargarAgenda = () => {
+    obtenerEventos(rango, undefined, false)
+    if (textoBuscado) buscarCitasCliente(busquedaCliente.trim(), false)
+  }
+  useAgendaTiempoReal(recargarAgenda, (cambio) => {
     if (cambio.accion === 'crear') return
     if (!modalEvento.show || modalEvento.evento.id !== cambio.id) return
     onCerrarModal()
@@ -204,6 +216,7 @@ export const App = () => {
           <VistaMes
             fecha={fecha}
             eventos={eventosVisibles}
+            cargando={cargandoEventos}
             onSeleccionarDia={onVerSemana}
             onSeleccionarEvento={onAbrirEvento}
             onVerDia={onVerDia}
@@ -214,6 +227,7 @@ export const App = () => {
           <VistaSemana
             fecha={fecha}
             eventos={eventosVisibles}
+            cargando={cargandoEventos}
             minutosxcli={minutosxcli}
             onSeleccionarSlot={onAgendarSlot}
             onSeleccionarEvento={onAbrirEvento}
@@ -222,7 +236,7 @@ export const App = () => {
           />
         )}
         {vista === 'dia' && (
-          <VistaDia fecha={fecha} eventos={eventosVisibles} onSeleccionarEvento={onAbrirEvento} idResaltado={idResaltado} />
+          <VistaDia fecha={fecha} eventos={eventosVisibles} cargando={cargandoEventos} onSeleccionarEvento={onAbrirEvento} idResaltado={idResaltado} />
         )}
         </div>
       </div>

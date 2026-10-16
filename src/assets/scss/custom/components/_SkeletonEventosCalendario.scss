@@ -1,0 +1,26 @@
+// SkeletonEventosCalendario (components/Calendario): eventos en gris mientras carga el calendario
+
+// Vista semana: bloque suelto dentro de la columna del día (igual que un evento)
+.skeleton-eventos-calendario__bloque {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  border-radius: 6px;
+}
+
+// Vista mes: barritas debajo del número del día
+.skeleton-eventos-calendario__mes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+// Vista día: misma forma que una fila de evento
+.skeleton-eventos-calendario__fila {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 10px;
+}

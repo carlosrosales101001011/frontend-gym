@@ -142,6 +142,19 @@ export const diasDeLaSemana = (fecha: Date) => {
   return Array.from({ length: DIAS_VISIBLES }, (_, i) => addDays(inicio, i))
 }
 
+/** Rango de fechas (yyyy-MM-dd) cuyas citas se piden al backend */
+export type RangoAgenda = { fecha_inicio: string, fecha_fin: string }
+
+/** Lo que se ve en cada vista: el mes (del 1 al último día), la semana (lunes a sábado) o el día */
+export const rangoDeVista = (vista: VistaCalendario, fecha: Date): RangoAgenda => {
+  if (vista === 'mes') return { fecha_inicio: aFechaISO(startOfMonth(fecha)), fecha_fin: aFechaISO(endOfMonth(fecha)) }
+  if (vista === 'semana') {
+    const dias = diasDeLaSemana(fecha)
+    return { fecha_inicio: aFechaISO(dias[0]), fecha_fin: aFechaISO(dias[dias.length - 1]) }
+  }
+  return { fecha_inicio: aFechaISO(fecha), fecha_fin: aFechaISO(fecha) }
+}
+
 const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1)
 
 export const tituloVista = (vista: VistaCalendario, fecha: Date) => {

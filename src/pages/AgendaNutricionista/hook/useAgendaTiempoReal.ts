@@ -1,24 +1,23 @@
 import { useEffect, useEffectEvent } from 'react'
 import { crearSocket } from '@/common/helpers/socketClient'
-import { useAgendaNutricionistaStore } from './useAgendaNutricionistaStore'
 
 /** Aviso del backend cuando cualquier usuario crea, edita o elimina una cita */
 export type CambioAgenda = { accion: 'crear' | 'editar' | 'eliminar', id: number }
 
 /**
  * Mientras la agenda está abierta escucha los cambios de citas (de cualquier usuario, incluido uno mismo),
- * recarga el calendario y llama a onCambio para que la pantalla reaccione (ej. cerrar el modal).
+ * llama a recargar (las citas que la pantalla esté mostrando: su rango y, si hay, la búsqueda) y a onCambio
+ * para que la pantalla reaccione (ej. cerrar el modal).
  */
-export const useAgendaTiempoReal = (onCambio: (cambio: CambioAgenda) => void) => {
-  const { obtenerEventos } = useAgendaNutricionistaStore()
-  // useEffectEvent: el socket se crea una sola vez, pero siempre llama a la versión actual de onCambio
+export const useAgendaTiempoReal = (recargar: () => void, onCambio: (cambio: CambioAgenda) => void) => {
+  // useEffectEvent: el socket se crea una sola vez, pero siempre llama a la versión actual de recargar y onCambio
   const alCambiar = useEffectEvent((cambio: CambioAgenda) => {
-    obtenerEventos()
+    recargar()
     onCambio(cambio)
   })
   // Lo que se perdió mientras no había conexión
   const alReconectar = useEffectEvent(() => {
-    obtenerEventos()
+    recargar()
   })
 
   useEffect(() => {

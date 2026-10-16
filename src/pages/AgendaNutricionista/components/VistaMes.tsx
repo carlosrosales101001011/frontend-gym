@@ -4,6 +4,7 @@ import { diasDelMes, diasDeLaSemana, eventosDelDia } from '../helpers/agendaHelp
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 import { EventoChip } from './EventoChip'
 import { es } from 'date-fns/locale'
+import { SkeletonEventosCalendario } from '@/components/Calendario/SkeletonEventosCalendario'
 
 /** Cantidad de eventos visibles por celda; el resto se ve en la vista día */
 const MAX_EVENTOS_POR_DIA = 3
@@ -11,6 +12,8 @@ const MAX_EVENTOS_POR_DIA = 3
 type VistaMesProps = {
   fecha: Date
   eventos: EventoAgendaProps[]
+  /** Mientras se piden las citas: skeleton en lugar de los eventos y no se puede ir a agendar */
+  cargando?: boolean
   /** Click en la celda del día (ej: ir a la semana para agendar) */
   onSeleccionarDia: (dia: Date) => void
   onSeleccionarEvento: (evento: EventoAgendaProps) => void
@@ -19,7 +22,7 @@ type VistaMesProps = {
   idResaltado?: number
 }
 
-export const VistaMes = ({ fecha, eventos, onSeleccionarDia, onSeleccionarEvento, onVerDia, idResaltado }: VistaMesProps) => {
+export const VistaMes = ({ fecha, eventos, cargando = false, onSeleccionarDia, onSeleccionarEvento, onVerDia, idResaltado }: VistaMesProps) => {
   return (
     <div className="agenda__mes">
       {diasDeLaSemana(fecha).map((dia) => (
@@ -27,7 +30,7 @@ export const VistaMes = ({ fecha, eventos, onSeleccionarDia, onSeleccionarEvento
           {format(dia, 'EEEE', { locale: es })}
         </div>
       ))}
-      {diasDelMes(fecha).map((dia) => {
+      {diasDelMes(fecha).map((dia, indiceDia) => {
         const eventosDia = eventosDelDia(eventos, dia)
         const ocultos = eventosDia.length - MAX_EVENTOS_POR_DIA
         return (
@@ -37,8 +40,8 @@ export const VistaMes = ({ fecha, eventos, onSeleccionarDia, onSeleccionarEvento
               'agenda__mes-dia--fuera': !isSameMonth(dia, fecha),
               'agenda__mes-dia--hoy': isToday(dia),
             })}
-            onClick={() => onSeleccionarDia(dia)}
-            title="Click para agendar en la semana de este día"
+            onClick={() => { if (!cargando) onSeleccionarDia(dia) }}
+            title={cargando ? 'Cargando citas…' : 'Click para agendar en la semana de este día'}
           >
             <button
               type="button"
@@ -48,10 +51,12 @@ export const VistaMes = ({ fecha, eventos, onSeleccionarDia, onSeleccionarEvento
             >
               {format(dia, 'd')}
             </button>
-            {eventosDia.slice(0, MAX_EVENTOS_POR_DIA).map((evento) => (
+            {/* Solo los días del mes tienen citas (el rango pedido es el mes) */}
+            {cargando && isSameMonth(dia, fecha) && <SkeletonEventosCalendario variante="mes" indice={indiceDia} />}
+            {!cargando && eventosDia.slice(0, MAX_EVENTOS_POR_DIA).map((evento) => (
               <EventoChip key={evento.id} evento={evento} onClick={onSeleccionarEvento} resaltado={evento.id === idResaltado} />
             ))}
-            {ocultos > 0 && (
+            {!cargando && ocultos > 0 && (
               <button
                 type="button"
                 className="agenda__ver-mas"

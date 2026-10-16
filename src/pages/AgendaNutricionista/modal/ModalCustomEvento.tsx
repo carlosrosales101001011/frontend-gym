@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import ModalCR from '@/components/Modal/ModalCR'
 import { ButtonCR } from '@/components/Button/ButtonCR'
@@ -39,7 +39,7 @@ type ModalCustomEventoProps = {
 }
 
 export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoProps) => {
-  const { eventos, estados, guardarEvento, eliminarEvento } = useAgendaNutricionistaStore()
+  const { eventos, estados, guardarEvento, eliminarEvento, obtenerCitasDeCliente } = useAgendaNutricionistaStore()
   const { register, formState: { errors }, handleSubmit, setError } = useForm<EventoAgendaProps>({ mode: 'onChange', defaultValues: evento })
   const [cliente, setCliente] = useState(() => aPersona(evento.id_cli, evento.label_cliente))
   const [nutricionista, setNutricionista] = useState(() => aPersona(evento.id_nutricionista, evento.label_nutricionista))
@@ -48,6 +48,17 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
     DURACIONES_CITA.some((d) => d.value === duracionEvento(evento)) ? duracionEvento(evento) : DURACION_CITA_DEFAULT)
   const horaFin = sumarMinutos(evento.hora_inicio, duracion)
   const esEdicion = evento.id !== 0
+
+  // Historial: todas las citas del cliente elegido (de cualquier fecha), pedidas al backend
+  const [citasCliente, setCitasCliente] = useState<EventoAgendaProps[]>([])
+  useEffect(() => {
+    if (!cliente?.id) return
+    const ctrl = new AbortController()
+    obtenerCitasDeCliente(cliente.id, ctrl.signal).then((citas) => {
+      if (!ctrl.signal.aborted) setCitasCliente(citas)
+    })
+    return () => ctrl.abort()
+  }, [cliente?.id])
 
   const onSubmit = async (data: EventoAgendaProps) => {
     const valores: EventoAgendaProps = {
@@ -138,7 +149,7 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
             </Col>
             {/* Columna 2: citas del cliente, se activa al seleccionar un cliente */}
             <Col lg={6}>
-              <HistorialCitasCliente eventos={eventos} id_cli={cliente?.id} idEvento={evento.id} />
+              <HistorialCitasCliente eventos={citasCliente} id_cli={cliente?.id} idEvento={evento.id} />
             </Col>
           </Row>
           <div className="d-flex align-items-center mt-2">

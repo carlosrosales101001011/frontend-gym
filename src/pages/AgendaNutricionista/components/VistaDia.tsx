@@ -1,5 +1,6 @@
 import classNames from 'classnames'
 import IconCR from '@/components/Icons/IconCR'
+import { SkeletonEventosCalendario } from '@/components/Calendario/SkeletonEventosCalendario'
 import { useAppSelector } from '@/stores/Store'
 import { duracionEvento, esEventoBloqueado, eventosDelDia, obtenerEstado, TEXTO_EVENTO_BLOQUEADO } from '../helpers/agendaHelpers'
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
@@ -7,15 +8,19 @@ import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 type VistaDiaProps = {
   fecha: Date
   eventos: EventoAgendaProps[]
+  /** Mientras se piden las citas: skeleton en lugar de la lista */
+  cargando?: boolean
   onSeleccionarEvento: (evento: EventoAgendaProps) => void
   /** Cita con borde brillante (coincidencia actual del buscador) */
   idResaltado?: number
 }
 
 /** Lista de los eventos del día ordenados por hora */
-export const VistaDia = ({ fecha, eventos, onSeleccionarEvento, idResaltado }: VistaDiaProps) => {
+export const VistaDia = ({ fecha, eventos, cargando = false, onSeleccionarEvento, idResaltado }: VistaDiaProps) => {
   const { estados } = useAppSelector((state) => state.AGENDA_NUTRICIONISTA)
   const eventosDia = eventosDelDia(eventos, fecha)
+
+  if (cargando) return <SkeletonEventosCalendario variante="dia" />
 
   if (eventosDia.length === 0) {
     return <div className="text-center py-5">No hay eventos para este día</div>

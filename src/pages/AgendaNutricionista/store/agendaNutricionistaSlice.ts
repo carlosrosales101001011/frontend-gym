@@ -16,7 +16,12 @@ export type EventoAgendaProps = {
   label_nutricionista?: string,
 };
 export type AgendaNutricionistaState={
+    /** Citas del rango que se ve en el calendario */
     eventos: EventoAgendaProps[],
+    /** Citas (de cualquier fecha) del cliente buscado en el buscador de la agenda */
+    eventosBuscados: EventoAgendaProps[],
+    /** true mientras se piden citas (el calendario muestra el skeleton de eventos) */
+    cargandoEventos: boolean,
     evento: EventoAgendaProps,
     /** Duración de cada cita en minutos: la vista semana se divide en slots de este tamaño */
     minutosxcli: number
@@ -36,6 +41,8 @@ const initialEvento: EventoAgendaProps = {
 export const initialStateAgendaNutricionista: AgendaNutricionistaState = {
   evento: initialEvento,
   eventos: [],
+  eventosBuscados: [],
+  cargandoEventos: false,
   minutosxcli: 10,
   estados: [],
 };
@@ -47,6 +54,12 @@ export const agendaNutricionistaSlice = createSlice({
     onSetDataEventos: (state, action: PayloadAction<EventoAgendaProps[]>)=>{
       state.eventos = action.payload;
     },
+    onSetEventosBuscados: (state, action: PayloadAction<EventoAgendaProps[]>)=>{
+      state.eventosBuscados = action.payload;
+    },
+    onSetCargandoEventos: (state, action: PayloadAction<boolean>)=>{
+      state.cargandoEventos = action.payload;
+    },
     onSetEstadosCita: (state, action: PayloadAction<EstadoEvento[]>)=>{
       state.estados = action.payload;
     },
@@ -54,4 +67,4 @@ export const agendaNutricionistaSlice = createSlice({
 });
 
 
-export const { onSetDataEventos, onSetEstadosCita } = agendaNutricionistaSlice.actions;
+export const { onSetDataEventos, onSetEventosBuscados, onSetCargandoEventos, onSetEstadosCita } = agendaNutricionistaSlice.actions;

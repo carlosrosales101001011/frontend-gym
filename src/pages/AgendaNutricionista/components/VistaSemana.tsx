@@ -13,6 +13,7 @@ import {
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 import { EventoChip } from './EventoChip'
 import { LineaHoraActual } from './LineaHoraActual'
+import { SkeletonEventosCalendario } from '@/components/Calendario/SkeletonEventosCalendario'
 
 /** Mantener presionada una flecha: cada cuánto vuelve a desplazar */
 const REPETIR_DESPLAZAMIENTO_MS = 250
@@ -20,6 +21,8 @@ const REPETIR_DESPLAZAMIENTO_MS = 250
 type VistaSemanaProps = {
   fecha: Date
   eventos: EventoAgendaProps[]
+  /** Mientras se piden las citas: skeleton en lugar de los eventos y no se puede agendar */
+  cargando?: boolean
   /** Duración de cada cita: la grilla se divide en slots de este tamaño */
   minutosxcli: number
   /** Click en un slot libre: día y hora de inicio ("HH:mm") de la cita */
@@ -30,7 +33,7 @@ type VistaSemanaProps = {
   idResaltado?: number
 }
 
-export const VistaSemana = ({ fecha, eventos, minutosxcli, onSeleccionarSlot, onSeleccionarEvento, onVerDia, idResaltado }: VistaSemanaProps) => {
+export const VistaSemana = ({ fecha, eventos, cargando = false, minutosxcli, onSeleccionarSlot, onSeleccionarEvento, onVerDia, idResaltado }: VistaSemanaProps) => {
   const dias = diasDeLaSemana(fecha)
   const slots = slotsDelDia(minutosxcli)
 
@@ -93,22 +96,23 @@ export const VistaSemana = ({ fecha, eventos, minutosxcli, onSeleccionarSlot, on
           </div>
         ))}
       </div>
-      {dias.map((dia) => (
+      {dias.map((dia, indiceDia) => (
         <div key={dia.toISOString()} className={classNames('agenda__semana-columna', { 'agenda__semana-columna--hoy': isToday(dia) })}>
           {slots.map((hora) => (
             <div
               key={hora}
               className={classNames('agenda__semana-slot', { 'agenda__semana-slot--hora': hora.endsWith(':00') })}
               style={{ height: ALTO_SLOT }}
-              onClick={() => onSeleccionarSlot(dia, hora)}
-              title={`Agendar cita a las ${hora}`}
+              onClick={() => { if (!cargando) onSeleccionarSlot(dia, hora) }}
+              title={cargando ? 'Cargando citas…' : `Agendar cita a las ${hora}`}
             >
               {hora}
             </div>
           ))}
           {isToday(dia) && <LineaHoraActual minutosxcli={minutosxcli} />}
+          {cargando && <SkeletonEventosCalendario variante="semana" altoColumna={slots.length * ALTO_SLOT} indice={indiceDia} />}
           {/* Los slots ocupados quedan tapados por su evento (que abre la edición) */}
-          {eventosDelDia(eventos, dia).map((evento) => (
+          {!cargando && eventosDelDia(eventos, dia).map((evento) => (
             <EventoChip
               key={evento.id}
               evento={evento}
