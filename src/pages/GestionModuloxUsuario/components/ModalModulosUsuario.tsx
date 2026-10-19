@@ -12,6 +12,7 @@ import { useModulosUsuario, type ModuloAsignado, type OpcionUsuario } from '../h
 import type { ModuloProps, ModuloUsuarioProps, SeccionProps } from '../store/modulosUsuarioSlice'
 import { ListaSecciones } from './ListaSecciones'
 import { ChecklistSecciones } from './ChecklistSecciones'
+import { useSesionStore } from '@/hook/useSesionStore'
 
 type Columna = 'mios' | 'usuario'
 
@@ -19,6 +20,8 @@ type ModalModulosUsuarioProps = {
   /** Usuario a editar; 0 = Agregar (se elige en el select) */
   idUsuario: number
   onHide: () => void
+  /** Después de guardar (antes de cerrar): para refrescar la tabla de quien lo abrió */
+  onGuardado: () => Promise<unknown> | void
 }
 
 /** Para comparar si hubo cambios: mismo orden siempre (módulos y secciones) */
@@ -32,8 +35,9 @@ const firma = (modulos: ModuloAsignado[]) =>
  * derecha los del usuario. Se pasan arrastrando o con las flechas; en los del usuario se marca fijado y
  * favorito. Nada se guarda hasta "Guardar". Se monta al abrirse (ver App): arranca limpio cada vez.
  */
-export const ModalModulosUsuario = ({ idUsuario, onHide }: ModalModulosUsuarioProps) => {
+export const ModalModulosUsuario = ({ idUsuario, onHide, onGuardado }: ModalModulosUsuarioProps) => {
   const { obtenerOpcionesUsuarios, obtenerModulosDisponibles, obtenerModulosDeUsuario, guardarModulos } = useModulosUsuario()
+  const { usuario: usuarioSesion } = useSesionStore()
   const esEdicion = idUsuario > 0
   const [usuarioId, setUsuarioId] = useState(idUsuario)
   const [opciones, setOpciones] = useState<OpcionUsuario[]>([])
@@ -96,6 +100,8 @@ export const ModalModulosUsuario = ({ idUsuario, onHide }: ModalModulosUsuarioPr
   const mios = (disponibles ?? []).filter((m) => !idsAsignados.has(m.id))
   const hayCambios = firma(asignados) !== firma(inicial)
   const usuarioEditado = opciones.find((u) => u.id === usuarioId)
+  // Super usuario asignándose módulos a sí mismo
+  const esPropio = !!usuarioId && usuarioId === usuarioSesion?.id
 
   /** Cambia el usuario del select: lo armado para el anterior se descarta y se cargan los módulos del nuevo */
   const elegirUsuario = (id: number) => {
@@ -164,6 +170,7 @@ export const ModalModulosUsuario = ({ idUsuario, onHide }: ModalModulosUsuarioPr
     if (!usuarioId) return
     setGuardando(true)
     const guardado = await guardarModulos(usuarioId, asignados)
+    if (guardado) await onGuardado()
     setGuardando(false)
     if (guardado) onHide()
   }
@@ -173,7 +180,7 @@ export const ModalModulosUsuario = ({ idUsuario, onHide }: ModalModulosUsuarioPr
   return (
     <ModalCR onHide={onHide} show size="lg" position="center">
       <ModalCR.Header>
-        <ModalCR.Title>{esEdicion ? 'Editar módulos del usuario' : 'Asignar módulos a un usuario'}</ModalCR.Title>
+        <ModalCR.Title>{esPropio ? 'Mis módulos' : esEdicion ? 'Editar módulos del usuario' : 'Asignar módulos a un usuario'}</ModalCR.Title>
       </ModalCR.Header>
       <ModalCR.Body>
         <div className="position-relative" style={{ minHeight: 160 }}>
@@ -198,8 +205,8 @@ export const ModalModulosUsuario = ({ idUsuario, onHide }: ModalModulosUsuarioPr
               )}
 
               <div className={`modulos-usuario__columnas ${!usuarioId ? 'modulos-usuario__columnas--inactivas' : ''}`}>
-                <ColumnaAsignacion titulo="Mis módulos" total={mios.length} {...zona('mios')}
-                  vacio={!usuarioId ? 'Elige un usuario para asignarle módulos' : 'Ya le pasaste todos tus módulos'}>
+                <ColumnaAsignacion titulo={esPropio ? 'Módulos disponibles' : 'Mis módulos'} total={mios.length} {...zona('mios')}
+                  vacio={!usuarioId ? 'Elige un usuario para asignarle módulos' : esPropio ? 'Ya tienes todos los módulos' : 'Ya le pasaste todos tus módulos'}>
                   {mios.map((modulo) => (
                     <TarjetaAsignable key={modulo.id} icono={modulo.icono} label={modulo.label} descripcion={modulo.descripcion}
                       {...arrastre(modulo.id, 'mios')}
@@ -213,8 +220,9 @@ export const ModalModulosUsuario = ({ idUsuario, onHide }: ModalModulosUsuarioPr
                   ))}
                 </ColumnaAsignacion>
 
-                <ColumnaAsignacion titulo="Módulos del usuario" total={asignados.length + ajenos.length}
-                  cargando={cargandoUsuario} {...zona('usuario')} vacio="Arrastra aquí los módulos que tendrá el usuario">
+                <ColumnaAsignacion titulo={esPropio ? 'Tus módulos' : 'Módulos del usuario'} total={asignados.length + ajenos.length}
+                  cargando={cargandoUsuario} {...zona('usuario')}
+                  vacio={esPropio ? 'Arrastra aquí los módulos que tendrás' : 'Arrastra aquí los módulos que tendrá el usuario'}>
                   {asignados.map(({ id_modulo, is_fijado, is_favorito }) => {
                     const modulo = moduloPorId.get(id_modulo)
                     if (!modulo) return null

@@ -70,9 +70,10 @@ export const ProtectedRoutes = () => {
     return <Navigate to={primeraSeccion} replace />;
   }
 
-  // Sección marcada en mantenimiento: se muestra el aviso en lugar de la página
+  // Sección marcada en mantenimiento: en producción se muestra el aviso en lugar de la página;
+  // en local (npm run dev) siempre se ve la página, para poder trabajarla
   const seccionActual = secciones.find((s) => s.seccion.url.replace(/^\//, '') === urlSeccion);
-  const enMantenimiento = seccionActual?.seccion.is_seccion_mantenimiento ? seccionActual.seccion.label : null;
+  const enMantenimiento = import.meta.env.PROD && seccionActual?.seccion.is_seccion_mantenimiento ? seccionActual.seccion.label : null;
 
   return <VerticalLayout misSecciones={secciones} seccionEnMantenimiento={enMantenimiento} />;
 }

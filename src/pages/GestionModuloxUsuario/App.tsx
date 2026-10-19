@@ -33,7 +33,7 @@ export const App = () => {
   return (
     <div>
       <PageBreadCumb title="Módulos por usuario" />
-      {idUsuarioModal !== null && <ModalModulosUsuario idUsuario={idUsuarioModal} onHide={() => setIdUsuarioModal(null)} />}
+      {idUsuarioModal !== null && <ModalModulosUsuario idUsuario={idUsuarioModal} onHide={() => setIdUsuarioModal(null)} onGuardado={() => searcher()} />}
       <DataTableModulosUsuario
         onEditar={setIdUsuarioModal}
         otrosBotones={<ButtonCR label="Agregar" onClick={() => setIdUsuarioModal(0)} icon={<IconCR name="plus" size={14} />} />}

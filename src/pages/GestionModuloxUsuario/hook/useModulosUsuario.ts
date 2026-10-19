@@ -40,11 +40,10 @@ export const useModulosUsuario = () => {
     return data
   }
 
-  /** Deja al usuario con estos módulos y refresca la tabla. Devuelve true si se guardó */
+  /** Deja al usuario con estos módulos (quien abrió el modal refresca su tabla). Devuelve true si se guardó */
   const guardarModulos = async (idUsuario: number, modulos: ModuloAsignado[]) => {
     try {
       await httpClient.put(`/modulo-x-user/usuario/${idUsuario}`, { modulos })
-      await searcher()
       await Swal.fire({ icon: 'success', title: 'Módulos guardados', timer: 1500, showConfirmButton: false })
       return true
     } catch (e) {

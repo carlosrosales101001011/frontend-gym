@@ -53,6 +53,7 @@ const GestionPlanesEntrenamiento = lazy(() => import('@/pages/GestionPlanesEntre
 const GestionMetas = lazy(() => import('@/pages/GestionMeta'));
 const ReporteMetas = lazy(() => import('@/pages/ReporteMeta'));
 const ReporteVentas = lazy(() => import('@/pages/ReporteVentas'));
+const ReporteCitasNutricion = lazy(() => import('@/pages/ReporteCitasNutricion'));
 const ModulosxUsuario = lazy(() => import('@/pages/GestionModuloxUsuario'));
 const GestionAsistencias = lazy(() => import('@/pages/GestionAsistencias'));
 const ReporteAsistenciasClientes = lazy(() => import('@/pages/ReporteAsistenciaClientes'));
@@ -99,6 +100,7 @@ export const AppRoutes = () => {
             <Route path="gestion-metas" element={<GestionMetas/>}/>
             <Route path="reporte-metas" element={<ReporteMetas/>}/>
             <Route path="reporte-ventas" element={<ReporteVentas/>}/>
+            <Route path="reporte-citas-nutricion" element={<ReporteCitasNutricion/>}/>
             <Route path="modulo-x-user" element={<ModulosxUsuario/>}/>
             <Route path="asistencia" element={<GestionAsistencias/>}/>
             <Route path="reporte-asistencia-clientes" element={<ReporteAsistenciasClientes/>}/>

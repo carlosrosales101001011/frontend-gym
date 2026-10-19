@@ -1,13 +1,17 @@
+import { useMemo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { DataTableSimple2, type ColumnaSimple2 } from '@/components/DataTableSimple/DataTableSimple2'
 import type { SeguimientoMembresiaProps } from './store/seguimientoMembresiaSlice'
 import { formatDate } from '@/helpers/FormatDate'
-import { diaEnCurso, diasVencidos, sesionesDisponibles } from '@/helpers/diasMembresia'
+import { diasVencidos, sesionesDisponibles } from '@/helpers/diasMembresia'
+import { extensionEnCurso } from './helpers/seguimiento'
 
 type Props = {
     data: SeguimientoMembresiaProps[]
     /** activo: muestra sesiones disponibles; inactivo: muestra dias vencidos */
     tipo: 'activo' | 'inactivo'
+    /** Filas que quedan tras el buscador y el orden (para exportarlas) */
+    onFilasVisibles?: (rows: SeguimientoMembresiaProps[]) => void
 }
 
 /** Resalta la fila según la extensión en curso hoy: congelamiento (azul hielo) o regalo (rojo) */
@@ -16,21 +20,31 @@ const claseFila = (row: SeguimientoMembresiaProps) =>
 
 /** "Está en congelamiento: 3/10 días" (o regalo) debajo del vencimiento; nada si no hay extensión en curso */
 const ExtensionEnCurso = ({ row }: { row: SeguimientoMembresiaProps }) => {
-    if (!(row.es_congelado || row.es_regalo) || !row.fecha_inicio_extension_actual || !row.dias_extension_actual) return null
-    const total = row.dias_extension_actual
-    // Un regalo termina el día después de su último día: no pasar del total
-    const dia = Math.min(Math.max(diaEnCurso(row.fecha_inicio_extension_actual), 1), total)
+    const extension = extensionEnCurso(row)
+    if (!extension) return null
+    const { tipo, dia, total } = extension
     return (
         <div style={{ fontSize: '12px' }}>
-            Está en {row.es_congelado ? 'congelamiento' : 'regalo'}: <span className='fw-bold'>{dia}/{total}</span> {total === 1 ? 'día' : 'días'}
+            Está en {tipo}: <span className='fw-bold'>{dia}/{total}</span> {total === 1 ? 'día' : 'días'}
         </div>
     )
 }
 
-export const DataTableSeguimiento = ({ data, tipo }: Props) => {
+/** "Programa, plan" de la membresía ('' si la venta no los tiene) */
+// const programaPlan = (row: SeguimientoMembresiaProps) =>
+//     [row.label_programa?.trim(), row.n_plan?.trim()].filter(Boolean).join(<br />)
+
+/** Programa y plan arriba de los días; nada si la venta no los tiene */
+const ProgramaPlan = ({ row }: { row: SeguimientoMembresiaProps }) => {
+    const texto = row.label_programa?.trim()
+    return texto ? <div className='fw-semibold' style={{ fontSize: '14px' }}>{row.label_programa?.trim()} <br/> {row.n_plan?.trim()}</div> : 'POR DEFINIR'
+}
+
+export const DataTableSeguimiento = ({ data, tipo, onFilasVisibles }: Props) => {
     const location = useLocation()
     const [, uid_modulo] = location.pathname.split('/')
-    const columns: ColumnaSimple2<SeguimientoMembresiaProps>[] = [
+    // Memorizadas: si cambiaran en cada render, la tabla avisaría filas nuevas sin parar (onFilasVisibles)
+    const columns = useMemo<ColumnaSimple2<SeguimientoMembresiaProps>[]>(() => [
         {
             id: 0,
             header: 'Cliente',
@@ -54,16 +68,26 @@ export const DataTableSeguimiento = ({ data, tipo }: Props) => {
             ? {
                 id: 1,
                 header: <div className='' style={{width: '140px'}}>Días por vencer</div>,
-                render: (row) => <div className=''><span className='fs-4'>{sesionesDisponibles(row.fecha_vencimiento)}</span> {sesionesDisponibles(row.fecha_vencimiento)===1?'día':'días'}</div>,
+                render: (row) => (
+                    <>
+                        <ProgramaPlan row={row} />
+                        <div className=''><span className='fs-4'>{sesionesDisponibles(row.fecha_vencimiento)}</span> {sesionesDisponibles(row.fecha_vencimiento)===1?'día':'días'}</div>
+                    </>
+                ),
                 sortValue: (row) => sesionesDisponibles(row.fecha_vencimiento),
-                searchValue: (row) => String(sesionesDisponibles(row.fecha_vencimiento)),
+                searchValue: (row) => `${sesionesDisponibles(row.fecha_vencimiento)} ${row.label_programa?.trim()} ${row.n_plan?.trim()}`,
             }
             : {
                 id: 1,
                 header: 'Dias vencidos',
-                render: (row) =><div className=''><span className='fs-4'>{-diasVencidos(row.fecha_vencimiento)}</span> {diasVencidos(row.fecha_vencimiento)==1?'día':'días'}</div>,
+                render: (row) => (
+                    <>
+                        <ProgramaPlan row={row} />
+                        <div className=''><span className='fs-4'>{-diasVencidos(row.fecha_vencimiento)}</span> {diasVencidos(row.fecha_vencimiento)==1?'día':'días'}</div>
+                    </>
+                ),
                 sortValue: (row) => -diasVencidos(row.fecha_vencimiento),
-                searchValue: (row) => String(-diasVencidos(row.fecha_vencimiento)),
+                searchValue: (row) => `${-diasVencidos(row.fecha_vencimiento)} ${row.label_programa?.trim()} ${row.n_plan?.trim()}`,
             },
         {
             id: 2,
@@ -76,10 +100,11 @@ export const DataTableSeguimiento = ({ data, tipo }: Props) => {
             ),
             searchValue: (row) => formatDate(row.fecha_vencimiento, 'yyyy-mm-dd', 'DDDD dd [de] MMMM [del] yyyy'),
         },
-    ]
+    ], [tipo, uid_modulo])
     return (
         <div>
-            <DataTableSimple2 columns={columns} data={data} rowClassName={claseFila} defaultSort={{ id: 1, dir: tipo === 'activo' ? 'asc' : 'desc' }} />
+            <DataTableSimple2 columns={columns} data={data} rowClassName={claseFila} defaultSort={{ id: 1, dir: tipo === 'activo' ? 'asc' : 'desc' }}
+                onFilasVisibles={onFilasVisibles} />
         </div>
     )
 }

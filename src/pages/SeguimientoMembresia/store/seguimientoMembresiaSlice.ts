@@ -24,6 +24,12 @@ export type SeguimientoMembresiaProps = {
   dias_extension_actual?: number | null;
   sesiones_pendientes: string;
   fecha_vencimiento: string;
+  /** Programa y plan de la membresía vendida (0 / '' si la venta no los tiene) */
+  id_programa?: number;
+  label_programa?: string;
+  id_plan?: number;
+  /** Nombre del plan, ej. "3 Meses" */
+  n_plan?: string;
 };
 export type SeccionesState={
     SeguimientoMembresias:SeguimientoMembresiaProps[],

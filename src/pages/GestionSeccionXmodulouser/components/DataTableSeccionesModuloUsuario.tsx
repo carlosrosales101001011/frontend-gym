@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import IconCR, { type IconName } from '@/components/Icons/IconCR'
 import { DataTableTest } from '@/components/DataTableTest/DataTableTest'
 import { useAppSelector } from '@/stores/Store'
@@ -6,10 +7,12 @@ import type { UsuarioModulosProps } from '@/pages/GestionModuloxUsuario/store/mo
 type DataTableSeccionesModuloUsuarioProps = {
   /** Abre el modal de secciones del módulo del usuario (id de modulo_x_user) */
   onAbrirModulo: (idModuloUser: number) => void
+  /** Botones junto al buscador */
+  otrosBotones?: ReactNode
 }
 
 /** Usuarios que administra quien está logueado; el ícono de cada módulo abre sus secciones */
-export const DataTableSeccionesModuloUsuario = ({ onAbrirModulo }: DataTableSeccionesModuloUsuarioProps) => {
+export const DataTableSeccionesModuloUsuario = ({ onAbrirModulo, otrosBotones }: DataTableSeccionesModuloUsuarioProps) => {
   const { usuarios } = useAppSelector((state) => state.SECCIONXMODULOUSER)
 
   const columns = [
@@ -56,6 +59,7 @@ export const DataTableSeccionesModuloUsuario = ({ onAbrirModulo }: DataTableSecc
       mostrarFlechas
       classNameTablePagination="sticky-bottom-1"
       classNameToolBar="sticky-top-1"
+      otrosBotones={otrosBotones}
       data={usuarios}
       columns={columns}
     />

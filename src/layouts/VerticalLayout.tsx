@@ -1,5 +1,5 @@
 import { Topbar } from '@/components/TopBar/Topbar'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import LeftSidebar from '@/layouts/LeftSidebar'
 import {  useState } from 'react'
 import { type SeccionType } from '@/routes/hook/useUserModuloStore'
@@ -33,7 +33,7 @@ export const VerticalLayout = ({misSecciones, seccionEnMantenimiento}:Props) => 
         )}
         <div className={`principal-view ${isOpenSideBar.isOpen ? 'shift' : ''}`}>
             <Topbar onOpenSideBar={onOpenSideBar} isOpenSideBar={isOpenSideBar.isOpen}/>
-                {seccionEnMantenimiento ? <SeccionMantenimiento nombre={seccionEnMantenimiento} /> : <Outlet/>}
+                {(seccionEnMantenimiento) ? <SeccionMantenimiento nombre={seccionEnMantenimiento} /> : <Outlet/>}
         </div>
     </div>
   )

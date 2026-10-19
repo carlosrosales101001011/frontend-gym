@@ -30,6 +30,8 @@ type Props<T> = {
   rowClassName?: (row: T) => string | undefined;
   /** Orden inicial (la columna debe tener sortValue); sin él, la data va en el orden recibido */
   defaultSort?: { id: number | string; dir: 'asc' | 'desc' };
+  /** Avisa las filas que quedan tras el buscador y el orden (todas las páginas), ej. para exportarlas */
+  onFilasVisibles?: (rows: T[]) => void;
 };
 
 type SortState = { id: number | string; dir: 'asc' | 'desc' } | null;
@@ -43,7 +45,7 @@ const getColumnLabel = <T,>(column: ColumnaSimple2<T>): ReactNode =>
  * A diferencia de DataTableTest, todo el estado es local (no usa la URL ni Redux),
  * así que se pueden tener varias en la misma página sin que se pisen.
  */
-export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostrarBuscador = true, mostrarTamanoPagina = true, mostrarPaginacion = true, rowClassName, defaultSort }: Props<T>) {
+export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostrarBuscador = true, mostrarTamanoPagina = true, mostrarPaginacion = true, rowClassName, defaultSort, onFilasVisibles }: Props<T>) {
   const [search, setSearch] = useState('');
   const [searchColumns, setSearchColumns] = useState<Set<number | string>>(() => new Set());
   const [sort, setSort] = useState<SortState>(defaultSort ?? null);
@@ -72,6 +74,10 @@ export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostr
       return String(va).localeCompare(String(vb)) * factor;
     });
   }, [filtered, sort, columns]);
+
+  useEffect(() => {
+    onFilasVisibles?.(sorted);
+  }, [sorted, onFilasVisibles]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
   const currentPage = Math.min(page, totalPages);
