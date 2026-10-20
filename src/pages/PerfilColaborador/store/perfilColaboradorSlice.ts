@@ -19,6 +19,8 @@ export type ColaboradorProps = {
   email_corporativo: string;
   id_distrito:number;
   direccion: string;
+  /** 1 = activo, 0 = inactivo */
+  id_estado: number;
   uid_comentario:string;
   uid_contactoEmergencia:string;
   /** Foto de la persona (ruta en el blob storage); vacía si no tiene */
@@ -49,6 +51,7 @@ const initialColaborador={
     email_corporativo: '',
     id_distrito: 0,
     direccion: '',
+    id_estado: 0,
     uid_comentario: '',
     uid_contactoEmergencia: ''
 }

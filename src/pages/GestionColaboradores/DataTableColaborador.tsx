@@ -75,8 +75,12 @@ export const DataTableColaborador = ({otrosBotones}:Props) => {
         header: 'Estado',
         id: 5,
         sortable: false,
-        render:()=>{
-            return <BadgeEstado activo />
+        render:(row:ColaboradorProps)=>{
+            return (
+                <>
+                <BadgeEstado activo={row.id_estado===1?true:false} />
+                </>
+            )
         }
     },
     {

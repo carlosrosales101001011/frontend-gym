@@ -1,42 +1,54 @@
-import { useParams } from "react-router-dom";
-import { usePerfilColaboradorStore } from "@/pages/PerfilColaborador/usePerfilColaboradorStore";
-import type { RootState } from "@/stores/Store";
-import { useSelector } from "react-redux";
-import { useForm } from "@/hook/useForm";
-import type { ColaboradorProps } from "@/pages/PerfilColaborador/store/perfilColaboradorSlice";
-import { useTerminologiaPersona } from "@/hook/usePropiedadesStore";
-import { useEffect } from "react";
-import { Col, Row } from "react-bootstrap";
-import { InputCR } from "@/components/TextFields/InputCR";
-import { InputSelectCR } from "@/components/TextFields/InputSelectCR";
-import { ButtonCR } from "@/components/Button/ButtonCR";
-import { quitarCamposSoloLectura } from '@/helpers/quitarCamposSoloLectura'
-
-export const TabDatosPersonales = () => {
-  const { uid_colaborador } = useParams<{ uid_colaborador: string }>();
-  const { obtenerDataColaboradorxUID, loading, patchColaborador,  } = usePerfilColaboradorStore()
+import { InputCR } from '@/components/TextFields/InputCR'
+import { Col, Row } from 'react-bootstrap'
+import { useForm } from '@/hook/useForm'
+import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
+import type { ColaboradorProps } from '@/pages/PerfilColaborador/store/perfilColaboradorSlice'
+import { useEffect } from 'react'
+import { usePerfilColaboradorStore } from '@/pages/PerfilColaborador/usePerfilColaboradorStore'
+import { useSelector } from 'react-redux'
+import type { RootState } from '@/stores/Store';
+import { useParams } from 'react-router-dom';
+import { ButtonCR } from '@/components/Button/ButtonCR'
+import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
+/** Estado del colaborador (persona.id_estado): 1 activo, 0 inactivo */
+const OPCIONES_ESTADO = [
+  { value: 1, label: 'Activo' },
+  { value: 0, label: 'Inactivo' },
+]
+type TabDatosPersonalesProps = {
+  /** Si el tab está a la vista: cada vez que se activa se vuelven a pedir los datos */
+  activo: boolean
+}
+/** Datos personales del colaborador (mismo formulario que el perfil del cliente) */
+export const TabDatosPersonales = ({ activo }: TabDatosPersonalesProps) => {
+  const { uid_colaborador = '' } = useParams<{ uid_colaborador: string }>();
+  const { obtenerDataColaboradorxUID, loading, actualizarDatosPersonales } = usePerfilColaboradorStore()
   const {colaborador} = useSelector((state: RootState)=>state.PERFIL_COLABORADOR)
   const { register, formState: { errors }, reset, getValues} = useForm<ColaboradorProps>({mode: "all",defaultValues: colaborador })
   const { data:dataGeneroPersona, cargar:cargarGeneroPersona } = useTerminologiaPersona('GeneroPersona');
+  const { data:dataDistritoCallao, cargar:cargarDistritoCallao } = useTerminologiaPersona('distritosCallao');
+  const { data:dataDistritoLima, cargar:cargarDistritoLima } = useTerminologiaPersona('distritosLima');
   const { data:dataEstadoCivilPersona, cargar:cargarEstadoCivilPersona } = useTerminologiaPersona('EstadoCivilPersona');
   const { data:dataTipoDeDocumentoPersona, cargar:cargarTipoDeDocumentoPersona } = useTerminologiaPersona('TipoDeDocumentoPersona');
   useEffect(() => {
-    obtenerDataColaboradorxUID(uid_colaborador||'')
+    if (!activo || !uid_colaborador) return
+    obtenerDataColaboradorxUID(uid_colaborador)
     cargarGeneroPersona()
     cargarEstadoCivilPersona()
     cargarTipoDeDocumentoPersona()
-  }, [uid_colaborador])
+    cargarDistritoCallao()
+    cargarDistritoLima()
+  }, [activo, uid_colaborador])
   useEffect(() => {
     if (colaborador) {
       reset(colaborador);
     }
   }, [colaborador]);
+  if (!activo) return null
   if (loading)return( <>LOADING</>)
+  // El hook envía solo los campos del formulario y recarga con el uid de la URL
   const onSubmitActualizar = ()=>{
-    // La foto no va en el formulario: sus campos (url_avatar, encuadre...) y uid_comentario no están en el DTO de persona
-    const { id, uuid, ...v } = quitarCamposSoloLectura(getValues())
-    console.log({id, uuid});
-    patchColaborador(colaborador.id, colaborador.uuid, v as ColaboradorProps)
+    actualizarDatosPersonales(colaborador.id, uid_colaborador, getValues() as Partial<ColaboradorProps>)
   }
     return (
     <div>
@@ -88,34 +100,30 @@ export const TabDatosPersonales = () => {
                   })} label="N° de documento" messageErrors={errors.numero_documento?.message}/>
                 </Col>
                 <Col lg={6}>
-                  <InputSelectCR {...register("id_nacionalidad", {
-                    required: "Este campo es obligatorio"
-                  })} label="Nacionalidad" options={dataTipoDeDocumentoPersona} messageErrors={errors.id_nacionalidad?.message}/>
-                </Col>
-                <Col lg={6}>
                   <InputSelectCR {...register("id_distrito", {
                     required: "Este campo es obligatorio"
-                  })} label="Distrito" options={dataTipoDeDocumentoPersona} messageErrors={errors.id_distrito?.message}/>
+                  })} label="Distrito" options={[...dataDistritoCallao, ...dataDistritoLima]} messageErrors={errors.id_distrito?.message}/>
                 </Col>
-                <Col lg={12}>
+                <Col lg={6}>
                   <InputCR {...register("direccion", {
                     required: "Este campo es obligatorio"
                   })} label="Direccion" messageErrors={errors.direccion?.message}/>
                 </Col>
-                <Col lg={12}>
+                <Col lg={6}>
                   <InputCR {...register("email_personal", {
                     required: "Este campo es obligatorio",
                   })} label="Email personal" messageErrors={errors.email_personal?.message}/>
                 </Col>
-                <Col lg={12}>
+                <Col lg={6}>
                   <InputCR {...register("email_corporativo", {
                     required: "Este campo es obligatorio",
                   })} label="Email corporativo" messageErrors={errors.email_corporativo?.message}/>
                 </Col>
                 <Col lg={6}>
-                  <ButtonCR onClick={onSubmitActualizar} style={{width: '100%'}} className='w-100' label={'Actualizar'}/>
+                  <InputSelectCR {...register("id_estado")} label="Estado" options={OPCIONES_ESTADO}/>
                 </Col>
               </Row>
+                  <ButtonCR onClick={onSubmitActualizar} style={{width: '100%'}} className='w-100 btn-primary' label={'Actualizar'}/>
         </form>
     </div>
   )

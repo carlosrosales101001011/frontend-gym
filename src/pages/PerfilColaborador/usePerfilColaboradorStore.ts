@@ -1,5 +1,9 @@
 import { useDispatch } from "react-redux";
 import httpClient from "@/common/helpers/httpClient";
+import Swal from "sweetalert2";
+import { mensajeError } from "@/helpers/mensajeError";
+import { payloadDatosPersonales } from "@/helpers/payloadDatosPersonales";
+import { ID_TIPO_COLABORADOR } from "@/pages/PerfilColaborador/hook/usePersonaColaborador";
 import { onSetDataColaborador, type ColaboradorProps } from "@/pages/PerfilColaborador/store/perfilColaboradorSlice";
 import { useState } from "react";
 import { useCrudhook } from "@/hook/usecrudhook";
@@ -31,6 +35,24 @@ export const usePerfilColaboradorStore = () => {
             setloading(false)
         }
     }
+    /**
+     * Guarda "Datos personales" (PATCH /persona/id_tipo/1/id/:id) y vuelve a pedir la persona por el uid de la URL.
+     * Avisa si se guardó o por qué no. Devuelve true si se guardó.
+     */
+    const actualizarDatosPersonales = async(id:number, uid_colaborador:string, datos:Partial<ColaboradorProps>)=>{
+        setloading(true)
+        try {
+            await httpClient.patch(`/persona/id_tipo/${ID_TIPO_COLABORADOR}/id/${id}`, { ...payloadDatosPersonales(datos), id_estado: Number(datos.id_estado) || 0 });
+            await obtenerDataColaboradorxUID(uid_colaborador);
+            await Swal.fire({ icon: 'success', title: 'Datos actualizados', timer: 1500, showConfirmButton: false });
+            return true
+        } catch (error) {
+            await Swal.fire({ icon: 'error', title: 'No se pudieron actualizar los datos', html: mensajeError(error) });
+            return false
+        }finally{
+            setloading(false)
+        }
+    }
     const obtenerContratoxEmpleado = async(uid_empleado:string)=>{
         try {
             const { data } = await httpClient.get(`/contrato-empleado/uid_empleado/${uid_empleado}`)
@@ -42,6 +64,7 @@ export const usePerfilColaboradorStore = () => {
     }
   return {
     obtenerContratoxEmpleado,
+    actualizarDatosPersonales,
     patchColaborador,
     obtenerDataColaboradorxUID,
     loading,
