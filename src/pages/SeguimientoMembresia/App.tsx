@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Col, Row } from "react-bootstrap"
 import { ExportSeguimientoMembresia } from "./ExportSeguimientoMembresia"
 import type { SeguimientoMembresiaProps } from "./store/seguimientoMembresiaSlice"
+import { ultimaMembresiaPorCliente } from "./helpers/seguimiento"
 
 export const App = () => {
     const { obtenerMembresiaSeguimiento, SeguimientoMembresias } = useSeguimientoMembresiaStore()
@@ -16,10 +17,11 @@ export const App = () => {
         obtenerMembresiaSeguimiento()
     }, [])
 
+    // Solo la última membresía de cada cliente, luego:
     // Activos: fecha_actual <= fecha_vencimiento (el dia del vencimiento aun cuenta como activo)
     // Inactivos: fecha_actual > fecha_vencimiento
     const { activos, inactivos } = useMemo(() => {
-        const conFecha = SeguimientoMembresias.filter((m) => m.fecha_vencimiento)
+        const conFecha = ultimaMembresiaPorCliente(SeguimientoMembresias).filter((m) => m.fecha_vencimiento)
         return {
             activos: conFecha.filter((m) => diasVencidos(m.fecha_vencimiento) <= 0),
             inactivos: conFecha.filter((m) => diasVencidos(m.fecha_vencimiento) > 0),

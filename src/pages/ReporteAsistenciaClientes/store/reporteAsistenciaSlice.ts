@@ -31,13 +31,25 @@ export type FiltrosReporteAsistencia = {
   horario: string,
 };
 
+/** GET /persona-eventos-asistencia/reporte-clientes/resumen: clientes con membresía vigente en el rango (del programa) */
+export type ResumenClientesProps = {
+  /** No asistieron en el rango */
+  clientes_sin_asistir: number,
+  /** Última asistencia hace 7–13 días (hasta la fecha fin) */
+  clientes_en_riesgo: number,
+  /** Última asistencia hace ≥ 14 días (hasta la fecha fin) */
+  clientes_criticos: number,
+  /** Sin ninguna asistencia */
+  clientes_nunca_asistieron: number,
+};
+
 export type ReporteAsistenciaState = {
   filtros: FiltrosReporteAsistencia,
   /** Opciones del seleccionable de programa ("Todos" primero) */
   opcionesProgramas: OpcionesSelect[],
   asistencias: AsistenciaReporteProps[],
-  /** Clientes con membresía vigente en el rango (del programa) que no asistieron (lo calcula el backend) */
-  clientesSinAsistir: number,
+  /** Lo calcula el backend */
+  resumen: ResumenClientesProps,
   cargando: boolean,
 };
 
@@ -48,7 +60,7 @@ export const initialStateReporteAsistencia: ReporteAsistenciaState = {
   filtros: { fecha_inicio: hoy(), fecha_fin: hoy(), id_programa: ID_TODOS_PROGRAMAS, horario: '' },
   opcionesProgramas: [],
   asistencias: [],
-  clientesSinAsistir: 0,
+  resumen: { clientes_sin_asistir: 0, clientes_en_riesgo: 0, clientes_criticos: 0, clientes_nunca_asistieron: 0 },
   cargando: false,
 };
 
@@ -62,9 +74,9 @@ export const reporteAsistenciaSlice = createSlice({
     onSetOpcionesProgramas: (state, action: PayloadAction<OpcionesSelect[]>) => {
       state.opcionesProgramas = action.payload;
     },
-    onSetAsistenciasReporte: (state, action: PayloadAction<{ asistencias: AsistenciaReporteProps[], clientesSinAsistir: number }>) => {
+    onSetAsistenciasReporte: (state, action: PayloadAction<{ asistencias: AsistenciaReporteProps[], resumen: ResumenClientesProps }>) => {
       state.asistencias = action.payload.asistencias;
-      state.clientesSinAsistir = action.payload.clientesSinAsistir;
+      state.resumen = action.payload.resumen;
     },
     onSetCargandoReporte: (state, action: PayloadAction<boolean>) => {
       state.cargando = action.payload;

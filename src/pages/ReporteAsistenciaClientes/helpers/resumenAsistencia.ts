@@ -31,6 +31,37 @@ export const horaPico = (asistencias: AsistenciaReporteProps[], dias: number): H
   return { hora, asistencias: cantidad, promedioPorDia: cantidad / dias }
 }
 
+export type FrecuenciaClientes = {
+  /** ≥ 3 asistencias por semana */
+  frecuentes: number
+  /** 2 asistencias por semana */
+  regulares: number
+  /** 1 asistencia por semana (o menos) */
+  baja: number
+}
+
+/**
+ * Clientes que asistieron según su promedio de asistencias por semana en el rango (días distintos con asistencia /
+ * semanas del rango; un rango menor a 7 días cuenta como una semana).
+ */
+export const frecuenciaClientes = (asistencias: AsistenciaReporteProps[], dias: number): FrecuenciaClientes => {
+  const diasPorCliente = new Map<number, Set<string>>()
+  for (const a of asistencias) {
+    const diasCliente = diasPorCliente.get(a.id_persona) ?? new Set<string>()
+    diasCliente.add(new Date(a.fecha_registro).toDateString())
+    diasPorCliente.set(a.id_persona, diasCliente)
+  }
+  const semanas = Math.max(1, dias / 7)
+  const frecuencia: FrecuenciaClientes = { frecuentes: 0, regulares: 0, baja: 0 }
+  for (const diasCliente of diasPorCliente.values()) {
+    const porSemana = diasCliente.size / semanas
+    if (porSemana >= 3) frecuencia.frecuentes++
+    else if (porSemana >= 2) frecuencia.regulares++
+    else frecuencia.baja++
+  }
+  return frecuencia
+}
+
 /** 7 -> "07:00 - 08:00" */
 export const franjaHora = (hora: number) =>
   `${String(hora).padStart(2, '0')}:00 - ${String((hora + 1) % 24).padStart(2, '0')}:00`

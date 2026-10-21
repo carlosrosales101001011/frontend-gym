@@ -8,12 +8,13 @@ import {
   onSetOpcionesProgramas,
   type AsistenciaReporteProps,
   type FiltrosReporteAsistencia,
+  type ResumenClientesProps,
 } from '../store/reporteAsistenciaSlice'
 
 /** Reporte de asistencias de clientes: filtros del header, programas para el seleccionable y las asistencias */
 export const useReporteAsistenciaStore = () => {
   const dispatch = useAppDispatch()
-  const { filtros, opcionesProgramas, asistencias, clientesSinAsistir, cargando } = useAppSelector((state) => state.REPORTE_ASISTENCIA)
+  const { filtros, opcionesProgramas, asistencias, resumen, cargando } = useAppSelector((state) => state.REPORTE_ASISTENCIA)
 
   const cambiarFiltro = (cambio: Partial<FiltrosReporteAsistencia>) => dispatch(onSetFiltroReporteAsistencia(cambio))
 
@@ -31,8 +32,8 @@ export const useReporteAsistenciaStore = () => {
   }
 
   /**
-   * Asistencias de clientes con los filtros actuales (programa y horario vacíos = todos) y, en paralelo,
-   * cuántos clientes con membresía vigente (del programa) no asistieron en el rango.
+   * Asistencias de clientes con los filtros actuales (programa y horario vacíos = todos) y, en paralelo, el resumen
+   * de clientes con membresía vigente (del programa): sin asistir, en riesgo, críticos y nunca asistieron.
    */
   const obtenerReporte = async (signal?: AbortSignal) => {
     dispatch(onSetCargandoReporte(true))
@@ -43,11 +44,11 @@ export const useReporteAsistenciaStore = () => {
         ...(filtros.id_programa !== ID_TODOS_PROGRAMAS ? { id_programa: filtros.id_programa } : {}),
         ...(filtros.horario.trim() ? { horario: filtros.horario.trim() } : {}),
       }
-      const [{ data: asistenciasReporte }, { data: resumen }]: [{ data: AsistenciaReporteProps[] }, { data: { clientes_sin_asistir: number } }] = await Promise.all([
+      const [{ data: asistenciasReporte }, { data: resumenClientes }]: [{ data: AsistenciaReporteProps[] }, { data: ResumenClientesProps }] = await Promise.all([
         httpClient.get('/persona-eventos-asistencia/reporte-clientes', { params, signal }),
         httpClient.get('/persona-eventos-asistencia/reporte-clientes/resumen', { params, signal }),
       ])
-      dispatch(onSetAsistenciasReporte({ asistencias: asistenciasReporte, clientesSinAsistir: resumen.clientes_sin_asistir }))
+      dispatch(onSetAsistenciasReporte({ asistencias: asistenciasReporte, resumen: resumenClientes }))
     } catch (error) {
       if (!signal?.aborted) console.log(error)
     } finally {
@@ -55,5 +56,5 @@ export const useReporteAsistenciaStore = () => {
     }
   }
 
-  return { filtros, opcionesProgramas, asistencias, clientesSinAsistir, cargando, cambiarFiltro, obtenerProgramas, obtenerReporte }
+  return { filtros, opcionesProgramas, asistencias, resumen, cargando, cambiarFiltro, obtenerProgramas, obtenerReporte }
 }
