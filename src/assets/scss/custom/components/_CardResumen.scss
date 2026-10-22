@@ -37,4 +37,17 @@
     font-size: 11px;
     opacity: 0.6;
   }
+
+  // Con onClick: abre el detalle del dato
+  &--clickable {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      outline: none;
+    }
+  }
 }

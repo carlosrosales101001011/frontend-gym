@@ -36,7 +36,7 @@ export const App = () => {
                 <div className="p-2 card-actual h-100">
                     <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
                         <h5 className="fw-bold mb-0 fs-4">Clientes activos ({activos.length})</h5>
-                        {/* <ExportSeguimientoMembresia filas={visiblesActivos} tipo="activo"/> */}
+                        <ExportSeguimientoMembresia filas={visiblesActivos} tipo="activo"/>
                     </div>
                     <DataTableSeguimiento data={activos} tipo="activo" onFilasVisibles={setVisiblesActivos}/>
                 </div>
@@ -45,7 +45,7 @@ export const App = () => {
                 <div className="p-2 card-actual h-100">
                     <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
                         <h5 className="fw-bold mb-0 fs-4">Clientes inactivos ({inactivos.length})</h5>
-                        {/* <ExportSeguimientoMembresia filas={visiblesInactivos} tipo="inactivo"/> */}
+                        <ExportSeguimientoMembresia filas={visiblesInactivos} tipo="inactivo"/>
                     </div>
                     <DataTableSeguimiento data={inactivos} tipo="inactivo" onFilasVisibles={setVisiblesInactivos}/>
                 </div>

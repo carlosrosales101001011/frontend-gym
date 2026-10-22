@@ -1,4 +1,5 @@
-import { differenceInCalendarDays, parseISO } from 'date-fns'
+import { differenceInCalendarDays, eachDayOfInterval, parseISO } from 'date-fns'
+import { formatDate } from '@/helpers/FormatDate'
 import type { AsistenciaReporteProps } from '../store/reporteAsistenciaSlice'
 
 /** Clientes distintos que asistieron (en las asistencias del reporte) */
@@ -40,28 +41,127 @@ export type FrecuenciaClientes = {
   baja: number
 }
 
+export type NivelFrecuencia = keyof FrecuenciaClientes
+
+/** Un cliente que asistió, con lo que hizo en el rango */
+export type ClienteAsistido = {
+  id_persona: number
+  label_nombres_apellidos_persona: string
+  asistencias: number
+  /** Días distintos con asistencia */
+  dias_asistidos: number
+  /** dias_asistidos / semanas del rango */
+  por_semana: number
+  nivel: NivelFrecuencia
+  /** La más reciente (ISO) */
+  ultima_asistencia: string
+}
+
 /**
- * Clientes que asistieron según su promedio de asistencias por semana en el rango (días distintos con asistencia /
- * semanas del rango; un rango menor a 7 días cuenta como una semana).
+ * Clientes que asistieron (por nombre) y su nivel según su promedio de asistencias por semana en el rango (días
+ * distintos con asistencia / semanas del rango; un rango menor a 7 días cuenta como una semana).
  */
-export const frecuenciaClientes = (asistencias: AsistenciaReporteProps[], dias: number): FrecuenciaClientes => {
-  const diasPorCliente = new Map<number, Set<string>>()
+export const detalleClientesAsistidos = (asistencias: AsistenciaReporteProps[], dias: number): ClienteAsistido[] => {
+  const porCliente = new Map<number, { nombre: string, asistencias: number, dias: Set<string>, ultima: string }>()
   for (const a of asistencias) {
-    const diasCliente = diasPorCliente.get(a.id_persona) ?? new Set<string>()
-    diasCliente.add(new Date(a.fecha_registro).toDateString())
-    diasPorCliente.set(a.id_persona, diasCliente)
+    const cliente = porCliente.get(a.id_persona)
+      ?? { nombre: a.label_nombres_apellidos_persona, asistencias: 0, dias: new Set<string>(), ultima: a.fecha_registro }
+    cliente.asistencias++
+    cliente.dias.add(new Date(a.fecha_registro).toDateString())
+    if (a.fecha_registro > cliente.ultima) cliente.ultima = a.fecha_registro
+    porCliente.set(a.id_persona, cliente)
   }
   const semanas = Math.max(1, dias / 7)
+  return [...porCliente.entries()]
+    .map(([id_persona, c]) => {
+      const por_semana = c.dias.size / semanas
+      const nivel: NivelFrecuencia = por_semana >= 3 ? 'frecuentes' : por_semana >= 2 ? 'regulares' : 'baja'
+      return {
+        id_persona, label_nombres_apellidos_persona: c.nombre, asistencias: c.asistencias,
+        dias_asistidos: c.dias.size, por_semana, nivel, ultima_asistencia: c.ultima,
+      }
+    })
+    .sort((x, y) => x.label_nombres_apellidos_persona.localeCompare(y.label_nombres_apellidos_persona))
+}
+
+/** Cuántos clientes que asistieron hay en cada nivel (ver detalleClientesAsistidos) */
+export const frecuenciaClientes = (clientes: ClienteAsistido[]): FrecuenciaClientes => {
   const frecuencia: FrecuenciaClientes = { frecuentes: 0, regulares: 0, baja: 0 }
-  for (const diasCliente of diasPorCliente.values()) {
-    const porSemana = diasCliente.size / semanas
-    if (porSemana >= 3) frecuencia.frecuentes++
-    else if (porSemana >= 2) frecuencia.regulares++
-    else frecuencia.baja++
-  }
+  for (const c of clientes) frecuencia[c.nivel]++
   return frecuencia
 }
+
+/** Asistencias registradas en la franja que empieza a esa hora (hora local) */
+export const asistenciasDeLaHora = (asistencias: AsistenciaReporteProps[], hora: number) =>
+  asistencias.filter((a) => new Date(a.fecha_registro).getHours() === hora)
 
 /** 7 -> "07:00 - 08:00" */
 export const franjaHora = (hora: number) =>
   `${String(hora).padStart(2, '0')}:00 - ${String((hora + 1) % 24).padStart(2, '0')}:00`
+
+export type PuntoAsistidosDia = {
+  /** yyyy-mm-dd */
+  fecha: string
+  /** dd/mm, para el eje */
+  dia: string
+  /** Clientes distintos que asistieron ese día (varias marcaciones de uno en el día cuentan una vez); null si es futuro */
+  clientes: number | null
+}
+
+/** Clientes que asistieron en cada día del rango (ambos inclusive), con los días sin asistencias en 0 */
+export const asistidosPorDia = (asistencias: AsistenciaReporteProps[], fecha_inicio: string, fecha_fin: string): PuntoAsistidosDia[] => {
+  if (!fecha_inicio || !fecha_fin || fecha_inicio > fecha_fin) return []
+  const clientesPorDia = new Map<string, Set<number>>()
+  for (const a of asistencias) {
+    const fecha = formatDate(new Date(a.fecha_registro), 'yyyy-mm-dd', 'yyyy-mm-dd')
+    const clientes = clientesPorDia.get(fecha) ?? new Set<number>()
+    clientes.add(a.id_persona)
+    clientesPorDia.set(fecha, clientes)
+  }
+  const hoy = formatDate(new Date(), 'yyyy-mm-dd', 'yyyy-mm-dd')
+  return eachDayOfInterval({ start: parseISO(fecha_inicio), end: parseISO(fecha_fin) }).map((d) => {
+    const fecha = formatDate(d, 'yyyy-mm-dd', 'yyyy-mm-dd')
+    return {
+      fecha,
+      dia: formatDate(d, 'yyyy-mm-dd', 'dd/mm/yyyy').slice(0, 5),
+      clientes: fecha <= hoy ? clientesPorDia.get(fecha)?.size ?? 0 : null,
+    }
+  })
+}
+
+/** Días de la semana del recuento (getDay: 1 = lunes ... 6 = sábado) */
+export const DIAS_SEMANA = [
+  { dia: 1, nombre: 'Lunes' },
+  { dia: 2, nombre: 'Martes' },
+  { dia: 3, nombre: 'Miércoles' },
+  { dia: 4, nombre: 'Jueves' },
+  { dia: 5, nombre: 'Viernes' },
+  { dia: 6, nombre: 'Sábado' },
+] as const
+
+export type AsistidosDiaSemana = {
+  dia: number
+  nombre: string
+  /** Suma de los clientes de cada uno de esos días (un cliente que viene todos los lunes cuenta cada lunes) */
+  clientes: number
+  /** Cuántos de esos días ya pasaron en el rango */
+  dias: number
+}
+
+/** Recuento por día de la semana a partir de la serie diaria (ver asistidosPorDia); los días futuros no cuentan */
+export const asistidosPorDiaSemana = (serie: PuntoAsistidosDia[]): AsistidosDiaSemana[] =>
+  DIAS_SEMANA.map(({ dia, nombre }) => {
+    const puntos = serie.filter((p) => p.clientes !== null && parseISO(p.fecha).getDay() === dia)
+    return { dia, nombre, clientes: puntos.reduce((total, p) => total + (p.clientes ?? 0), 0), dias: puntos.length }
+  })
+
+/** Asistencias registradas en ese día de la semana (getDay, hora local) */
+export const asistenciasDelDiaSemana = (asistencias: AsistenciaReporteProps[], dia: number) =>
+  asistencias.filter((a) => new Date(a.fecha_registro).getDay() === dia)
+
+/** "Lunes" -> "lunes", "Sábado" -> "sábados" (los que terminan en s no cambian) */
+export const pluralDiaSemana = (nombre: string) => `${nombre.toLowerCase()}${nombre.endsWith('s') ? '' : 's'}`
+
+/** Asistencias registradas ese día (yyyy-mm-dd, hora local) */
+export const asistenciasDelDia = (asistencias: AsistenciaReporteProps[], fecha: string) =>
+  asistencias.filter((a) => formatDate(new Date(a.fecha_registro), 'yyyy-mm-dd', 'yyyy-mm-dd') === fecha)

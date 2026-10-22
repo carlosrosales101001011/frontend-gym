@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { KeyboardEvent, ReactNode } from 'react'
 import IconCR, { type IconName } from '@/components/Icons/IconCR'
 
 type CardResumenProps = {
@@ -9,14 +9,24 @@ type CardResumenProps = {
   detalle?: string
   /** Muestra un skeleton en lugar del valor */
   cargando?: boolean
+  /** Si se pasa, la card se puede clickear (ej. para ver el detalle del dato) */
+  onClick?: () => void
 }
 
 /**
  * Card pequeña de un dato (ícono, título, valor grande y detalle), para resúmenes de reportes y listados.
  * Varias juntas van dentro de .card-resumen-grupo. Estilos en _CardResumen.scss.
  */
-export const CardResumen = ({ icono, titulo, valor, detalle, cargando = false }: CardResumenProps) => (
-  <div className="card-mode-actual rounded card-resumen">
+export const CardResumen = ({ icono, titulo, valor, detalle, cargando = false, onClick }: CardResumenProps) => (
+  <div
+    className={`card-mode-actual rounded card-resumen ${onClick ? 'card-resumen--clickable' : ''}`}
+    {...(onClick ? {
+      role: 'button',
+      tabIndex: 0,
+      onClick,
+      onKeyDown: (e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() } },
+    } : {})}
+  >
     <span className="card-resumen__icono icono-modulo">
       <IconCR name={icono} size={18} className="" />
     </span>
