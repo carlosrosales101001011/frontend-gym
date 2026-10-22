@@ -2,11 +2,9 @@ import { useState } from 'react'
 import { CardResumen } from '@/components/CardResumen/CardResumen'
 import { useReporteAsistenciaStore } from '../hook/useReporteAsistenciaStore'
 import {
-  asistenciasDeLaHora,
   detalleClientesAsistidos,
   diasDelRango,
   frecuenciaClientes,
-  horaPico,
 } from '../helpers/resumenAsistencia'
 import { ModalClientesReporte, type CardClientes } from './ModalClientesReporte'
 import { Col, Row } from 'react-bootstrap'
@@ -20,9 +18,7 @@ export const Header2App = () => {
   const { asistencias, resumen, filtros, cargando } = useReporteAsistenciaStore()
   const [cardAbierta, setCardAbierta] = useState<CardClientes | null>(null)
   const dias = diasDelRango(filtros.fecha_inicio, filtros.fecha_fin)
-  const pico = horaPico(asistencias, dias)
   const asistidos = detalleClientesAsistidos(asistencias, dias)
-  const asistidosHoraPico = pico ? detalleClientesAsistidos(asistenciasDeLaHora(asistencias, pico.hora), dias) : []
   const frecuencia = frecuenciaClientes(asistidos)
   const abrir = (card: CardClientes) => () => setCardAbierta(card)
 
@@ -120,12 +116,7 @@ export const Header2App = () => {
           </Col>
         </Row>
       </div>
-      <ModalClientesReporte
-        card={cardAbierta}
-        onHide={() => setCardAbierta(null)}
-        asistidos={asistidos}
-        asistidosHoraPico={asistidosHoraPico}
-      />
+      <ModalClientesReporte card={cardAbierta} onHide={() => setCardAbierta(null)} />
     </>
   )
 }

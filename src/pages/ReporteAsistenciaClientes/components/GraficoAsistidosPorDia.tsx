@@ -6,9 +6,7 @@ import { formatDate } from '@/helpers/FormatDate'
 import { COLORES_REPORTE } from '@/pages/ReporteMeta/helpers/coloresReporte'
 import { useReporteAsistenciaStore } from '../hook/useReporteAsistenciaStore'
 import {
-  asistenciasDelDia,
   asistidosPorDia,
-  detalleClientesAsistidos,
   type PuntoAsistidosDia,
 } from '../helpers/resumenAsistencia'
 import { ModalClientesReporte } from './ModalClientesReporte'
@@ -27,7 +25,6 @@ export const GraficoAsistidosPorDia = () => {
   const serie = asistidosPorDia(asistencias, filtros.fecha_inicio, filtros.fecha_fin)
   /** yyyy-mm-dd del día abierto en el modal */
   const [fechaAbierta, setFechaAbierta] = useState<string | null>(null)
-  const clientesFechaAbierta = fechaAbierta ? detalleClientesAsistidos(asistenciasDelDia(asistencias, fechaAbierta), 1) : []
 
   // El click toma el día más cercano (el mismo del tooltip), no hace falta atinarle al punto; los futuros no abren
   const abrirDia = (indice: number | string | null | undefined) => {
@@ -93,7 +90,7 @@ export const GraficoAsistidosPorDia = () => {
       <ModalClientesReporte
         card={fechaAbierta ? 'dia' : null}
         onHide={() => setFechaAbierta(null)}
-        dia={fechaAbierta ? { fecha: fechaAbierta, clientes: clientesFechaAbierta } : undefined}
+        fecha={fechaAbierta ?? undefined}
       />
     </div>
   )

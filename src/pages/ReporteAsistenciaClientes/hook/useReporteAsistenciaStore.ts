@@ -10,6 +10,7 @@ import {
   type FiltrosReporteAsistencia,
   type ResumenClientesProps,
 } from '../store/reporteAsistenciaSlice'
+import { unaAsistenciaPorClienteDia } from '../helpers/resumenAsistencia'
 
 /** Reporte de asistencias de clientes: filtros del header, programas para el seleccionable y las asistencias */
 export const useReporteAsistenciaStore = () => {
@@ -48,7 +49,8 @@ export const useReporteAsistenciaStore = () => {
         httpClient.get('/persona-eventos-asistencia/reporte-clientes', { params, signal }),
         httpClient.get('/persona-eventos-asistencia/reporte-clientes/resumen', { params, signal }),
       ])
-      dispatch(onSetAsistenciasReporte({ asistencias: asistenciasReporte, resumen: resumenClientes }))
+      // 1 asistencia por cliente por día en todo el reporte (cards, hora pico, gráfico y modales)
+      dispatch(onSetAsistenciasReporte({ asistencias: unaAsistenciaPorClienteDia(asistenciasReporte), resumen: resumenClientes }))
     } catch (error) {
       if (!signal?.aborted) console.log(error)
     } finally {

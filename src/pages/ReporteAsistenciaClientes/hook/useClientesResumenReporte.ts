@@ -8,6 +8,7 @@ export type ClienteResumenProps = {
   label_nombres_apellidos_persona: string
   /** Hasta la fecha fin (o hoy); null si nunca asistió */
   ultima_asistencia: string | null
+  /** Días distintos con asistencia en el rango (1 por día) */
   asistencias_en_rango: number
   sin_asistir: boolean
   /** Última asistencia hace 7–13 días */

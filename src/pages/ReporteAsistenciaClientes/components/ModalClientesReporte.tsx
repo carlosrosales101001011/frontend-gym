@@ -6,17 +6,27 @@ import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
 import { formatDate } from '@/helpers/FormatDate'
 import { useReporteAsistenciaStore } from '../hook/useReporteAsistenciaStore'
 import { useClientesResumenReporte, type ClienteResumenProps } from '../hook/useClientesResumenReporte'
-import { pluralDiaSemana, type ClienteAsistido, type NivelFrecuencia } from '../helpers/resumenAsistencia'
+import type { AsistenciaReporteProps } from '../store/reporteAsistenciaSlice'
+import {
+  asistenciasDeLaHora,
+  asistenciasDelDia,
+  asistenciasDelDiaSemana,
+  detalleClientesAsistidos,
+  diasDelRango,
+  franjaHora,
+  horaPico,
+  pluralDiaSemana,
+  type NivelFrecuencia,
+} from '../helpers/resumenAsistencia'
 
 /**
  * Card del reporte cuyos clientes se listan (dia_semana: una de las cards de lunes a sábado, ver diaSemana;
- * dia: un punto del gráfico de asistidos por día, ver dia)
+ * dia: un punto del gráfico de asistidos por día, ver fecha)
  */
 export type CardClientes = 'asistidos' | 'hora_pico' | NivelFrecuencia | 'sin_asistir' | 'en_riesgo' | 'criticos' | 'nunca' | 'dia_semana' | 'dia'
 
-const TITULO: Record<Exclude<CardClientes, 'dia_semana' | 'dia'>, string> = {
+const TITULO: Record<Exclude<CardClientes, 'dia_semana' | 'dia' | 'hora_pico'>, string> = {
   asistidos: 'Clientes asistidos',
-  hora_pico: 'Clientes en la hora pico',
   frecuentes: 'Clientes frecuentes',
   regulares: 'Clientes regulares',
   baja: 'Clientes de baja frecuencia',
@@ -44,52 +54,36 @@ const columnaCliente = <T extends { label_nombres_apellidos_persona: string }>()
   sortValue: (c) => c.label_nombres_apellidos_persona,
 })
 
-const columnasAsistidos = (conFrecuencia: boolean): ColumnaSimple2<ClienteAsistido>[] => [
-  columnaCliente<ClienteAsistido>(),
-  { id: 'asistencias', header: 'Asistencias', render: (c) => <strong>{c.asistencias}</strong>, sortValue: (c) => c.asistencias },
-  ...(conFrecuencia ? [
-    { id: 'dias', header: 'Días asistidos', render: (c: ClienteAsistido) => c.dias_asistidos, sortValue: (c: ClienteAsistido) => c.dias_asistidos },
-    { id: 'semana', header: 'Por semana', render: (c: ClienteAsistido) => c.por_semana.toFixed(1), sortValue: (c: ClienteAsistido) => c.por_semana },
-  ] : []),
-  { id: 'ultima', header: 'Última asistencia', render: (c) => fechaHora(c.ultima_asistencia), sortValue: (c) => c.ultima_asistencia },
-]
-
-/** Un día de la semana: cuántos de esos días vino cada cliente (la suma es el total de la card) */
-const columnasDiaSemana = (nombre: string): ColumnaSimple2<ClienteAsistido>[] => [
-  columnaCliente<ClienteAsistido>(),
-  { id: 'dias', header: `${nombre} asistidos`, render: (c) => <strong>{c.dias_asistidos}</strong>, sortValue: (c) => c.dias_asistidos },
-  { id: 'ultima', header: `Último ${nombre.toLowerCase()}`, render: (c) => fechaHora(c.ultima_asistencia), sortValue: (c) => c.ultima_asistencia },
-]
-
-/** Un día: a qué hora marcó cada cliente (la última, si marcó varias veces) y cuántas veces */
-const columnasDia: ColumnaSimple2<ClienteAsistido>[] = [
-  columnaCliente<ClienteAsistido>(),
+/** Una fila por asistencia (ya es 1 por cliente por día): cliente y fecha y hora en que llegó */
+const columnasAsistencias: ColumnaSimple2<AsistenciaReporteProps>[] = [
+  columnaCliente<AsistenciaReporteProps>(),
   {
-    id: 'hora', header: 'Hora',
-    render: (c) => formatDate(new Date(c.ultima_asistencia), 'yyyy-mm-dd', 'hh:mm'),
-    sortValue: (c) => c.ultima_asistencia,
+    id: 'fecha', header: 'Fecha y hora',
+    render: (a) => fechaHora(a.fecha_registro),
+    sortValue: (a) => a.fecha_registro,
   },
-  { id: 'marcaciones', header: 'Marcaciones', render: (c) => c.asistencias, sortValue: (c) => c.asistencias },
 ]
 
 type ModalClientesReporteProps = {
   /** null = cerrado */
   card: CardClientes | null
   onHide: () => void
-  /** Clientes que asistieron en el rango y los de la franja de la hora pico */
-  asistidos?: ClienteAsistido[]
-  asistidosHoraPico?: ClienteAsistido[]
-  /** Con card 'dia_semana': el día ("Lunes") y los clientes que asistieron ese día de la semana */
-  diaSemana?: { nombre: string, clientes: ClienteAsistido[] }
-  /** Con card 'dia': la fecha (yyyy-mm-dd) y los clientes que asistieron ese día */
-  dia?: { fecha: string, clientes: ClienteAsistido[] }
+  /** Con card 'dia_semana': el día (getDay, 1 = lunes) y su nombre ("Lunes") */
+  diaSemana?: { dia: number, nombre: string }
+  /** Con card 'dia': yyyy-mm-dd */
+  fecha?: string
 }
 
-/** Nombres de los clientes de una card del reporte, en una tabla con buscador */
-export const ModalClientesReporte = ({ card, onHide, asistidos = [], asistidosHoraPico = [], diaSemana, dia }: ModalClientesReporteProps) => {
-  const { filtros } = useReporteAsistenciaStore()
+/**
+ * Clientes de una card del reporte, en una tabla con buscador. Las cards que salen de las asistencias listan cada
+ * asistencia (cliente y fecha y hora); las del resumen de membresías, cada cliente con su última asistencia.
+ */
+export const ModalClientesReporte = ({ card, onHide, diaSemana, fecha }: ModalClientesReporteProps) => {
+  const { asistencias, filtros } = useReporteAsistenciaStore()
   const { clientes, cargando, obtenerClientes } = useClientesResumenReporte()
   const filtroResumen = card ? FILTRO_RESUMEN[card] : undefined
+  const dias = diasDelRango(filtros.fecha_inicio, filtros.fecha_fin)
+  const pico = horaPico(asistencias, dias)
 
   useEffect(() => {
     if (filtroResumen) obtenerClientes(filtros)
@@ -111,24 +105,24 @@ export const ModalClientesReporte = ({ card, onHide, asistidos = [], asistidosHo
         : sinDato,
       sortValue: (c) => c.ultima_asistencia ? differenceInCalendarDays(referencia, new Date(c.ultima_asistencia)) : Infinity,
     },
-    { id: 'en-rango', header: 'Asistencias en el rango', render: (c) => c.asistencias_en_rango, sortValue: (c) => c.asistencias_en_rango },
+    { id: 'en-rango', header: 'Días asistidos en el rango', render: (c) => c.asistencias_en_rango, sortValue: (c) => c.asistencias_en_rango },
   ]
 
-  const contenido = () => {
-    if (!card) return null
-    if (filtroResumen) return <DataTableSimple2 data={clientes.filter(filtroResumen)} columns={columnasResumen} />
-    if (card === 'dia_semana') return diaSemana
-      ? <DataTableSimple2 data={diaSemana.clientes} columns={columnasDiaSemana(diaSemana.nombre)} />
-      : null
-    if (card === 'dia') return dia ? <DataTableSimple2 data={dia.clientes} columns={columnasDia} /> : null
-    if (card === 'hora_pico') return <DataTableSimple2 data={asistidosHoraPico} columns={columnasAsistidos(false)} />
-    const lista = card === 'asistidos' ? asistidos : asistidos.filter((c) => c.nivel === card)
-    return <DataTableSimple2 data={lista} columns={columnasAsistidos(true)} />
+  /** Asistencias de la card (más reciente primero) */
+  const asistenciasCard = (): AsistenciaReporteProps[] => {
+    if (card === 'dia_semana') return diaSemana ? asistenciasDelDiaSemana(asistencias, diaSemana.dia) : []
+    if (card === 'dia') return fecha ? asistenciasDelDia(asistencias, fecha) : []
+    if (card === 'hora_pico') return pico ? asistenciasDeLaHora(asistencias, pico.hora) : []
+    if (card === 'asistidos') return asistencias
+    // Frecuentes / regulares / baja: todas las asistencias de los clientes de ese nivel
+    const ids = new Set(detalleClientesAsistidos(asistencias, dias).filter((c) => c.nivel === card).map((c) => c.id_persona))
+    return asistencias.filter((a) => ids.has(a.id_persona))
   }
 
   const titulo = !card ? ''
     : card === 'dia_semana' ? `Clientes que asistieron los ${pluralDiaSemana(diaSemana?.nombre ?? '')}`
-    : card === 'dia' ? `Clientes que asistieron el ${dia ? formatDate(dia.fecha, 'yyyy-mm-dd', 'DDDD dd [de] MMMM [del] yyyy') : ''}`
+    : card === 'dia' ? `Clientes que asistieron el ${fecha ? formatDate(fecha, 'yyyy-mm-dd', 'DDDD dd [de] MMMM [del] yyyy') : ''}`
+    : card === 'hora_pico' ? `Clientes en la hora pico${pico ? ` (${franjaHora(pico.hora)})` : ''}`
     : TITULO[card]
 
   return (
@@ -139,7 +133,9 @@ export const ModalClientesReporte = ({ card, onHide, asistidos = [], asistidosHo
       <ModalCR.Body>
         <div className="position-relative">
           <LoadingOverlay show={!!filtroResumen && cargando} interno texto="Cargando" />
-          {contenido()}
+          {card && (filtroResumen
+            ? <DataTableSimple2 data={clientes.filter(filtroResumen)} columns={columnasResumen} />
+            : <DataTableSimple2 data={asistenciasCard()} columns={columnasAsistencias} />)}
         </div>
       </ModalCR.Body>
     </ModalCR>

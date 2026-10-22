@@ -47,14 +47,15 @@ export type NivelFrecuencia = keyof FrecuenciaClientes
 export type ClienteAsistido = {
   id_persona: number
   label_nombres_apellidos_persona: string
-  asistencias: number
-  /** Días distintos con asistencia */
+  /** Días distintos con asistencia (1 asistencia por día) */
   dias_asistidos: number
   /** dias_asistidos / semanas del rango */
   por_semana: number
   nivel: NivelFrecuencia
   /** La más reciente (ISO) */
   ultima_asistencia: string
+  /** La más antigua (ISO); en un solo día, a qué hora llegó */
+  primera_asistencia: string
 }
 
 /**
@@ -62,13 +63,13 @@ export type ClienteAsistido = {
  * distintos con asistencia / semanas del rango; un rango menor a 7 días cuenta como una semana).
  */
 export const detalleClientesAsistidos = (asistencias: AsistenciaReporteProps[], dias: number): ClienteAsistido[] => {
-  const porCliente = new Map<number, { nombre: string, asistencias: number, dias: Set<string>, ultima: string }>()
+  const porCliente = new Map<number, { nombre: string, dias: Set<string>, ultima: string, primera: string }>()
   for (const a of asistencias) {
     const cliente = porCliente.get(a.id_persona)
-      ?? { nombre: a.label_nombres_apellidos_persona, asistencias: 0, dias: new Set<string>(), ultima: a.fecha_registro }
-    cliente.asistencias++
+      ?? { nombre: a.label_nombres_apellidos_persona, dias: new Set<string>(), ultima: a.fecha_registro, primera: a.fecha_registro }
     cliente.dias.add(new Date(a.fecha_registro).toDateString())
     if (a.fecha_registro > cliente.ultima) cliente.ultima = a.fecha_registro
+    if (a.fecha_registro < cliente.primera) cliente.primera = a.fecha_registro
     porCliente.set(a.id_persona, cliente)
   }
   const semanas = Math.max(1, dias / 7)
@@ -77,8 +78,8 @@ export const detalleClientesAsistidos = (asistencias: AsistenciaReporteProps[], 
       const por_semana = c.dias.size / semanas
       const nivel: NivelFrecuencia = por_semana >= 3 ? 'frecuentes' : por_semana >= 2 ? 'regulares' : 'baja'
       return {
-        id_persona, label_nombres_apellidos_persona: c.nombre, asistencias: c.asistencias,
-        dias_asistidos: c.dias.size, por_semana, nivel, ultima_asistencia: c.ultima,
+        id_persona, label_nombres_apellidos_persona: c.nombre,
+        dias_asistidos: c.dias.size, por_semana, nivel, ultima_asistencia: c.ultima, primera_asistencia: c.primera,
       }
     })
     .sort((x, y) => x.label_nombres_apellidos_persona.localeCompare(y.label_nombres_apellidos_persona))
@@ -165,3 +166,18 @@ export const pluralDiaSemana = (nombre: string) => `${nombre.toLowerCase()}${nom
 /** Asistencias registradas ese día (yyyy-mm-dd, hora local) */
 export const asistenciasDelDia = (asistencias: AsistenciaReporteProps[], fecha: string) =>
   asistencias.filter((a) => formatDate(new Date(a.fecha_registro), 'yyyy-mm-dd', 'yyyy-mm-dd') === fecha)
+
+/**
+ * Deja 1 asistencia por cliente por día (hora local): la primera marcación del día, a la que llegó. Las demás
+ * marcaciones de ese día no cuentan en ninguna parte del reporte. Mantiene el orden (más reciente primero).
+ */
+export const unaAsistenciaPorClienteDia = (asistencias: AsistenciaReporteProps[]) => {
+  const primeraPorClienteDia = new Map<string, AsistenciaReporteProps>()
+  for (const a of asistencias) {
+    const clave = `${a.id_persona}|${new Date(a.fecha_registro).toDateString()}`
+    const actual = primeraPorClienteDia.get(clave)
+    if (!actual || new Date(a.fecha_registro) < new Date(actual.fecha_registro)) primeraPorClienteDia.set(clave, a)
+  }
+  const unicas = new Set(primeraPorClienteDia.values())
+  return asistencias.filter((a) => unicas.has(a))
+}

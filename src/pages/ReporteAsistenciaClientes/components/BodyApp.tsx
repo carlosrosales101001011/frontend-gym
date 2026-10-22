@@ -3,11 +3,8 @@ import { Col, Row } from 'react-bootstrap'
 import { CardResumen } from '@/components/CardResumen/CardResumen'
 import { useReporteAsistenciaStore } from '../hook/useReporteAsistenciaStore'
 import {
-  asistenciasDelDiaSemana,
   asistidosPorDia,
   asistidosPorDiaSemana,
-  detalleClientesAsistidos,
-  diasDelRango,
   pluralDiaSemana,
   type AsistidosDiaSemana,
 } from '../helpers/resumenAsistencia'
@@ -22,8 +19,6 @@ export const BodyApp = () => {
   const { asistencias, filtros, cargando } = useReporteAsistenciaStore()
   const [diaAbierto, setDiaAbierto] = useState<AsistidosDiaSemana | null>(null)
   const porDiaSemana = asistidosPorDiaSemana(asistidosPorDia(asistencias, filtros.fecha_inicio, filtros.fecha_fin))
-  const dias = diasDelRango(filtros.fecha_inicio, filtros.fecha_fin)
-  const clientesDiaAbierto = diaAbierto ? detalleClientesAsistidos(asistenciasDelDiaSemana(asistencias, diaAbierto.dia), dias) : []
 
   return (
     <Row className="g-3 mt-0">
@@ -51,7 +46,7 @@ export const BodyApp = () => {
       <ModalClientesReporte
         card={diaAbierto ? 'dia_semana' : null}
         onHide={() => setDiaAbierto(null)}
-        diaSemana={diaAbierto ? { nombre: diaAbierto.nombre, clientes: clientesDiaAbierto } : undefined}
+        diaSemana={diaAbierto ? { dia: diaAbierto.dia, nombre: diaAbierto.nombre } : undefined}
       />
     </Row>
   )
