@@ -3,11 +3,11 @@ import httpClient from "@/common/helpers/httpClient"
 import { useCrudhook } from "@/hook/usecrudhook"
 import { useAppDispatch, useAppSelector } from "@/stores/Store"
 import type { MetaProps } from "@/pages/GestionMeta/store/metaSlice"
-import { ID_TODOS_ASESORES, onSelectAsesor, onSelectMeta, onSetAsesoresMeta, onSetMetas, type AsesorReporteProps, type VentaReporteProps } from "../store/reporteMetaSlice"
+import { ID_TODOS_ASESORES, onSelectAsesor, onSelectMeta, onSetAsesoresMeta, onSetMetas, onSetPorFechaPago, type AsesorReporteProps, type VentaReporteProps } from "../store/reporteMetaSlice"
 
 export const useReporteMetaStore = () => {
     const dispatch = useAppDispatch()
-    const { metas, idMetaSeleccionada, asesoresMeta, idAsesorSeleccionado } = useAppSelector((state) => state.REPORTE_META)
+    const { metas, idMetaSeleccionada, asesoresMeta, idAsesorSeleccionado, porFechaPago } = useAppSelector((state) => state.REPORTE_META)
     const { obtenerAll: obtenerMetasApi } = useCrudhook<MetaProps>('/ventas-meta')
 
     /** Opciones del seleccionable: solo el nombre como label y el id como value */
@@ -83,8 +83,9 @@ export const useReporteMetaStore = () => {
         ? ventas
         : ventas.filter((venta) => venta.id_empl === idAsesorSeleccionado)
 
+    /** Con porFechaPago, el periodo se aplica a la fecha de los pagos en vez de a la fecha de venta */
     const obtenerVentasRango = async (fecha_inicio: string, fecha_fin: string): Promise<VentaReporteProps[]> => {
-      const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio, fecha_fin } })
+      const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio, fecha_fin, por_fecha_pago: porFechaPago } })
       return data.lista
     }
 
@@ -95,11 +96,13 @@ export const useReporteMetaStore = () => {
     asesorSeleccionado,
     opcionesAsesores,
     idAsesorSeleccionado,
+    porFechaPago,
     montoMetaObjetivo,
     obtenerMetas,
     obtenerVentasRango,
     filtrarVentasPorAsesor,
     seleccionarMeta,
     seleccionarAsesor,
+    cambiarPorFechaPago: (valor: boolean) => dispatch(onSetPorFechaPago(valor)),
   }
 }

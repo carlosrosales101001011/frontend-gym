@@ -67,7 +67,7 @@ export type PerfilUsuarioProps = {
 }
 
 /** Lo que se cambia en "Datos Sistema"; lo que no viene no se toca */
-export type CambiosSistema = { is_super_user?: boolean, id_rol?: number, id_empl?: number }
+export type CambiosSistema = { is_super_user?: boolean, id_rol?: number, id_empl?: number, usuario?: string }
 
 /** Opción del select de colaboradores */
 export type OpcionColaborador = { value: number, label: string }
@@ -79,7 +79,7 @@ export const usePerfilUsuario = () => {
     return data
   }
 
-  /** Guarda super usuario, rol y colaborador. Avisa el resultado; devuelve true si se guardó */
+  /** Guarda usuario (login), super usuario, rol y colaborador. Avisa el resultado; devuelve true si se guardó */
   const actualizarSistema = async (idUsuario: number, cambios: CambiosSistema) => {
     try {
       await httpClient.patch(`/user/id/${idUsuario}/sistema`, cambios)

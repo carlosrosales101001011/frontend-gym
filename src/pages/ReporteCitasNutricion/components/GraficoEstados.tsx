@@ -1,6 +1,6 @@
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useThemeStore } from '@/components/TopBar/useThemeStore'
-import { COLORES_REPORTE_VENTAS } from '@/pages/ReporteVentas/helpers/coloresReporteVentas'
+import { COLORES_REPORTE_VENTAS } from '@/components/ReporteBarras/coloresReporteVentas'
 import type { ConteoEstado } from '../helpers/resumenCitas'
 
 type GraficoEstadosProps = {

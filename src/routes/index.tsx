@@ -28,6 +28,8 @@ const GestionCuentasFinancieras = lazy(() => import('@/pages/GestionCuentasFinan
 const GestionTC = lazy(() => import('@/pages/GestionTipoCambio'));
 const GestionTermGrupoFinanzas = lazy(() => import('@/pages/GestionTermGrupoFinanzas'));
 const GestionTerminologiaFinanzas = lazy(() => import('@/pages/GestionTerminologiaFinanzas'));
+const GestionCompromisosPagos = lazy(() => import('@/pages/GestionCompromisosPagos'));
+const GestionCuestionarios = lazy(() => import('@/pages/GestionCuestionarios'));
 // TODO: PERFILES
 const Perfil = lazy(() => import('@/pages/perfil'));
 const PerfilColaborador = lazy(() => import('@/pages/PerfilColaborador/Index'));
@@ -57,9 +59,11 @@ const ReporteCitasNutricion = lazy(() => import('@/pages/ReporteCitasNutricion')
 const ModulosxUsuario = lazy(() => import('@/pages/GestionModuloxUsuario'));
 const GestionAsistencias = lazy(() => import('@/pages/GestionAsistencias'));
 const ReporteAsistenciasClientes = lazy(() => import('@/pages/ReporteAsistenciaClientes'));
+const ReporteClientesActivos = lazy(() => import('@/pages/ReporteClientesActivos'));
+const ReportePosiblesVentas = lazy(() => import('@/pages/ReportePosiblesVentas'));
 // const InformacionEmpresa = lazy(() => import('@/pages/InformacionEmpresa'));
 export const AppRoutes = () => {
-  return (
+  return (  
     <Routes>
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path=":url_modulo/*" element={<ProtectedRoutes/>}>
@@ -101,9 +105,13 @@ export const AppRoutes = () => {
             <Route path="reporte-metas" element={<ReporteMetas/>}/>
             <Route path="reporte-ventas" element={<ReporteVentas/>}/>
             <Route path="reporte-citas-nutricion" element={<ReporteCitasNutricion/>}/>
+            <Route path="compromisos-pago" element={<GestionCompromisosPagos/>}/>
             <Route path="modulo-x-user" element={<ModulosxUsuario/>}/>
             <Route path="asistencia" element={<GestionAsistencias/>}/>
+            <Route path="gestion-cuestionario" element={<GestionCuestionarios/>}/>
+            <Route path="posibles-ventas" element={<ReportePosiblesVentas/>}/>
             <Route path="reporte-asistencia-clientes" element={<ReporteAsistenciasClientes/>}/>
+            <Route path="reporte-clientes-activos" element={<ReporteClientesActivos/>}/>
             {/* reporte-asistencia-clientes */}
             <Route element={<ProfileGuard gestion="gestion-usuario"/>}>
               <Route path="gestion-usuario" element={<GestionUsuario/>}/>

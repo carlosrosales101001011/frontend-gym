@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
 import { useReporteVentasStore } from '../hook/useReporteVentasStore'
 import { agruparVentasPorPrograma } from '../helpers/ventasPorPrograma'
-import { prepararBarras } from '../helpers/barrasComparacion'
-import type { MedidaReporte } from '../helpers/medidaReporte'
-import { SelectorMedida } from '../components/SelectorMedida'
-import { PanelBarras } from '../components/PanelBarras'
+import { prepararBarras } from '@/components/ReporteBarras/barrasComparacion'
+import type { MedidaReporte } from '@/components/ReporteBarras/medidaReporte'
+import { SelectorMedida } from '@/components/ReporteBarras/SelectorMedida'
+import { PanelBarras } from '@/components/ReporteBarras/PanelBarras'
 import { ID_TODOS, type VentaReporteVentasProps } from '../store/reporteVentasSlice'
 
 type VentasPorProgramaProps = {
@@ -21,7 +21,7 @@ type VentasPorProgramaProps = {
  * su barra se resalta y las de los programas que vendieron más muestran el % de alcance.
  */
 export const VentasPorPrograma = ({ fecha_inicio, fecha_fin }: VentasPorProgramaProps) => {
-  const { opcionesProgramas, idAsesorSeleccionado, idSucursalSeleccionada, idProgramaSeleccionado, idPlanSeleccionado, idOrigenSeleccionado, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
+  const { opcionesProgramas, idAsesorSeleccionado, idProgramaSeleccionado, idPlanSeleccionado, idOrigenSeleccionado, porFechaPago, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
   const [ventas, setVentas] = useState<VentaReporteVentasProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -44,13 +44,13 @@ export const VentasPorPrograma = ({ fecha_inicio, fecha_fin }: VentasPorPrograma
     }
     cargar()
     return () => { vigente = false }
-  }, [fecha_inicio, fecha_fin])
+  }, [fecha_inicio, fecha_fin, porFechaPago])
 
-  // Asesor, sucursal y origen filtran; el programa no (se resalta y los demás se comparan contra él)
+  // Asesor y origen filtran; el programa no (se resalta y los demás se comparan contra él)
   const idElegido = idProgramaSeleccionado !== ID_TODOS ? idProgramaSeleccionado : null
   const barras = useMemo(
     () => prepararBarras(agruparVentasPorPrograma(filtrarVentas(ventas, { ignorarPrograma: true }), opcionesProgramas, idPlanSeleccionado), medida, idElegido),
-    [ventas, medida, idElegido, opcionesProgramas, idPlanSeleccionado, idAsesorSeleccionado, idSucursalSeleccionada, idOrigenSeleccionado]
+    [ventas, medida, idElegido, opcionesProgramas, idPlanSeleccionado, idAsesorSeleccionado, idOrigenSeleccionado]
   )
 
   return (

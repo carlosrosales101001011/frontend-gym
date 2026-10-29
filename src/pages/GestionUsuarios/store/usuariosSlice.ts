@@ -4,6 +4,14 @@ import type { OpcionesSelect } from '@/types/props';
 /** users.id_estado: 1 = activo (0 = inactivo) */
 export const ID_ESTADO_ACTIVO = 1;
 
+/** Colaborador del select "Empleado": sus datos reemplazan nombres, apellidos y correos del usuario */
+export type OpcionEmpleado = OpcionesSelect & {
+  nombres: string;
+  apellidos: string;
+  email: string;
+  email_corporativo: string;
+}
+
 export type UserProps = {
   id?:number;
   uuid: string;
@@ -65,7 +73,7 @@ export type UserState = {
   permisosCreador: PermisoEntidadProps[],
   /** Quien registra es super usuario: puede otorgar todas las acciones, tenga o no el permiso */
   creadorEsSuperUsuario: boolean,
-  opcionesEmpleados: OpcionesSelect[],
+  opcionesEmpleados: OpcionEmpleado[],
 }
 
 export const initialUser: UserProps = {
@@ -113,7 +121,7 @@ export const usuariosSlice = createSlice({
       state.permisosCreador = action.payload.permisos;
       state.creadorEsSuperUsuario = action.payload.esSuperUsuario;
     },
-    onSetOpcionesEmpleados: (state, action: PayloadAction<OpcionesSelect[]>) => {
+    onSetOpcionesEmpleados: (state, action: PayloadAction<OpcionEmpleado[]>) => {
       state.opcionesEmpleados = action.payload;
     },
     /** Limpia el registro en curso (al guardar o cerrar el modal) */

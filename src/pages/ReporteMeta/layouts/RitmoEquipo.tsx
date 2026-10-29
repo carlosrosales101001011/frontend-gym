@@ -31,7 +31,7 @@ const Indicador = ({ titulo, valor }: { titulo: string, valor: string }) => (
 export const RitmoEquipo = ({ fecha_inicio, fecha_fin }: RitmoEquipoProps) => {
   const { theme } = useThemeStore()
   const colores = COLORES_REPORTE[theme]
-  const { montoMetaObjetivo, idAsesorSeleccionado, asesorSeleccionado, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
+  const { montoMetaObjetivo, idAsesorSeleccionado, asesorSeleccionado, porFechaPago, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
   const [ventas, setVentas] = useState<VentaReporteProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -53,7 +53,7 @@ export const RitmoEquipo = ({ fecha_inicio, fecha_fin }: RitmoEquipoProps) => {
     }
     cargar()
     return () => { vigente = false }
-  }, [fecha_inicio, fecha_fin])
+  }, [fecha_inicio, fecha_fin, porFechaPago])
 
   // Con un asesor elegido: su meta y sus ventas
   const ritmo = useMemo(

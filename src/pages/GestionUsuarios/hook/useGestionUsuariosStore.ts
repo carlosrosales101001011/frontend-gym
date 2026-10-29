@@ -23,6 +23,8 @@ type ColaboradorProps = {
   nombres: string;
   apellido_paterno: string;
   apellido_materno: string;
+  email_personal?: string;
+  email_corporativo?: string;
 }
 
 /** Fila de GET /entidad-x-user/user/all */
@@ -40,10 +42,17 @@ export const useGestionUsuariosStore = () => {
   const obtenerOpcionesEmpleados = async () => {
     try {
       const data = await obtenerColaboradoresApi()
-      dispatch(onSetOpcionesEmpleados(data.lista.map((persona: ColaboradorProps) => ({
-        value: persona.id,
-        label: [persona.nombres, persona.apellido_paterno, persona.apellido_materno].filter(Boolean).join(' '),
-      }))))
+      dispatch(onSetOpcionesEmpleados(data.lista.map((persona: ColaboradorProps) => {
+        const apellidos = [persona.apellido_paterno, persona.apellido_materno].map((a) => a?.trim()).filter(Boolean).join(' ')
+        return {
+          value: persona.id,
+          label: [persona.nombres?.trim(), apellidos].filter(Boolean).join(' '),
+          nombres: persona.nombres?.trim() ?? '',
+          apellidos,
+          email: persona.email_personal?.trim() ?? '',
+          email_corporativo: persona.email_corporativo?.trim() ?? '',
+        }
+      })))
     } catch (error) {
       console.log(error);
     }

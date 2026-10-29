@@ -1,7 +1,7 @@
 
 export const BadgeCR = ({label, id, onRemove}: {label: string, id: number, onRemove: (id: number) => void}) => {
   return (
-    <span className="badge section-assignment__badge d-inline-flex align-items-center">
+    <span className="badge bg-black text-white section-assignment__badge d-inline-flex align-items-center">
       {label}
       <button
         type="button"

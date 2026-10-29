@@ -1,7 +1,7 @@
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useThemeStore } from '@/components/TopBar/useThemeStore'
 import type { EstadoEvento } from '@/pages/AgendaNutricionista/helpers/agendaHelpers'
-import { COLORES_REPORTE_VENTAS } from '@/pages/ReporteVentas/helpers/coloresReporteVentas'
+import { COLORES_REPORTE_VENTAS } from '@/components/ReporteBarras/coloresReporteVentas'
 import type { FilaApilada } from '../helpers/resumenCitas'
 
 type GraficoApiladoProps = {

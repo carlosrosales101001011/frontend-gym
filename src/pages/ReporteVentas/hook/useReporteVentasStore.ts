@@ -6,7 +6,6 @@ import { formatDate } from "@/helpers/FormatDate"
 import { uniqueById } from "@/helpers/arrays"
 import { useTerminologiaPersona } from "@/hook/usePropiedadesStore"
 import { useAppDispatch, useAppSelector } from "@/stores/Store"
-import type { SucursalProps } from "@/pages/GestionAlmacen/store/almacenSlice"
 import type { ProgramaBaseBackend } from "@/pages/GestionProgramasEntrenamiento/store/programaSlice"
 import type { OpcionesSelect } from "@/types/props"
 import { ventaCumpleFiltroMembresia, type FiltroMembresia } from "../helpers/resumenVentas"
@@ -16,12 +15,11 @@ import {
   onSelectOrigen,
   onSelectPlan,
   onSelectPrograma,
-  onSelectSucursal,
   onSetAsesores,
   onSetFechas,
   onSetPlanes,
+  onSetPorFechaPago,
   onSetProgramas,
-  onSetSucursales,
   type PlanReporteVentasProps,
   type VentaReporteVentasProps,
 } from "../store/reporteVentasSlice"
@@ -34,12 +32,11 @@ const conTodos = (opciones: OpcionesSelect[]) => [{ value: ID_TODOS, label: 'Tod
 export const useReporteVentasStore = () => {
     const dispatch = useAppDispatch()
     const {
-      fecha_inicio, fecha_fin, opcionesAsesores, opcionesSucursales, opcionesProgramas, planes,
-      idAsesorSeleccionado, idSucursalSeleccionada, idProgramaSeleccionado, idPlanSeleccionado, idOrigenSeleccionado,
+      fecha_inicio, fecha_fin, porFechaPago, opcionesAsesores, opcionesProgramas, planes,
+      idAsesorSeleccionado, idProgramaSeleccionado, idPlanSeleccionado, idOrigenSeleccionado,
     } = useAppSelector((state) => state.REPORTE_VENTAS)
     // Orígenes de venta desde terminologías (igual que en Punto de Venta)
     const { cargar: obtenerOrigenes, data: dataOrigenes } = useTerminologiaPersona('origenVenta')
-    const { obtenerAll: obtenerSucursalesApi } = useCrudhook<SucursalProps>('/empresa-sucursal')
     const { obtenerAll: obtenerProgramasApi } = useCrudhook<ProgramaBaseBackend>('/programa-entrenamiento')
     const { obtenerAll: obtenerPlanesApi } = useCrudhook<PlanReporteVentasProps>('/entrenamiento-plan')
 
@@ -65,21 +62,24 @@ export const useReporteVentasStore = () => {
     /** Asesores = quienes tienen ventas en el rango (nombre como label, id_empl como value) */
     const obtenerAsesoresRango = async (inicio: string, fin: string) => {
       try {
-        const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio: inicio, fecha_fin: fin } })
+        const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio: inicio, fecha_fin: fin, por_fecha_pago: porFechaPago } })
         const asesores = uniqueById((data.lista as VentaReporteVentasProps[])
           .filter((venta) => venta.id_empl)
           .map((venta) => ({ id: venta.id_empl, label: venta.label_nombres_apellidos_empl ?? '' })))
           .sort((a, b) => a.label.localeCompare(b.label))
           .map((asesor) => ({ value: asesor.id, label: asesor.label }))
-        dispatch(onSetAsesores({ fecha_inicio: inicio, fecha_fin: fin, asesores }))
+        dispatch(onSetAsesores({ fecha_inicio: inicio, fecha_fin: fin, porFechaPago, asesores }))
       } catch (error) {
         console.log(error);
       }
     }
 
-    /** Todas las ventas del rango (con sus membresías); cada componente guarda el resultado en su propio estado */
+    /**
+     * Todas las ventas del rango (con sus membresías); cada componente guarda el resultado en su propio estado.
+     * Con porFechaPago, el rango se aplica a la fecha de los pagos en vez de a la fecha de venta.
+     */
     const obtenerVentasRango = async (inicio: string, fin: string): Promise<VentaReporteVentasProps[]> => {
-      const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio: inicio, fecha_fin: fin } })
+      const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio: inicio, fecha_fin: fin, por_fecha_pago: porFechaPago } })
       return data.lista
     }
 
@@ -91,19 +91,8 @@ export const useReporteVentasStore = () => {
     const filtrarVentas = (ventas: VentaReporteVentasProps[], { ignorarAsesor = false, ignorarOrigen = false, ignorarPrograma = false, ignorarPlan = false } = {}) =>
       ventas.filter((venta) =>
         (ignorarAsesor || idAsesorSeleccionado === ID_TODOS || venta.id_empl === idAsesorSeleccionado)
-        && (idSucursalSeleccionada === ID_TODOS || venta.id_sucursal === idSucursalSeleccionada)
         && (ignorarOrigen || idOrigenSeleccionado === ID_TODOS || venta.id_origen === idOrigenSeleccionado)
         && ventaCumpleFiltroMembresia(venta, { idPrograma: ignorarPrograma ? ID_TODOS : idProgramaSeleccionado, idPlan: ignorarPlan ? ID_TODOS : idPlanSeleccionado }))
-
-    /** Todas las sucursales (sin paginar) */
-    const obtenerSucursales = async () => {
-      try {
-        const data = await obtenerSucursalesApi()
-        dispatch(onSetSucursales(data.lista.map((sucursal: SucursalProps) => ({ value: sucursal.id, label: sucursal.nombre }))))
-      } catch (error) {
-        console.log(error);
-      }
-    }
 
     /** Todos los programas (sin paginar) */
     const obtenerProgramas = async () => {
@@ -137,37 +126,34 @@ export const useReporteVentasStore = () => {
     ), [planes, idProgramaSeleccionado])
 
     const opcionesAsesoresTodos = useMemo(() => conTodos(opcionesAsesores), [opcionesAsesores])
-    const opcionesSucursalesTodos = useMemo(() => conTodos(opcionesSucursales), [opcionesSucursales])
     const opcionesProgramasTodos = useMemo(() => conTodos(opcionesProgramas), [opcionesProgramas])
     const opcionesOrigenesTodos = useMemo(() => conTodos(dataOrigenes), [dataOrigenes])
 
   return {
     fecha_inicio,
     fecha_fin,
+    porFechaPago,
     rangoValido,
     opcionesAsesores: opcionesAsesoresTodos,
-    opcionesSucursales: opcionesSucursalesTodos,
     opcionesProgramas: opcionesProgramasTodos,
     opcionesOrigenes: opcionesOrigenesTodos,
     opcionesPlanes,
     planes,
     idAsesorSeleccionado,
-    idSucursalSeleccionada,
     idProgramaSeleccionado,
     idPlanSeleccionado,
     idOrigenSeleccionado,
     filtroMembresia,
     inicializarFechas,
     cambiarFechas,
+    cambiarPorFechaPago: (valor: boolean) => dispatch(onSetPorFechaPago(valor)),
     obtenerAsesoresRango,
     obtenerVentasRango,
     filtrarVentas,
-    obtenerSucursales,
     obtenerProgramas,
     obtenerOrigenes,
     obtenerPlanes,
     seleccionarAsesor: (id: number) => dispatch(onSelectAsesor(id)),
-    seleccionarSucursal: (id: number) => dispatch(onSelectSucursal(id)),
     seleccionarPrograma: (id: number) => dispatch(onSelectPrograma(id)),
     seleccionarPlan: (id: number) => dispatch(onSelectPlan(id)),
     seleccionarOrigen: (id: number) => dispatch(onSelectOrigen(id)),

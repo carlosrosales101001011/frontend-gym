@@ -22,7 +22,7 @@ const NOMBRES = { meta: 'Meta acumulada', ventas: 'Venta real acumulada' } as co
 export const MetaAcumuladaVsVenta = ({ fecha_inicio, fecha_fin }: MetaAcumuladaVsVentaProps) => {
   const { theme } = useThemeStore()
   const colores = COLORES_REPORTE[theme]
-  const { montoMetaObjetivo, idAsesorSeleccionado, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
+  const { montoMetaObjetivo, idAsesorSeleccionado, porFechaPago, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
   const [ventas, setVentas] = useState<VentaReporteProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -44,7 +44,7 @@ export const MetaAcumuladaVsVenta = ({ fecha_inicio, fecha_fin }: MetaAcumuladaV
     }
     cargar()
     return () => { vigente = false }
-  }, [fecha_inicio, fecha_fin])
+  }, [fecha_inicio, fecha_fin, porFechaPago])
 
   // Con un asesor elegido solo cuentan sus ventas (la meta ya viene filtrada en montoMetaObjetivo)
   const serie = useMemo(

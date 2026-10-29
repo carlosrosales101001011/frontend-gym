@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
 import { useReporteVentasStore } from '../hook/useReporteVentasStore'
 import { agruparVentasPorAsesor } from '../helpers/ventasPorAsesor'
-import { prepararBarras } from '../helpers/barrasComparacion'
-import type { MedidaReporte } from '../helpers/medidaReporte'
-import { SelectorMedida } from '../components/SelectorMedida'
-import { PanelBarras } from '../components/PanelBarras'
+import { prepararBarras } from '@/components/ReporteBarras/barrasComparacion'
+import type { MedidaReporte } from '@/components/ReporteBarras/medidaReporte'
+import { SelectorMedida } from '@/components/ReporteBarras/SelectorMedida'
+import { PanelBarras } from '@/components/ReporteBarras/PanelBarras'
 import { ID_TODOS, type VentaReporteVentasProps } from '../store/reporteVentasSlice'
 
 type VentasPorAsesorProps = {
@@ -21,7 +21,7 @@ type VentasPorAsesorProps = {
  * en el header, su barra se resalta y las de quienes vendieron más muestran el % de alcance.
  */
 export const VentasPorAsesor = ({ fecha_inicio, fecha_fin }: VentasPorAsesorProps) => {
-  const { idAsesorSeleccionado, idSucursalSeleccionada, idOrigenSeleccionado, filtroMembresia, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
+  const { idAsesorSeleccionado, idOrigenSeleccionado, filtroMembresia, porFechaPago, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
   const [ventas, setVentas] = useState<VentaReporteVentasProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -44,13 +44,13 @@ export const VentasPorAsesor = ({ fecha_inicio, fecha_fin }: VentasPorAsesorProp
     }
     cargar()
     return () => { vigente = false }
-  }, [fecha_inicio, fecha_fin])
+  }, [fecha_inicio, fecha_fin, porFechaPago])
 
-  // Sucursal, programa y origen filtran; el asesor no (se resalta y los demás se comparan contra él)
+  // Programa y origen filtran; el asesor no (se resalta y los demás se comparan contra él)
   const idElegido = idAsesorSeleccionado !== ID_TODOS ? idAsesorSeleccionado : null
   const barras = useMemo(
     () => prepararBarras(agruparVentasPorAsesor(filtrarVentas(ventas, { ignorarAsesor: true }), filtroMembresia), medida, idElegido),
-    [ventas, medida, idElegido, idSucursalSeleccionada, filtroMembresia, idOrigenSeleccionado]
+    [ventas, medida, idElegido, filtroMembresia, idOrigenSeleccionado]
   )
 
   return (

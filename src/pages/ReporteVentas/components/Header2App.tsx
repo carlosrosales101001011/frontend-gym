@@ -30,7 +30,7 @@ const CardResumen = ({ icono, titulo, cargando, children }: CardResumenProps) =>
 
 /** Segundo header del reporte de ventas: resumen de las ventas del rango con los filtros del header */
 export const Header2App = () => {
-  const { fecha_inicio, fecha_fin, rangoValido, idAsesorSeleccionado, idSucursalSeleccionada, idOrigenSeleccionado, filtroMembresia, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
+  const { fecha_inicio, fecha_fin, rangoValido, idAsesorSeleccionado, idOrigenSeleccionado, filtroMembresia, porFechaPago, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
   const [ventas, setVentas] = useState<VentaReporteVentasProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -58,18 +58,18 @@ export const Header2App = () => {
     }
     cargar()
     return () => { vigente = false }
-  }, [fecha_inicio, fecha_fin])
+  }, [fecha_inicio, fecha_fin, porFechaPago])
 
-  // Los filtros de asesor, sucursal, programa y origen se aplican sobre las ventas ya cargadas
+  // Los filtros de asesor, programa y origen se aplican sobre las ventas ya cargadas
   const resumen = useMemo(
     () => calcularResumenVentas(filtrarVentas(ventas), filtroMembresia),
-    [ventas, idAsesorSeleccionado, idSucursalSeleccionada, filtroMembresia, idOrigenSeleccionado]
+    [ventas, idAsesorSeleccionado, filtroMembresia, idOrigenSeleccionado]
   )
 
   // Nuevos, renovaciones y reinscripciones: monto y cantidad de ventas (con los mismos filtros del header)
   const porTipoCliente = useMemo(
     () => resumirPorTipoCliente(tiposCliente, filtrarVentas(ventas), filtroMembresia),
-    [tiposCliente, ventas, idAsesorSeleccionado, idSucursalSeleccionada, filtroMembresia, idOrigenSeleccionado]
+    [tiposCliente, ventas, idAsesorSeleccionado, filtroMembresia, idOrigenSeleccionado]
   )
 
   if (!rangoValido) return null

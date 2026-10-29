@@ -1,9 +1,9 @@
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useThemeStore } from '@/components/TopBar/useThemeStore'
 import { getFormatMoney } from '@/helpers/getFormatMoney'
-import type { BarraComparacion } from '../helpers/barrasComparacion'
-import { formatearMedida, type MedidaReporte } from '../helpers/medidaReporte'
-import { COLORES_REPORTE_VENTAS } from '../helpers/coloresReporteVentas'
+import type { BarraComparacion } from './barrasComparacion'
+import { formatearMedida, type MedidaReporte } from './medidaReporte'
+import { COLORES_REPORTE_VENTAS } from './coloresReporteVentas'
 
 type GraficoBarrasProps = {
   barras: BarraComparacion[]

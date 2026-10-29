@@ -32,6 +32,8 @@ type Props<T> = {
   defaultSort?: { id: number | string; dir: 'asc' | 'desc' };
   /** Avisa las filas que quedan tras el buscador y el orden (todas las páginas), ej. para exportarlas */
   onFilasVisibles?: (rows: T[]) => void;
+  /** Click en una fila (la fila muestra el cursor de link); sin él las filas no son clickeables */
+  onRowClick?: (row: T) => void;
 };
 
 type SortState = { id: number | string; dir: 'asc' | 'desc' } | null;
@@ -45,7 +47,7 @@ const getColumnLabel = <T,>(column: ColumnaSimple2<T>): ReactNode =>
  * A diferencia de DataTableTest, todo el estado es local (no usa la URL ni Redux),
  * así que se pueden tener varias en la misma página sin que se pisen.
  */
-export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostrarBuscador = true, mostrarTamanoPagina = true, mostrarPaginacion = true, rowClassName, defaultSort, onFilasVisibles }: Props<T>) {
+export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostrarBuscador = true, mostrarTamanoPagina = true, mostrarPaginacion = true, rowClassName, defaultSort, onFilasVisibles, onRowClick }: Props<T>) {
   const [search, setSearch] = useState('');
   const [searchColumns, setSearchColumns] = useState<Set<number | string>>(() => new Set());
   const [sort, setSort] = useState<SortState>(defaultSort ?? null);
@@ -199,7 +201,7 @@ export function DataTableSimple2<T>({ data, columns, defaultPageSize = 10, mostr
             </tr>
           ) : (
             pageRows.map((row, rowIndex) => (
-              <tr key={rowIndex}>
+              <tr key={rowIndex} onClick={onRowClick ? () => onRowClick(row) : undefined} style={onRowClick ? { cursor: 'pointer' } : undefined}>
                 {columns.map((column) => (
                   <td className={`tbody-actual ${rowClassName?.(row) ?? ''}`} key={column.id}>{column.render(row)}</td>
                 ))}

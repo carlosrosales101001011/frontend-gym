@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { OpcionesSelect } from '@/types/props';
 
-/** Valor de los seleccionables (asesor, sucursal, programa, origen) que significa "Todos" */
+/** Valor de los seleccionables (asesor, programa, origen) que significa "Todos" */
 export const ID_TODOS = 0;
 
 /** Membresía de una venta (programa, plan y su monto con descuento) */
@@ -47,14 +47,14 @@ export type ReporteVentasState={
     fecha_inicio: string,
     /** yyyy-MM-dd (vacío hasta que se inicializa con hoy) */
     fecha_fin: string,
+    /** true: el rango se aplica a la fecha de pago (por defecto); false: a la fecha de venta */
+    porFechaPago: boolean,
     /** Asesores que vendieron en el rango de fechas */
     opcionesAsesores: OpcionesSelect[],
-    opcionesSucursales: OpcionesSelect[],
     opcionesProgramas: OpcionesSelect[],
     /** Todos los planes; las opciones del seleccionable se filtran por el programa elegido */
     planes: PlanReporteVentasProps[],
     idAsesorSeleccionado: number,
-    idSucursalSeleccionada: number,
     idProgramaSeleccionado: number,
     idPlanSeleccionado: number,
     /** Origen de la venta (terminología origenVenta) */
@@ -64,12 +64,11 @@ export type ReporteVentasState={
 export const initialStateReporteVentas: ReporteVentasState = {
   fecha_inicio: '',
   fecha_fin: '',
+  porFechaPago: true,
   opcionesAsesores: [],
-  opcionesSucursales: [],
   opcionesProgramas: [],
   planes: [],
   idAsesorSeleccionado: ID_TODOS,
-  idSucursalSeleccionada: ID_TODOS,
   idProgramaSeleccionado: ID_TODOS,
   idPlanSeleccionado: ID_TODOS,
   idOrigenSeleccionado: ID_TODOS,
@@ -83,27 +82,24 @@ export const reporteVentasSlice = createSlice({
       state.fecha_inicio = action.payload.fecha_inicio;
       state.fecha_fin = action.payload.fecha_fin;
     },
+    onSetPorFechaPago: (state, action: PayloadAction<boolean>)=>{
+      state.porFechaPago = action.payload;
+    },
     /**
      * Asesores que vendieron en el rango. Solo se guardan si el rango sigue siendo el elegido
      * (evita respuestas viejas); si el asesor elegido ya no está, vuelve a "Todos".
      */
-    onSetAsesores: (state, action: PayloadAction<{ fecha_inicio: string, fecha_fin: string, asesores: OpcionesSelect[] }>)=>{
-      const { fecha_inicio, fecha_fin, asesores } = action.payload;
-      if (fecha_inicio !== state.fecha_inicio || fecha_fin !== state.fecha_fin) return;
+    onSetAsesores: (state, action: PayloadAction<{ fecha_inicio: string, fecha_fin: string, porFechaPago: boolean, asesores: OpcionesSelect[] }>)=>{
+      const { fecha_inicio, fecha_fin, porFechaPago, asesores } = action.payload;
+      if (fecha_inicio !== state.fecha_inicio || fecha_fin !== state.fecha_fin || porFechaPago !== state.porFechaPago) return;
       state.opcionesAsesores = asesores;
       if (!asesores.some((asesor) => asesor.value === state.idAsesorSeleccionado)) state.idAsesorSeleccionado = ID_TODOS;
-    },
-    onSetSucursales: (state, action: PayloadAction<OpcionesSelect[]>)=>{
-      state.opcionesSucursales = action.payload;
     },
     onSetProgramas: (state, action: PayloadAction<OpcionesSelect[]>)=>{
       state.opcionesProgramas = action.payload;
     },
     onSelectAsesor: (state, action: PayloadAction<number>)=>{
       state.idAsesorSeleccionado = action.payload;
-    },
-    onSelectSucursal: (state, action: PayloadAction<number>)=>{
-      state.idSucursalSeleccionada = action.payload;
     },
     /** Los planes dependen del programa: si el plan elegido no es del nuevo programa (o se elige "Todos"), vuelve a "Todos" */
     onSelectPrograma: (state, action: PayloadAction<number>)=>{
@@ -124,4 +120,4 @@ export const reporteVentasSlice = createSlice({
 });
 
 
-export const { onSetFechas, onSetAsesores, onSetSucursales, onSetProgramas, onSelectAsesor, onSelectSucursal, onSelectPrograma, onSetPlanes, onSelectPlan, onSelectOrigen } = reporteVentasSlice.actions;
+export const { onSetFechas, onSetPorFechaPago, onSetAsesores, onSetProgramas, onSelectAsesor, onSelectPrograma, onSetPlanes, onSelectPlan, onSelectOrigen } = reporteVentasSlice.actions;

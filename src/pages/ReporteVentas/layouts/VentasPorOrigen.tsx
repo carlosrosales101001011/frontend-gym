@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
 import { useReporteVentasStore } from '../hook/useReporteVentasStore'
 import { agruparVentasPorOrigen } from '../helpers/ventasPorOrigen'
-import { prepararBarras } from '../helpers/barrasComparacion'
-import type { MedidaReporte } from '../helpers/medidaReporte'
-import { SelectorMedida } from '../components/SelectorMedida'
-import { PanelBarras } from '../components/PanelBarras'
+import { prepararBarras } from '@/components/ReporteBarras/barrasComparacion'
+import type { MedidaReporte } from '@/components/ReporteBarras/medidaReporte'
+import { SelectorMedida } from '@/components/ReporteBarras/SelectorMedida'
+import { PanelBarras } from '@/components/ReporteBarras/PanelBarras'
 import { ID_TODOS, type VentaReporteVentasProps } from '../store/reporteVentasSlice'
 
 type VentasPorOrigenProps = {
@@ -21,7 +21,7 @@ type VentasPorOrigenProps = {
  * que vendieron más muestran el % de alcance.
  */
 export const VentasPorOrigen = ({ fecha_inicio, fecha_fin }: VentasPorOrigenProps) => {
-  const { idAsesorSeleccionado, idSucursalSeleccionada, idOrigenSeleccionado, filtroMembresia, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
+  const { idAsesorSeleccionado, idOrigenSeleccionado, filtroMembresia, porFechaPago, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
   const [ventas, setVentas] = useState<VentaReporteVentasProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -44,13 +44,13 @@ export const VentasPorOrigen = ({ fecha_inicio, fecha_fin }: VentasPorOrigenProp
     }
     cargar()
     return () => { vigente = false }
-  }, [fecha_inicio, fecha_fin])
+  }, [fecha_inicio, fecha_fin, porFechaPago])
 
-  // Asesor, sucursal y programa filtran; el origen no (se resalta y los demás se comparan contra él)
+  // Asesor y programa filtran; el origen no (se resalta y los demás se comparan contra él)
   const idElegido = idOrigenSeleccionado !== ID_TODOS ? idOrigenSeleccionado : null
   const barras = useMemo(
     () => prepararBarras(agruparVentasPorOrigen(filtrarVentas(ventas, { ignorarOrigen: true }), filtroMembresia), medida, idElegido),
-    [ventas, medida, idElegido, idAsesorSeleccionado, idSucursalSeleccionada, filtroMembresia]
+    [ventas, medida, idElegido, idAsesorSeleccionado, filtroMembresia]
   )
 
   return (

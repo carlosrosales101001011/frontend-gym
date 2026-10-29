@@ -34,7 +34,7 @@ const CardResumen = ({ icono, titulo, valor, detalle, cargando = false }: CardRe
 
 /** Segundo header del reporte: 4 cards con el resumen de la meta elegida (y del asesor, si se eligió uno) */
 export const Header2App = () => {
-  const { metaSeleccionada, montoMetaObjetivo, idAsesorSeleccionado, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
+  const { metaSeleccionada, montoMetaObjetivo, idAsesorSeleccionado, porFechaPago, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
   const [ventas, setVentas] = useState<VentaReporteProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -64,7 +64,7 @@ export const Header2App = () => {
     }
     cargar()
     return () => { vigente = false }
-  }, [fecha_inicio, fecha_fin])
+  }, [fecha_inicio, fecha_fin, porFechaPago])
 
   const resumen = useMemo(
     () => fecha_inicio && fecha_fin

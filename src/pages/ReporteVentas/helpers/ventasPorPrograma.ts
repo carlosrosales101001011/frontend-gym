@@ -2,7 +2,7 @@ import { groupBy } from '@/helpers/arrays'
 import { sumBy } from '@/helpers/reports'
 import type { OpcionesSelect } from '@/types/props'
 import type { VentaReporteVentasProps } from '../store/reporteVentasSlice'
-import type { ItemBarra } from './barrasComparacion'
+import type { ItemBarra } from '@/components/ReporteBarras/barrasComparacion'
 import { ID_TODOS } from '../store/reporteVentasSlice'
 
 /**

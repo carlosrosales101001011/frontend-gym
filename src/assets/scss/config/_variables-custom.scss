@@ -55,6 +55,9 @@ $card-border-actual: var(--cr-card-border);
     --cr-regalo-bg: #3d1216;
     --cr-regalo-color: #ffc9cc;
     --cr-regalo-border: #e8545c;
+    // Amarillo: fila elegida en una tabla (ej. el filtro de un reporte)
+    --cr-elegida-bg: #3d3412;
+    --cr-elegida-color: #ffe69c;
 }
 
 :root[data-theme="light"] {
@@ -74,6 +77,8 @@ $card-border-actual: var(--cr-card-border);
     --cr-regalo-bg: #fde4e5;
     --cr-regalo-color: #8a1c22;
     --cr-regalo-border: #ef8a90;
+    --cr-elegida-bg: #fff3cd;
+    --cr-elegida-color: #664d03;
 }
 .bg-actual {
     background-color: $bg-actual !important;
@@ -124,6 +129,15 @@ $card-border-actual: var(--cr-card-border);
 .tbody-actual.fila-regalo *{
     color: var(--cr-regalo-color) !important;
 }
+// Fila elegida en una tabla (amarillo), ej. el filtro de un reporte
+.tbody-actual.fila-elegida{
+    background-color: var(--cr-elegida-bg) !important;
+    color: var(--cr-elegida-color) !important;
+}
+.tbody-actual.fila-elegida *{
+    color: var(--cr-elegida-color) !important;
+}
+
 .badge-regalo{
     display: inline-block;
     padding: 0 6px;

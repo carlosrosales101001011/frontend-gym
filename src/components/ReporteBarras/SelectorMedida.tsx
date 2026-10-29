@@ -1,5 +1,5 @@
 import { Button, ButtonGroup } from 'react-bootstrap'
-import type { MedidaReporte } from '../helpers/medidaReporte'
+import type { MedidaReporte } from './medidaReporte'
 
 const OPCIONES: { value: MedidaReporte, label: string }[] = [
   { value: 'monto', label: 'Monto' },

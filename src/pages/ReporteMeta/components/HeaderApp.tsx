@@ -2,12 +2,16 @@ import { useEffect } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import IconCR from '@/components/Icons/IconCR'
 import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
+import InputSwitchCR from '@/components/TextFields/InputSwitchCR'
 import { useReporteMetaStore } from '../hook/useReporteMetaStore'
 import { formatDate } from '@/helpers/FormatDate'
 
-/** Header del reporte de metas (en una card): seleccionables de meta y asesor, rango de fechas y monto de programas */
+/**
+ * Header del reporte de metas (en una card): seleccionables de meta y asesor, rango de fechas, monto de programas
+ * y si el periodo es por fecha de pago o de venta
+ */
 export const HeaderApp = () => {
-  const { opcionesMetas, idMetaSeleccionada, metaSeleccionada, opcionesAsesores, idAsesorSeleccionado, obtenerMetas, seleccionarMeta, seleccionarAsesor } = useReporteMetaStore()
+  const { opcionesMetas, idMetaSeleccionada, metaSeleccionada, opcionesAsesores, idAsesorSeleccionado, porFechaPago, obtenerMetas, seleccionarMeta, seleccionarAsesor, cambiarPorFechaPago } = useReporteMetaStore()
 
   useEffect(() => {
     obtenerMetas()
@@ -49,6 +53,14 @@ export const HeaderApp = () => {
           </Col>
         )}
       </Row>
+      {/* Habilitado (por defecto): el periodo se aplica a la fecha de pago; deshabilitado: a la fecha de venta */}
+      <InputSwitchCR
+        name="por_fecha_pago"
+        label={porFechaPago ? 'Con fecha de pago' : 'Con fecha de venta'}
+        defaultValue={porFechaPago}
+        onChange={(e) => cambiarPorFechaPago(e.target.checked)}
+        wrapperClassName="mb-0 mt-2"
+      />
     </div>
   )
 }

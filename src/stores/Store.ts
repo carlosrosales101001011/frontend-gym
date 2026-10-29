@@ -42,6 +42,7 @@ import { reporteMetaSlice } from "@/pages/ReporteMeta/store/reporteMetaSlice";
 import { reporteAsistenciaSlice } from "@/pages/ReporteAsistenciaClientes/store/reporteAsistenciaSlice";
 import { reporteVentasSlice } from "@/pages/ReporteVentas/store/reporteVentasSlice";
 import { reporteCitasSlice } from "@/pages/ReporteCitasNutricion/store/reporteCitasSlice";
+import { compromisoPagoSlice } from "@/pages/GestionCompromisosPagos/store/compromisoPagoSlice";
 import { asistenciasSlice } from "@/pages/GestionAsistencias/store/asistenciasSlice";
 import { modulosUsuarioSlice } from "@/pages/GestionModuloxUsuario/store/modulosUsuarioSlice";
 
@@ -89,6 +90,7 @@ export const store = configureStore({
     REPORTE_ASISTENCIA: reporteAsistenciaSlice.reducer,
     REPORTE_VENTAS: reporteVentasSlice.reducer,
     REPORTE_CITAS: reporteCitasSlice.reducer,
+    COMPROMISO_PAGO: compromisoPagoSlice.reducer,
     ASISTENCIAS: asistenciasSlice.reducer,
     MODULOS_USUARIO: modulosUsuarioSlice.reducer
 }

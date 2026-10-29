@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Col, Form, Row } from 'react-bootstrap'
+import { InputCR } from '@/components/TextFields/InputCR'
 import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
 import { ButtonCR } from '@/components/Button/ButtonCR'
 import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
@@ -10,7 +11,7 @@ import { usePerfilUsuario, type CambiosSistema, type OpcionColaborador } from '.
 const SIN_EMPLEADO: OpcionColaborador = { value: 0, label: '— Sin colaborador —' }
 
 /**
- * Datos de sistema del usuario: super usuario, rol y empleado (colaborador vinculado).
+ * Datos de sistema del usuario: usuario (login), super usuario, rol y empleado (colaborador vinculado).
  * Edita quien lo registró o un super usuario; "super usuario" solo lo cambia un super usuario.
  */
 export const TabDatosSistema = () => {
@@ -22,6 +23,7 @@ export const TabDatosSistema = () => {
 
   const usuario = perfil!.usuario
   const { puedeEditar, puedeMarcarSuper } = perfil!
+  const [nombreUsuario, setNombreUsuario] = useState(usuario.usuario ?? '')
   const [superUsuario, setSuperUsuario] = useState(usuario.is_super_user)
   const [idRol, setIdRol] = useState(usuario.id_rol ?? 0)
   const [idEmpl, setIdEmpl] = useState(usuario.id_empl ?? 0)
@@ -33,6 +35,7 @@ export const TabDatosSistema = () => {
 
   // Solo se envía lo que cambió
   const cambios: CambiosSistema = {
+    ...(nombreUsuario.trim() !== (usuario.usuario ?? '') ? { usuario: nombreUsuario.trim() } : {}),
     ...(superUsuario !== usuario.is_super_user ? { is_super_user: superUsuario } : {}),
     ...(idRol && idRol !== usuario.id_rol ? { id_rol: idRol } : {}),
     ...(idEmpl !== (usuario.id_empl ?? 0) ? { id_empl: idEmpl } : {}),
@@ -52,6 +55,15 @@ export const TabDatosSistema = () => {
       )}
       <fieldset disabled={!puedeEditar} style={puedeEditar ? undefined : { pointerEvents: 'none' }}>
         <Row className="g-3">
+          <Col lg={6}>
+            {/* Con el que inicia sesión (además del email) */}
+            <InputCR
+              label="Usuario"
+              value={nombreUsuario}
+              maxLength={30}
+              onChange={(e) => setNombreUsuario(e.target.value)}
+            />
+          </Col>
           <Col xs={12}>
             <Form.Check
               type="switch"
@@ -82,6 +94,9 @@ export const TabDatosSistema = () => {
               defaultValue={String(idEmpl)}
               onChange={(e) => setIdEmpl(Number(e.target.value))}
             />
+            {idEmpl > 0 && (
+              <div className="small opacity-75 mt-1">Nombres, apellidos y correos del usuario se toman del colaborador.</div>
+            )}
           </Col>
         </Row>
       </fieldset>

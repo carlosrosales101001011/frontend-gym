@@ -2,7 +2,7 @@ import { groupBy } from '@/helpers/arrays'
 import { sumBy } from '@/helpers/reports'
 import type { VentaReporteVentasProps } from '../store/reporteVentasSlice'
 import { montoVendidoVenta, type FiltroMembresia } from './resumenVentas'
-import type { ItemBarra } from './barrasComparacion'
+import type { ItemBarra } from '@/components/ReporteBarras/barrasComparacion'
 
 /** Lo vendido y la cantidad de ventas de cada asesor */
 export const agruparVentasPorAsesor = (ventas: VentaReporteVentasProps[], filtro: FiltroMembresia): ItemBarra[] =>

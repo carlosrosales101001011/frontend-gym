@@ -8,6 +8,8 @@ export type AsesorReporteProps = Pick<AsesorMetaProps, 'id_empl' | 'label_empl' 
 export type VentaReporteProps = {
   id: number,
   fecha_venta: string,
+  /** Con por_fecha_pago: primer pago de la venta dentro del periodo (yyyy-MM-dd); null por fecha de venta */
+  fecha_pago: string | null,
   id_empl: number,
   montoTotal_membresia: number | string,
   /** Tipo de cliente de la venta: Nuevo, Renovación, Reinscripción (terminología venta/cliente/tipo) */
@@ -26,6 +28,8 @@ export type ReporteMetaState={
     asesoresMeta: AsesorReporteProps[],
     /** Asesor elegido en el header (ID_TODOS_ASESORES = todos) */
     idAsesorSeleccionado: number,
+    /** true: el periodo se aplica a la fecha de pago (por defecto); false: a la fecha de venta */
+    porFechaPago: boolean,
 }
 
 export const initialStateReporteMeta: ReporteMetaState = {
@@ -33,6 +37,7 @@ export const initialStateReporteMeta: ReporteMetaState = {
   idMetaSeleccionada: 0,
   asesoresMeta: [],
   idAsesorSeleccionado: ID_TODOS_ASESORES,
+  porFechaPago: true,
 };
 
 export const reporteMetaSlice = createSlice({
@@ -55,8 +60,11 @@ export const reporteMetaSlice = createSlice({
     onSelectAsesor: (state, action: PayloadAction<number>)=>{
       state.idAsesorSeleccionado = action.payload;
     },
+    onSetPorFechaPago: (state, action: PayloadAction<boolean>)=>{
+      state.porFechaPago = action.payload;
+    },
   },
 });
 
 
-export const { onSetMetas, onSelectMeta, onSetAsesoresMeta, onSelectAsesor } = reporteMetaSlice.actions;
+export const { onSetMetas, onSelectMeta, onSetAsesoresMeta, onSelectAsesor, onSetPorFechaPago } = reporteMetaSlice.actions;

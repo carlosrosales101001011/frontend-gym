@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
-import { differenceInCalendarDays, format, parseISO } from 'date-fns'
+import { differenceInCalendarDays, parseISO } from 'date-fns'
 import ModalCR from '@/components/Modal/ModalCR'
 import { DataTableSimple2, type ColumnaSimple2 } from '@/components/DataTableSimple/DataTableSimple2'
 import { ButtonCR } from '@/components/Button/ButtonCR'
@@ -154,8 +154,8 @@ export const ModalDetalleMembresia = ({ detalle, membresia, show, onHide, onRegi
                 diasMaximos={detalle === 'congelamiento'
                   ? Math.max(0, membresia.congelamiento_regalados - membresia.dias_congelados)
                   : MAX_DIAS_REGALO}
-                // Mismas reglas que el backend: desde hoy (y no antes del inicio de la membresía) hasta su vencimiento
-                inicioMinimo={[format(new Date(), 'yyyy-MM-dd'), membresia.fecha_inicio ?? ''].sort().at(-1)!}
+                // Mismas reglas que el backend: empieza entre el inicio de la membresía y su vencimiento
+                inicioMinimo={membresia.fecha_inicio ?? ''}
                 inicioMaximo={membresia.fecha_vencimiento}
                 congelamientos={extensionesTipo}
                 guardando={guardando}
@@ -191,7 +191,7 @@ type FormExtensionProps = {
   /** Congelamiento: días que le quedan; regalo: máximo por extensión */
   diasMaximos: number
   guardando: boolean
-  /** Congelamiento: primer y último día en que puede empezar (yyyy-mm-dd) */
+  /** Primer y último día en que puede empezar (yyyy-mm-dd): inicio y vencimiento de la membresía */
   inicioMinimo: string
   inicioMaximo: string
   /** Congelamientos ya registrados: el nuevo no se puede cruzar con ellos */
@@ -200,7 +200,7 @@ type FormExtensionProps = {
   onGuardar: (extension: NuevaExtension) => void
 }
 
-/** Formulario de un congelamiento (desde / hasta) o un regalo (días); ambos con observación */
+/** Formulario de un congelamiento (desde / hasta) o un regalo (desde / días); ambos con observación */
 const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMaximo, congelamientos, onCancelar, onGuardar }: FormExtensionProps) => {
   const [desde, setDesde] = useState('')
   const [hasta, setHasta] = useState('')
@@ -211,17 +211,20 @@ const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMa
   // Congelamiento: días corridos de desde a hasta, ambos incluidos
   const diasCongelamiento = desde && hasta ? differenceInCalendarDays(parseISO(hasta), parseISO(desde)) + 1 : 0
   const cruce = desde && hasta ? congelamientos.find((c) => c.fecha_inicio <= hasta && c.fecha_fin >= desde) : undefined
+  // Ambos empiezan dentro de la membresía; solo el congelamiento no se puede cruzar con otro
+  const errorDesde = !desde ? 'Indica desde cuándo'
+    : inicioMinimo && desde < inicioMinimo ? `Debe empezar desde el ${fecha(inicioMinimo)} (inicio)`
+    : desde > inicioMaximo ? `Debe empezar a más tardar el ${fecha(inicioMaximo)} (vencimiento)`
+    : detalle === 'congelamiento' && cruce ? `Se cruza con el congelamiento del ${fecha(cruce.fecha_inicio)} al ${fecha(cruce.fecha_fin)}` : ''
   const errores = detalle === 'congelamiento'
     ? {
-        desde: !desde ? 'Indica desde cuándo'
-          : desde < inicioMinimo ? `Debe empezar desde el ${fecha(inicioMinimo)}`
-          : desde > inicioMaximo ? `Debe empezar a más tardar el ${fecha(inicioMaximo)} (vencimiento)`
-          : cruce ? `Se cruza con el congelamiento del ${fecha(cruce.fecha_inicio)} al ${fecha(cruce.fecha_fin)}` : '',
+        desde: errorDesde,
         hasta: !hasta ? 'Indica hasta cuándo'
           : diasCongelamiento < 1 ? 'Debe ser igual o posterior a "Desde"'
           : diasCongelamiento > diasMaximos ? `Le quedan ${dias(diasMaximos)} de congelamiento` : '',
       }
     : {
+        desde: errorDesde,
         dias: !/^\d+$/.test(diasRegalo) || Number(diasRegalo) < 1 ? 'Ingresa un número entero mayor a 0'
           : Number(diasRegalo) > diasMaximos ? `Máximo ${diasMaximos} días` : '',
       }
@@ -234,7 +237,7 @@ const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMa
     if (!valido) return
     onGuardar(detalle === 'congelamiento'
       ? { id_tipo_extension: ID_EXTENSION_CONGELAMIENTO, fecha_inicio: desde, fecha_fin: hasta, observacion: observacion.trim() }
-      : { id_tipo_extension: ID_EXTENSION_REGALO, dias_habiles: Number(diasRegalo), observacion: observacion.trim() })
+      : { id_tipo_extension: ID_EXTENSION_REGALO, fecha_inicio: desde, dias_habiles: Number(diasRegalo), observacion: observacion.trim() })
   }
 
   return (
@@ -257,10 +260,16 @@ const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMa
             )}
           </>
         ) : (
-          <Col md={6}>
-            <InputCR label={`Días de regalo (máx. ${diasMaximos})`} inputMode="numeric" value={diasRegalo}
-              onChange={(e) => setDiasRegalo(e.target.value)} messageErrors={mostrar(errores.dias ?? '')} />
-          </Col>
+          <>
+            <Col md={6}>
+              <InputCR type="date" label="Desde" value={desde} min={inicioMinimo} max={inicioMaximo}
+                onChange={(e) => setDesde(e.target.value)} messageErrors={mostrar(errores.desde ?? '')} />
+            </Col>
+            <Col md={6}>
+              <InputCR label={`Días de regalo (máx. ${diasMaximos})`} inputMode="numeric" value={diasRegalo}
+                onChange={(e) => setDiasRegalo(e.target.value)} messageErrors={mostrar(errores.dias ?? '')} />
+            </Col>
+          </>
         )}
         <Col xs={12}>
           <InputCR type="text-area" label={detalle === 'regalo' ? 'Observación / motivo' : 'Observación'} value={observacion}

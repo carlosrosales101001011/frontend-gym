@@ -1,4 +1,4 @@
-import { differenceInCalendarDays, parseISO, subDays } from 'date-fns'
+import { differenceInCalendarDays, eachDayOfInterval, parseISO, subDays } from 'date-fns'
 
 /**
  * Días transcurridos desde la fecha de vencimiento hasta hoy (cuenta domingos).
@@ -10,6 +10,14 @@ export const diasVencidos = (fecha_vencimiento: string) =>
 /** Días calendario de la membresía, de su inicio a su vencimiento (ambos incluidos; ej. 1 al 31 de octubre = 31) */
 export const diasMembresia = (fecha_inicio: string, fecha_vencimiento: string) =>
     differenceInCalendarDays(parseISO(fecha_vencimiento), parseISO(fecha_inicio)) + 1
+
+/** Días hábiles (lunes a sábado) de la membresía, de su inicio a su vencimiento (ambos incluidos); 0 si el rango no es válido */
+export const diasHabilesMembresia = (fecha_inicio: string, fecha_vencimiento: string) => {
+    const inicio = parseISO(fecha_inicio)
+    const fin = parseISO(fecha_vencimiento)
+    if (fin < inicio) return 0
+    return eachDayOfInterval({ start: inicio, end: fin }).filter((dia) => dia.getDay() !== 0).length
+}
 
 /** Día en curso de una extensión (congelamiento / regalo) que empezó en fecha_inicio: el primer día es 1 */
 export const diaEnCurso = (fecha_inicio: string) =>

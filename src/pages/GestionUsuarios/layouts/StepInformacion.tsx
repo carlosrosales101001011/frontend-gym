@@ -24,7 +24,7 @@ const PATRON_PASSWORD = { value: /^(?=.*(\d|\W)).{6,50}$/, message: "De 6 a 50 c
 export const StepInformacion = ({setStep}:StepInformacionProps) => {
   const { user, opcionesEmpleados, obtenerOpcionesEmpleados, guardarInformacion } = useGestionUsuariosStore()
   const { cargar:cargarRoles, data:dataRoles } = useTerminologiaPersona('userRoles')
-  const { register, formState: { errors }, handleSubmit } = useForm<FormInformacion>({
+  const { register, formState: { errors }, handleSubmit, watch, setValue } = useForm<FormInformacion>({
     mode: "onChange",
     defaultValues: { ...user, password_confirmacion: user.password },
   })
@@ -32,6 +32,17 @@ export const StepInformacion = ({setStep}:StepInformacionProps) => {
     cargarRoles()
     obtenerOpcionesEmpleados()
   }, [])
+
+  // Con empleado elegido, nombres, apellidos y correos son los del colaborador (el backend también los toma de él)
+  const empleado = opcionesEmpleados.find((opcion) => opcion.value === Number(watch('id_empl')))
+  const elegirEmpleado = (idEmpl: number) => {
+    const elegido = opcionesEmpleados.find((opcion) => opcion.value === idEmpl)
+    if (!elegido) return
+    setValue('nombres', elegido.nombres, { shouldValidate: true })
+    setValue('apellidos', elegido.apellidos, { shouldValidate: true })
+    setValue('email', elegido.email, { shouldValidate: true })
+    setValue('email_corporativo', elegido.email_corporativo, { shouldValidate: true })
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- la confirmación no se guarda
   const onSiguiente = ({ password_confirmacion, ...data }: FormInformacion)=>{
@@ -46,20 +57,20 @@ export const StepInformacion = ({setStep}:StepInformacionProps) => {
         <Col lg={6}>
           <InputCR {...register("nombres", {
             required: "Los nombres son obligatorios"
-          })} label="Nombres" name="nombres" required messageErrors={errors.nombres?.message}/>
+          })} label="Nombres" name="nombres" required readOnly={!!empleado} messageErrors={errors.nombres?.message}/>
         </Col>
         <Col lg={6}>
           <InputCR {...register("apellidos", {
             required: "Los apellidos son obligatorios"
-          })} label="Apellidos" name="apellidos" required messageErrors={errors.apellidos?.message}/>
+          })} label="Apellidos" name="apellidos" required readOnly={!!empleado} messageErrors={errors.apellidos?.message}/>
         </Col>
         <Col lg={6}>
           <InputCR {...register("email", { pattern: PATRON_EMAIL })}
-            label="Correo personal" name="email" messageErrors={errors.email?.message} />
+            label="Correo personal" name="email" readOnly={!!empleado} messageErrors={errors.email?.message} />
         </Col>
         <Col lg={6}>
           <InputCR {...register("email_corporativo", { pattern: PATRON_EMAIL })}
-            label="Correo empresarial" name="email_corporativo" messageErrors={errors.email_corporativo?.message}/>
+            label="Correo empresarial" name="email_corporativo" readOnly={!!empleado} messageErrors={errors.email_corporativo?.message}/>
         </Col>
         <Col lg={6}>
           <InputCR {...register("usuario", { required: "El usuario es obligatorio", pattern: PATRON_USUARIO })}
@@ -87,7 +98,9 @@ export const StepInformacion = ({setStep}:StepInformacionProps) => {
           <InputSelectCR {...register("id_rol", { setValueAs: Number })} label="Rol" options={dataRoles} />
         </Col>
         <Col lg={6}>
-          <InputSelectCR {...register("id_empl", { setValueAs: Number })} label="Empleado" options={opcionesEmpleados} />
+          <InputSelectCR {...register("id_empl", { setValueAs: Number, onChange: (e) => elegirEmpleado(Number((e.target as HTMLSelectElement).value)) })}
+            label="Empleado" options={opcionesEmpleados} />
+          {empleado && <div className="small opacity-75 mt-1">Nombres, apellidos y correos se toman del colaborador.</div>}
         </Col>
         <Col lg={6} className="d-flex align-items-center">
           <InputSwitchCR {...register("is_super_user")} name='is_super_user' label='Es super usuario' wrapperClassName="mb-0"/>

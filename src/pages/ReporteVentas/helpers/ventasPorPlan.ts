@@ -2,7 +2,7 @@ import { groupBy } from '@/helpers/arrays'
 import { sumBy } from '@/helpers/reports'
 import type { PlanReporteVentasProps, VentaReporteVentasProps } from '../store/reporteVentasSlice'
 import { ID_TODOS } from '../store/reporteVentasSlice'
-import type { ItemBarra } from './barrasComparacion'
+import type { ItemBarra } from '@/components/ReporteBarras/barrasComparacion'
 
 const duracion = (nMeses: number) => `${nMeses} ${nMeses === 1 ? 'mes' : 'meses'}`
 

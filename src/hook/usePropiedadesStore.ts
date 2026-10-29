@@ -88,6 +88,8 @@ const TERMINOLOGIAS = {
   subtipoAsistencia: ['asistencia', 'tipo', 'persona'], //Entrada, Salida, Refrigerio... (persona_eventos_asistencia.id_subtipo)
   distritosLima: ['persona', 'distrito', 'Lima'],
   distritosCallao: ['persona', 'distrito', 'Callao'],
+  motivoCompromisoPago: ['compromiso', 'pago', 'motivo'], //compromisos_pago_cliente.id_motivo
+  estadoCompromisoPago: ['compromiso', 'pago', 'estado'], //compromisos_pago_cliente.id_estado
   
 } as const;
 
