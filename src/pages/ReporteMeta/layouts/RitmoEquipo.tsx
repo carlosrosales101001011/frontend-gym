@@ -31,7 +31,7 @@ const Indicador = ({ titulo, valor }: { titulo: string, valor: string }) => (
 export const RitmoEquipo = ({ fecha_inicio, fecha_fin }: RitmoEquipoProps) => {
   const { theme } = useThemeStore()
   const colores = COLORES_REPORTE[theme]
-  const { montoMetaObjetivo, idAsesorSeleccionado, asesorSeleccionado, porFechaPago, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
+  const { montoMetaObjetivo, idAsesorSeleccionado, asesorSeleccionado, porFechaPago, textos, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
   const [ventas, setVentas] = useState<VentaReporteProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -65,17 +65,17 @@ export const RitmoEquipo = ({ fecha_inicio, fecha_fin }: RitmoEquipoProps) => {
   const faltaParaMeta = Math.max(montoMetaObjetivo - ritmo.ventaAcumulada, 0)
   // Anillo: lo vendido (hasta la meta) + lo que falta; si ya se pasó la meta, el anillo queda completo en azul
   const segmentos = [
-    { nombre: 'Venta acumulada', valor: Math.min(ritmo.ventaAcumulada, montoMetaObjetivo), color: colores.ventas },
+    { nombre: textos.acumulado, valor: Math.min(ritmo.ventaAcumulada, montoMetaObjetivo), color: colores.ventas },
     { nombre: 'Falta para la meta', valor: faltaParaMeta, color: colores.pendiente },
   ]
   const porcentajeTexto = `${Math.round(ritmo.porcentaje * 10) / 10}%`
 
   return (
     <div className="card-mode-actual rounded p-3 h-100 position-relative">
-      <LoadingOverlay texto="Cargando ventas" show={loading} interno />
+      <LoadingOverlay texto={textos.cargando} show={loading} interno />
       <h5 className="fw-bold mb-3">{asesorSeleccionado ? `Ritmo de ${asesorSeleccionado.label_empl}` : 'Ritmo del equipo'}</h5>
 
-      {error && <div className="text-danger small">No se pudieron cargar las ventas: {error}</div>}
+      {error && <div className="text-danger small">{textos.errorCarga}: {error}</div>}
       {!error && montoMetaObjetivo <= 0 && (
         <div className="small opacity-75 py-5 text-center">La meta no tiene monto asignado para comparar.</div>
       )}
@@ -118,7 +118,7 @@ export const RitmoEquipo = ({ fecha_inicio, fecha_fin }: RitmoEquipoProps) => {
           <div className="d-flex flex-wrap justify-content-center gap-3 small mb-3">
             <span className="d-inline-flex align-items-center gap-1">
               <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: colores.ventas, display: 'inline-block' }} />
-              <span className="opacity-75">Venta acumulada:</span>
+              <span className="opacity-75">{textos.acumulado}:</span>
               <span className="fw-semibold">{getFormatMoney(ritmo.ventaAcumulada)}</span>
             </span>
             <span className="d-inline-flex align-items-center gap-1">

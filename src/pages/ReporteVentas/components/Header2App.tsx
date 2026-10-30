@@ -8,21 +8,25 @@ import { useReporteVentasStore } from '../hook/useReporteVentasStore'
 import { calcularResumenVentas } from '../helpers/resumenVentas'
 import { resumirPorTipoCliente } from '../helpers/ventasPorTipoCliente'
 import type { VentaReporteVentasProps } from '../store/reporteVentasSlice'
+import { ModalDetalleVentas, type DetalleVentas } from './ModalDetalleVentas'
 
 type CardResumenProps = {
   icono: IconName
   titulo: string
   cargando: boolean
   children: ReactNode
+  /** Acción opcional a la derecha del título (ej. "Ver ventas") */
+  accion?: ReactNode
 }
 
 /** Card de un dato del resumen, con loading interno */
-const CardResumen = ({ icono, titulo, cargando, children }: CardResumenProps) => (
+const CardResumen = ({ icono, titulo, cargando, children, accion }: CardResumenProps) => (
   <div className="card-mode-actual rounded p-3 h-100 position-relative">
     <LoadingOverlay texto="Cargando" show={cargando} interno />
     <div className="d-flex align-items-center gap-2 mb-2">
       <IconCR name={icono} size={16} />
       <span className="small fw-semibold opacity-75">{titulo}</span>
+      {accion && <span className="ms-auto">{accion}</span>}
     </div>
     {children}
   </div>
@@ -30,7 +34,8 @@ const CardResumen = ({ icono, titulo, cargando, children }: CardResumenProps) =>
 
 /** Segundo header del reporte de ventas: resumen de las ventas del rango con los filtros del header */
 export const Header2App = () => {
-  const { fecha_inicio, fecha_fin, rangoValido, idAsesorSeleccionado, idOrigenSeleccionado, filtroMembresia, porFechaPago, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
+  const { fecha_inicio, fecha_fin, rangoValido, idAsesorSeleccionado, idOrigenSeleccionado, filtroMembresia, porFechaPago, textos, obtenerVentasRango, filtrarVentas } = useReporteVentasStore()
+  const [detalle, setDetalle] = useState<DetalleVentas | null>(null)
   const [ventas, setVentas] = useState<VentaReporteVentasProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -75,21 +80,30 @@ export const Header2App = () => {
   if (!rangoValido) return null
 
   const valor = (texto: string) => <div className="fs-4 fw-bold">{error ? '—' : texto}</div>
-  const detalle = (texto: string) => <div className="small opacity-75">{error ? 'No se pudieron cargar las ventas' : texto}</div>
+  const textoDetalle = (texto: string) => <div className="small opacity-75">{error ? textos.errorCarga : texto}</div>
+  // Lo mismo que suma "Total vendido/ingresado" (con todos los filtros del header)
+  const abrirDetalle = () => setDetalle({ titulo: `${textos.tituloModal} del rango`, filas: filtrarVentas(ventas), filtro: filtroMembresia })
 
   return (
     <>
     <Row className="g-3 mb-3">
       <Col lg={3} md={6}>
-        <CardResumen icono="sales" titulo="Total vendido" cargando={loading}>
+        <CardResumen
+          icono="sales"
+          titulo={textos.total}
+          cargando={loading}
+          accion={!error && !loading && (
+            <button type="button" className="btn btn-link btn-sm p-0" onClick={abrirDetalle}>{textos.verDetalle}</button>
+          )}
+        >
           {valor(getFormatMoney(resumen.totalVendido))}
-          {detalle('Membresías vendidas en el rango')}
+          {textoDetalle(textos.detalleTotal)}
         </CardResumen>
       </Col>
       <Col lg={3} md={6}>
         <CardResumen icono="users" titulo="Número de clientes" cargando={loading}>
           {valor(String(resumen.numeroClientes))}
-          {detalle('Clientes con ventas en el rango')}
+          {textoDetalle(textos.detalleClientes)}
         </CardResumen>
       </Col>
       <Col lg={3} md={6}>
@@ -97,14 +111,14 @@ export const Header2App = () => {
         <CardResumen icono="reporte" titulo="No pagado" cargando={loading}>
           {valor(getFormatMoney(resumen.montoNoPagado))}
           <div className="small opacity-75">
-            {error ? 'No se pudieron cargar las ventas' : <>Pagado: <span className="fw-semibold">{getFormatMoney(resumen.montoPagado)}</span></>}
+            {error ? textos.errorCarga : <>Pagado: <span className="fw-semibold">{getFormatMoney(resumen.montoPagado)}</span></>}
           </div>
         </CardResumen>
       </Col>
       <Col lg={3} md={6}>
         <CardResumen icono="user" titulo="Clientes con deudas" cargando={loading}>
           {valor(String(resumen.clientesConDeuda))}
-          {detalle(`De ${resumen.numeroClientes} ${resumen.numeroClientes === 1 ? 'cliente' : 'clientes'}`)}
+          {textoDetalle(`De ${resumen.numeroClientes} ${resumen.numeroClientes === 1 ? 'cliente' : 'clientes'}`)}
         </CardResumen>
       </Col>
     </Row>
@@ -113,11 +127,14 @@ export const Header2App = () => {
         <Col key={tipo.id_tipo_cli} lg={4} md={6}>
           <CardResumen icono="users" titulo={tipo.label} cargando={loading}>
             {valor(getFormatMoney(tipo.montoTotal))}
-            {detalle(`${tipo.cantidad} ${tipo.cantidad === 1 ? 'venta' : 'ventas'} en el rango`)}
+            {textoDetalle(textos.cantidad(tipo.cantidad))}
           </CardResumen>
         </Col>
       ))}
     </Row>
+    {detalle && (
+      <ModalDetalleVentas detalle={detalle} onHide={() => setDetalle(null)} porFechaPago={porFechaPago} fecha_inicio={fecha_inicio} fecha_fin={fecha_fin} />
+    )}
     </>
   )
 }

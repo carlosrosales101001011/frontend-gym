@@ -20,9 +20,11 @@ import {
   onSetPlanes,
   onSetPorFechaPago,
   onSetProgramas,
+  type PagoReporteVentasProps,
   type PlanReporteVentasProps,
   type VentaReporteVentasProps,
 } from "../store/reporteVentasSlice"
+import { textosReporteVentas } from "../helpers/textosReporteVentas"
 
 const aFechaISO = (fecha: Date) => formatDate(fecha, 'yyyy-mm-dd', 'yyyy-mm-dd')
 
@@ -75,12 +77,28 @@ export const useReporteVentasStore = () => {
     }
 
     /**
-     * Todas las ventas del rango (con sus membresías); cada componente guarda el resultado en su propio estado.
-     * Con porFechaPago, el rango se aplica a la fecha de los pagos en vez de a la fecha de venta.
+     * Filas del reporte; cada componente guarda el resultado en su propio estado.
+     * - por fecha de venta: las ventas del rango (con sus membresías).
+     * - por fecha de pago: los ingresos, una fila por pago del rango con los datos de su venta (membresías,
+     *   origen, deuda...). Así todo el reporte suma lo que realmente entró en el rango.
      */
     const obtenerVentasRango = async (inicio: string, fin: string): Promise<VentaReporteVentasProps[]> => {
-      const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio: inicio, fecha_fin: fin, por_fecha_pago: porFechaPago } })
-      return data.lista
+      if (!porFechaPago) {
+        const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio: inicio, fecha_fin: fin } })
+        return (data.lista as VentaReporteVentasProps[]).map((venta) => ({ ...venta, pago: null }))
+      }
+      // Las ventas con algún pago en el rango traen los datos de venta de cada pago
+      const [{ data: dataVentas }, { data: dataPagos }] = await Promise.all([
+        httpClient.get('/venta/rango-fechas', { params: { fecha_inicio: inicio, fecha_fin: fin, por_fecha_pago: true } }),
+        httpClient.get('/detalleventa-pagos/rango-fechas', { params: { fecha_inicio: inicio, fecha_fin: fin } }),
+      ])
+      const ventaPorId = new Map((dataVentas.lista as VentaReporteVentasProps[]).map((venta) => [venta.id, venta]))
+      return (dataPagos.lista as PagoReporteVentasProps[]).flatMap((pago) => {
+        const venta = ventaPorId.get(pago.id_venta)
+        if (!venta) return []
+        const { id, id_venta, fecha_pago, id_forma_pago, monto } = pago
+        return [{ ...venta, pago: { id, id_venta, fecha_pago, id_forma_pago, monto: Number(monto) || 0 } }]
+      })
     }
 
     /**
@@ -147,6 +165,8 @@ export const useReporteVentasStore = () => {
     inicializarFechas,
     cambiarFechas,
     cambiarPorFechaPago: (valor: boolean) => dispatch(onSetPorFechaPago(valor)),
+    /** Textos de venta o de ingreso según el switch de fecha */
+    textos: textosReporteVentas(porFechaPago),
     obtenerAsesoresRango,
     obtenerVentasRango,
     filtrarVentas,

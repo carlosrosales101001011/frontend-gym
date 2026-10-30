@@ -4,6 +4,7 @@ import type { OpcionesSelect } from '@/types/props'
 import type { VentaReporteVentasProps } from '../store/reporteVentasSlice'
 import type { ItemBarra } from '@/components/ReporteBarras/barrasComparacion'
 import { ID_TODOS } from '../store/reporteVentasSlice'
+import { montoMembresiaFila } from './resumenVentas'
 
 /**
  * Lo vendido y la cantidad de membresías de cada programa.
@@ -12,13 +13,16 @@ import { ID_TODOS } from '../store/reporteVentasSlice'
  * Con un plan elegido, solo cuentan las membresías de ese plan.
  */
 export const agruparVentasPorPrograma = (ventas: VentaReporteVentasProps[], programas: OpcionesSelect[], idPlan: number): ItemBarra[] => {
-  const membresias = ventas.flatMap((venta) => venta.membresias ?? []).filter((m) => idPlan === ID_TODOS || m.id_plan === idPlan)
+  // Cada membresía con lo que cuenta (por fecha de pago, su parte proporcional del pago)
+  const membresias = ventas
+    .flatMap((venta) => (venta.membresias ?? []).map((m) => ({ ...m, monto: montoMembresiaFila(venta, m) })))
+    .filter((m) => idPlan === ID_TODOS || m.id_plan === idPlan)
   return Object.values(groupBy(membresias, (membresia) => membresia.id_programa)).map((membresiasPrograma) => {
     const id = membresiasPrograma[0].id_programa
     return {
       id,
       nombre: programas.find((programa) => programa.value === id)?.label ?? `Programa ${id}`,
-      monto: Math.round(sumBy(membresiasPrograma, (membresia) => Number(membresia.montoTotal) || 0) * 100) / 100,
+      monto: Math.round(sumBy(membresiasPrograma, (membresia) => membresia.monto) * 100) / 100,
       cantidad: membresiasPrograma.length,
     }
   })

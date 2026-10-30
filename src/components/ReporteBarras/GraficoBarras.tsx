@@ -10,7 +10,13 @@ type GraficoBarrasProps = {
   medida: MedidaReporte
   /** Elemento resaltado (su barra en azul, las demás en gris); null = todas en azul */
   idElegido: number | null
+  /** Click en una barra (la barra muestra el cursor de link); sin él las barras no son clickeables */
+  onClickBarra?: (barra: BarraComparacion) => void
+  /** Texto del tooltip antes del valor, por medida (default: "Vendido: " / "Ventas: ") */
+  textoTooltip?: { monto: string, cantidad: string }
 }
+
+const TEXTO_TOOLTIP = { monto: 'Vendido: ', cantidad: 'Ventas: ' }
 
 /** Alto de cada fila del gráfico (barra de 18px + aire) */
 const ALTO_FILA = 36
@@ -29,7 +35,7 @@ const lineasEtiqueta = (etiqueta: string) => {
  * Barras horizontales del reporte de ventas (asesor, origen, programa y plan).
  * Barra fina redondeada en el extremo del dato, valor/comparación al final de cada barra, grilla suave y tooltip.
  */
-export const GraficoBarras = ({ barras, medida, idElegido }: GraficoBarrasProps) => {
+export const GraficoBarras = ({ barras, medida, idElegido, onClickBarra, textoTooltip = TEXTO_TOOLTIP }: GraficoBarrasProps) => {
   const { theme } = useThemeStore()
   const colores = COLORES_REPORTE_VENTAS[theme]
   const hayElegido = idElegido !== null
@@ -83,12 +89,19 @@ export const GraficoBarras = ({ barras, medida, idElegido }: GraficoBarrasProps)
           content={({ active, payload }) => active && payload?.length ? (
             <div className="card-mode-actual rounded shadow-sm px-3 py-2 small">
               <div className="fw-bold">{(payload[0].payload as BarraComparacion).nombre}</div>
-              <span className="opacity-75">{medida === 'monto' ? 'Vendido: ' : 'Ventas: '}</span>
+              <span className="opacity-75">{textoTooltip[medida]}</span>
               <span className="fw-semibold">{formatearMedida(Number(payload[0].value) || 0, medida)}</span>
             </div>
           ) : null}
         />
-        <Bar dataKey="valor" barSize={18} radius={[0, 4, 4, 0]} isAnimationActive={false}>
+        <Bar
+          dataKey="valor"
+          barSize={18}
+          radius={[0, 4, 4, 0]}
+          isAnimationActive={false}
+          onClick={onClickBarra ? (_, index) => { if (barras[index]) onClickBarra(barras[index]) } : undefined}
+          style={onClickBarra ? { cursor: 'pointer' } : undefined}
+        >
           {barras.map((barra) => <Cell key={barra.id} fill={colorBarra(barra)} />)}
           <LabelList dataKey="etiqueta" content={renderEtiqueta} />
         </Bar>

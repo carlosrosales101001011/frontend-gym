@@ -13,7 +13,7 @@ export const diasDelPeriodo = (fecha_inicio: string, fecha_fin: string) =>
   eachDayOfInterval({ start: localDateStringToDate(fecha_inicio), end: localDateStringToDate(fecha_fin) })
 
 /** Día en que cuenta la venta: el de su pago en el periodo (reporte por fecha de pago) o su fecha de venta */
-const claveDiaVenta = (venta: VentaReporteProps) =>
+export const claveDiaVenta = (venta: VentaReporteProps) =>
   venta.fecha_pago ? venta.fecha_pago.slice(0, 10) : aClaveDia(new Date(venta.fecha_venta))
 
 /** Lo vendido (montoTotal_membresia) en cada uno de los `dias`, en el mismo orden */

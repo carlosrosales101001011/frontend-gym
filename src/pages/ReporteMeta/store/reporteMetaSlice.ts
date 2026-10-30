@@ -11,9 +11,34 @@ export type VentaReporteProps = {
   /** Con por_fecha_pago: primer pago de la venta dentro del periodo (yyyy-MM-dd); null por fecha de venta */
   fecha_pago: string | null,
   id_empl: number,
+  label_nombres_apellidos_empl: string | null,
+  label_nombres_apellidos_cli: string | null,
+  label_documento_cli: string | null,
+  n_comprobante: string | null,
   montoTotal_membresia: number | string,
+  montoTotal_productos: number | string,
   /** Tipo de cliente de la venta: Nuevo, Renovación, Reinscripción (terminología venta/cliente/tipo) */
   id_tipo_cli: number | null,
+  label_tipo_cli: string | null,
+};
+
+/** Pago (ingreso) del periodo de la meta (de /detalleventa-pagos/rango-fechas) */
+export type PagoReporteProps = {
+  id: number,
+  id_venta: number,
+  /** yyyy-MM-dd */
+  fecha_pago: string,
+  id_forma_pago: number,
+  monto: number,
+  /** Total de la venta del pago (membresías + productos) */
+  monto_venta: number,
+  n_comprobante: string | null,
+  id_empl: number,
+  label_nombres_apellidos_empl: string | null,
+  label_nombres_apellidos_cli: string | null,
+  label_documento_cli: string | null,
+  id_tipo_cli: number | null,
+  label_tipo_cli: string | null,
 };
 
 /** Valor del seleccionable de asesor que significa "Todos" */

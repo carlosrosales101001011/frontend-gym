@@ -9,6 +9,7 @@ import { useReporteMetaStore } from '../hook/useReporteMetaStore'
 import { calcularResumenMeta } from '../helpers/resumenMeta'
 import { resumirPorTipoCliente } from '../helpers/ventasPorTipoCliente'
 import type { VentaReporteProps } from '../store/reporteMetaSlice'
+import { ModalVentasMeta } from './ModalVentasMeta'
 
 type CardResumenProps = {
   icono: IconName
@@ -17,15 +18,18 @@ type CardResumenProps = {
   detalle: ReactNode
   /** Muestra el loading dentro de la card (las que dependen de las ventas) */
   cargando?: boolean
+  /** Acción opcional a la derecha del título (ej. "Ver ventas") */
+  accion?: ReactNode
 }
 
 /** Card de un dato del resumen: título, valor grande y detalle */
-const CardResumen = ({ icono, titulo, valor, detalle, cargando = false }: CardResumenProps) => (
+const CardResumen = ({ icono, titulo, valor, detalle, cargando = false, accion }: CardResumenProps) => (
   <div className="card-mode-actual rounded p-3 h-100 position-relative">
     <LoadingOverlay texto="Cargando" show={cargando} interno />
     <div className="d-flex align-items-center gap-2 mb-2">
       <IconCR name={icono} size={16} />
       <span className="small fw-semibold opacity-75">{titulo}</span>
+      {accion && <span className="ms-auto">{accion}</span>}
     </div>
     <div className="fs-4 fw-bold">{valor}</div>
     <div className="small opacity-75">{detalle}</div>
@@ -34,10 +38,11 @@ const CardResumen = ({ icono, titulo, valor, detalle, cargando = false }: CardRe
 
 /** Segundo header del reporte: 4 cards con el resumen de la meta elegida (y del asesor, si se eligió uno) */
 export const Header2App = () => {
-  const { metaSeleccionada, montoMetaObjetivo, idAsesorSeleccionado, porFechaPago, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
+  const { metaSeleccionada, montoMetaObjetivo, idAsesorSeleccionado, porFechaPago, textos, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
   const [ventas, setVentas] = useState<VentaReporteProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showVentas, setShowVentas] = useState(false)
   const { cargar: cargarTiposCliente, data: tiposCliente } = useTerminologiaPersona('tipoClienteVenta')
   const fecha_inicio = metaSeleccionada?.fecha_inicio ?? ''
   const fecha_fin = metaSeleccionada?.fecha_fin ?? ''
@@ -79,6 +84,9 @@ export const Header2App = () => {
     [tiposCliente, ventas, idAsesorSeleccionado]
   )
 
+  // Las mismas ventas que suman en "Venta total acumulada" (con el filtro de asesor), para el modal
+  const ventasFiltradas = useMemo(() => filtrarVentasPorAsesor(ventas), [ventas, idAsesorSeleccionado])
+
   if (!resumen) return null
 
   return (
@@ -103,19 +111,22 @@ export const Header2App = () => {
       <Col lg={3} md={6}>
         <CardResumen
           icono="sales"
-          titulo="Venta total acumulada"
+          titulo={textos.totalAcumulado}
           valor={error ? '—' : getFormatMoney(resumen.ventaTotal)}
-          detalle={error ? 'No se pudieron cargar las ventas' : 'Membresías vendidas en el periodo'}
+          detalle={error ? textos.errorCarga : textos.detalleTotal}
           cargando={loading}
+          accion={!error && !loading && (
+            <button type="button" className="btn btn-link btn-sm p-0" onClick={() => setShowVentas(true)}>{textos.verDetalle}</button>
+          )}
         />
       </Col>
       <Col lg={3} md={6}>
         <CardResumen
           icono="check"
-          titulo="Mejor día de venta"
+          titulo={textos.mejorDia}
           valor={error || !resumen.mejorDia ? '—' : getFormatMoney(resumen.mejorDia.monto)}
           detalle={
-            error ? 'No se pudieron cargar las ventas'
+            error ? textos.errorCarga
               : resumen.mejorDia
                 ? `${formatDate(resumen.mejorDia.fecha, 'yyyy-mm-dd', 'd MMMM yyyy')} · +${getFormatMoney(resumen.mejorDia.excedente)} sobre la meta del día`
                 : 'Ningún día superó la meta del día'
@@ -131,12 +142,20 @@ export const Header2App = () => {
             icono="users"
             titulo={tipo.label}
             valor={error ? '—' : getFormatMoney(tipo.montoTotal)}
-            detalle={error ? 'No se pudieron cargar las ventas' : `${tipo.cantidad} ${tipo.cantidad === 1 ? 'venta' : 'ventas'} en el periodo`}
+            detalle={error ? textos.errorCarga : textos.cantidad(tipo.cantidad)}
             cargando={loading}
           />
         </Col>
       ))}
     </Row>
+    <ModalVentasMeta
+      show={showVentas}
+      onHide={() => setShowVentas(false)}
+      ventas={ventasFiltradas}
+      porFechaPago={porFechaPago}
+      fecha_inicio={fecha_inicio}
+      fecha_fin={fecha_fin}
+    />
     </>
   )
 }

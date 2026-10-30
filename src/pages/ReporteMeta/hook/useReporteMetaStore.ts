@@ -3,7 +3,8 @@ import httpClient from "@/common/helpers/httpClient"
 import { useCrudhook } from "@/hook/usecrudhook"
 import { useAppDispatch, useAppSelector } from "@/stores/Store"
 import type { MetaProps } from "@/pages/GestionMeta/store/metaSlice"
-import { ID_TODOS_ASESORES, onSelectAsesor, onSelectMeta, onSetAsesoresMeta, onSetMetas, onSetPorFechaPago, type AsesorReporteProps, type VentaReporteProps } from "../store/reporteMetaSlice"
+import { textosReporte } from "../helpers/textosReporte"
+import { ID_TODOS_ASESORES, onSelectAsesor, onSelectMeta, onSetAsesoresMeta, onSetMetas, onSetPorFechaPago, type AsesorReporteProps, type PagoReporteProps, type VentaReporteProps } from "../store/reporteMetaSlice"
 
 export const useReporteMetaStore = () => {
     const dispatch = useAppDispatch()
@@ -78,15 +79,43 @@ export const useReporteMetaStore = () => {
      * que guarda el resultado en su propio estado (con su loading).
      */
     /** Con un asesor elegido solo cuentan sus ventas; con "Todos", todas (la meta ya viene en montoMetaObjetivo) */
-    const filtrarVentasPorAsesor = (ventas: VentaReporteProps[]) =>
+    const filtrarVentasPorAsesor = <T extends Pick<VentaReporteProps, 'id_empl'>>(ventas: T[]) =>
       idAsesorSeleccionado === ID_TODOS_ASESORES
         ? ventas
         : ventas.filter((venta) => venta.id_empl === idAsesorSeleccionado)
 
-    /** Con porFechaPago, el periodo se aplica a la fecha de los pagos en vez de a la fecha de venta */
-    const obtenerVentasRango = async (fecha_inicio: string, fecha_fin: string): Promise<VentaReporteProps[]> => {
-      const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio, fecha_fin, por_fecha_pago: porFechaPago } })
+    /** Pagos (ingresos) con fecha de pago en el periodo de la meta (yyyy-MM-dd) */
+    const obtenerPagosRango = async (fecha_inicio: string, fecha_fin: string): Promise<PagoReporteProps[]> => {
+      const { data } = await httpClient.get('/detalleventa-pagos/rango-fechas', { params: { fecha_inicio, fecha_fin } })
       return data.lista
+    }
+
+    /**
+     * Filas que suma el reporte (cards, gráfico y ritmo):
+     * - por fecha de venta: las ventas del periodo (montoTotal_membresia, en su fecha_venta).
+     * - por fecha de pago: los ingresos, un registro por pago, con lo pagado como montoTotal_membresia y en su
+     *   fecha_pago. Así todos los cálculos suman lo que realmente entró, igual que el modal "Ver ingresos".
+     */
+    const obtenerVentasRango = async (fecha_inicio: string, fecha_fin: string): Promise<VentaReporteProps[]> => {
+      if (!porFechaPago) {
+        const { data } = await httpClient.get('/venta/rango-fechas', { params: { fecha_inicio, fecha_fin } })
+        return data.lista
+      }
+      const pagos = await obtenerPagosRango(fecha_inicio, fecha_fin)
+      return pagos.map((pago) => ({
+        id: pago.id_venta,
+        fecha_venta: pago.fecha_pago,
+        fecha_pago: pago.fecha_pago,
+        id_empl: pago.id_empl,
+        label_nombres_apellidos_empl: pago.label_nombres_apellidos_empl,
+        label_nombres_apellidos_cli: pago.label_nombres_apellidos_cli,
+        label_documento_cli: pago.label_documento_cli,
+        n_comprobante: pago.n_comprobante,
+        montoTotal_membresia: pago.monto,
+        montoTotal_productos: 0,
+        id_tipo_cli: pago.id_tipo_cli,
+        label_tipo_cli: pago.label_tipo_cli,
+      }))
     }
 
   return {
@@ -100,9 +129,12 @@ export const useReporteMetaStore = () => {
     montoMetaObjetivo,
     obtenerMetas,
     obtenerVentasRango,
+    obtenerPagosRango,
     filtrarVentasPorAsesor,
     seleccionarMeta,
     seleccionarAsesor,
     cambiarPorFechaPago: (valor: boolean) => dispatch(onSetPorFechaPago(valor)),
+    /** Textos de venta o de ingreso según el switch de fecha */
+    textos: textosReporte(porFechaPago),
   }
 }

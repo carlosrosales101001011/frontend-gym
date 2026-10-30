@@ -14,6 +14,10 @@ type PanelBarrasProps = {
   etiquetaColumna: string
   /** Click en una fila de la tabla */
   onClickFila?: (barra: BarraComparacion) => void
+  /** Click en una barra del gráfico */
+  onClickBarra?: (barra: BarraComparacion) => void
+  /** Texto del tooltip del gráfico antes del valor, por medida */
+  textoTooltip?: { monto: string, cantidad: string }
 }
 
 /** Título de pestaña con solo un ícono (tooltip y aria-label con el texto); el color lo da TabsCR */
@@ -24,10 +28,10 @@ const TituloIcono = ({ icono, texto }: { icono: 'grafica' | 'tabla', texto: stri
 )
 
 /** Contenido de las cards de barras (asesor, origen, programa): pestañas Gráfica y Tabla con los mismos datos */
-export const PanelBarras = ({ barras, medida, idElegido, etiquetaColumna, onClickFila }: PanelBarrasProps) => (
+export const PanelBarras = ({ barras, medida, idElegido, etiquetaColumna, onClickFila, onClickBarra, textoTooltip }: PanelBarrasProps) => (
   <TabsCR defaultActiveKey="grafica" variant="pildora">
     <TabCR eventKey="grafica" title={<TituloIcono icono="grafica" texto="Gráfica" />}>
-      <GraficoBarras barras={barras} medida={medida} idElegido={idElegido} />
+      <GraficoBarras barras={barras} medida={medida} idElegido={idElegido} onClickBarra={onClickBarra} textoTooltip={textoTooltip} />
     </TabCR>
     <TabCR eventKey="tabla" title={<TituloIcono icono="tabla" texto="Tabla" />}>
       <TablaBarras barras={barras} medida={medida} idElegido={idElegido} etiquetaColumna={etiquetaColumna} onClickFila={onClickFila} />

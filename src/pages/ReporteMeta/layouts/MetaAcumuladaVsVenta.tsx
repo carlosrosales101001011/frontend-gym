@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, type MouseHandlerDataParam } from 'recharts'
 import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
 import { useThemeStore } from '@/components/TopBar/useThemeStore'
 import { formatDate } from '@/helpers/FormatDate'
 import { getFormatMoney } from '@/helpers/getFormatMoney'
 import { useReporteMetaStore } from '../hook/useReporteMetaStore'
 import { armarSerieMetaVsVenta, type PuntoMetaVsVenta } from '../helpers/serieMetaVsVenta'
+import { claveDiaVenta } from '../helpers/ventasPorDia'
+import { ModalVentasMeta } from '../components/ModalVentasMeta'
 import type { VentaReporteProps } from '../store/reporteMetaSlice'
 import { COLORES_REPORTE, type ColoresReporte } from '../helpers/coloresReporte'
+import type { TextosReporte } from '../helpers/textosReporte'
 
 type MetaAcumuladaVsVentaProps = {
   /** yyyy-MM-dd */
@@ -16,16 +19,20 @@ type MetaAcumuladaVsVentaProps = {
   fecha_fin: string
 }
 
-const NOMBRES = { meta: 'Meta acumulada', ventas: 'Venta real acumulada' } as const
+/** Nombres de las series (leyenda y tooltip): la real dice venta o ingreso según el switch de fecha */
+const nombresSeries = (textos: TextosReporte) => ({ meta: 'Meta acumulada', ventas: textos.serieReal })
 
 /** Card "Meta acumulada vs venta real": llama a las ventas del periodo y las compara día a día con la meta */
 export const MetaAcumuladaVsVenta = ({ fecha_inicio, fecha_fin }: MetaAcumuladaVsVentaProps) => {
   const { theme } = useThemeStore()
   const colores = COLORES_REPORTE[theme]
-  const { montoMetaObjetivo, idAsesorSeleccionado, porFechaPago, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
+  const { montoMetaObjetivo, idAsesorSeleccionado, porFechaPago, textos, obtenerVentasRango, filtrarVentasPorAsesor } = useReporteMetaStore()
+  const nombres = nombresSeries(textos)
   const [ventas, setVentas] = useState<VentaReporteProps[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  /** Día elegido al hacer click en un punto (yyyy-MM-dd); abre el modal con sus ventas o ingresos */
+  const [diaElegido, setDiaElegido] = useState<string | null>(null)
 
   // Cada vez que cambia el periodo se vuelven a pedir las ventas (se ignora la respuesta de un periodo anterior)
   useEffect(() => {
@@ -51,6 +58,18 @@ export const MetaAcumuladaVsVenta = ({ fecha_inicio, fecha_fin }: MetaAcumuladaV
     () => armarSerieMetaVsVenta(fecha_inicio, fecha_fin, montoMetaObjetivo, filtrarVentasPorAsesor(ventas)),
     [ventas, idAsesorSeleccionado, fecha_inicio, fecha_fin, montoMetaObjetivo]
   )
+
+  // Ventas del día elegido (con el filtro de asesor), en el mismo día en que el gráfico las cuenta
+  const ventasDiaElegido = useMemo(
+    () => diaElegido ? filtrarVentasPorAsesor(ventas).filter((venta) => claveDiaVenta(venta) === diaElegido) : [],
+    [ventas, idAsesorSeleccionado, diaElegido]
+  )
+
+  /** Click en el gráfico: abre el día bajo el cursor, salvo días futuros (sin venta real) */
+  const onClickGrafico = ({ activeIndex }: MouseHandlerDataParam) => {
+    const punto = activeIndex == null ? undefined : serie[Number(activeIndex)]
+    if (punto && punto.ventas !== null) setDiaElegido(punto.fecha)
+  }
 
   // Eje Y: de la meta total hacia abajo en pasos de 25%
   const ticksY = [0, 0.25, 0.5, 0.75, 1].map((f) => Math.round(montoMetaObjetivo * f * 100) / 100)
@@ -79,16 +98,16 @@ export const MetaAcumuladaVsVenta = ({ fecha_inicio, fecha_fin }: MetaAcumuladaV
 
   return (
     <div className="card-mode-actual rounded p-3 h-100 position-relative">
-      <LoadingOverlay texto="Cargando ventas" show={loading} interno />
-      <h5 className="fw-bold mb-3">Meta acumulada vs venta real</h5>
+      <LoadingOverlay texto={textos.cargando} show={loading} interno />
+      <h5 className="fw-bold mb-3">{textos.tituloGrafico}</h5>
 
-      {error && <div className="text-danger small">No se pudieron cargar las ventas: {error}</div>}
+      {error && <div className="text-danger small">{textos.errorCarga}: {error}</div>}
       {!error && montoMetaObjetivo <= 0 && (
         <div className="small opacity-75 py-5 text-center">La meta no tiene monto asignado para comparar.</div>
       )}
       {!error && montoMetaObjetivo > 0 && (
         <ResponsiveContainer width="100%" height={320}>
-          <LineChart data={serie} margin={{ top: 8, right: 64, bottom: 0, left: 8 }}>
+          <LineChart data={serie} margin={{ top: 8, right: 64, bottom: 0, left: 8 }} onClick={onClickGrafico} style={{ cursor: 'pointer' }}>
             <CartesianGrid vertical={false} stroke={colores.grilla} strokeWidth={1} />
             <XAxis
               dataKey="dia"
@@ -108,7 +127,7 @@ export const MetaAcumuladaVsVenta = ({ fecha_inicio, fecha_fin }: MetaAcumuladaV
               width={86}
             />
             <Tooltip
-              content={({ active, payload }) => <TooltipMetaVsVenta active={active} payload={payload} colores={colores} />}
+              content={({ active, payload }) => <TooltipMetaVsVenta active={active} payload={payload} colores={colores} nombres={nombres} />}
               cursor={{ stroke: colores.texto, strokeWidth: 1 }}
             />
             <Legend
@@ -116,7 +135,7 @@ export const MetaAcumuladaVsVenta = ({ fecha_inicio, fecha_fin }: MetaAcumuladaV
               align="right"
               height={28}
               iconType="circle"
-              formatter={(valor: string) => <span style={{ color: colores.texto }}>{NOMBRES[valor as keyof typeof NOMBRES]}</span>}
+              formatter={(valor: string) => <span style={{ color: colores.texto }}>{nombres[valor as keyof typeof nombres]}</span>}
             />
             <Line
               dataKey="meta"
@@ -139,12 +158,22 @@ export const MetaAcumuladaVsVenta = ({ fecha_inicio, fecha_fin }: MetaAcumuladaV
               strokeLinecap="round"
               dot={puntos(colores.ventas)}
               activeDot={{ ...puntos(colores.ventas), r: 6 }}
-              label={etiquetaFinal(ultimoConVentas, 'Ventas', posicionVentas)}
+              label={etiquetaFinal(ultimoConVentas, textos.etiquetaLinea, posicionVentas)}
               connectNulls={false}
               isAnimationActive={false}
             />
           </LineChart>
         </ResponsiveContainer>
+      )}
+      {diaElegido && (
+        <ModalVentasMeta
+          show
+          onHide={() => setDiaElegido(null)}
+          ventas={ventasDiaElegido}
+          porFechaPago={porFechaPago}
+          fecha_inicio={diaElegido}
+          fecha_fin={diaElegido}
+        />
       )}
     </div>
   )
@@ -155,15 +184,16 @@ type TooltipMetaVsVentaProps = {
   /** Entradas que entrega Recharts; cada una trae el punto completo en `payload` */
   payload?: ReadonlyArray<{ payload?: unknown }>
   colores: ColoresReporte
+  nombres: ReturnType<typeof nombresSeries>
 }
 
 /** Tooltip: fecha completa y ambos acumulados (el texto usa el color de texto; el color de la serie va en el punto) */
-const TooltipMetaVsVenta = ({ active, payload, colores }: TooltipMetaVsVentaProps) => {
+const TooltipMetaVsVenta = ({ active, payload, colores, nombres }: TooltipMetaVsVentaProps) => {
   if (!active || !payload?.length) return null
   const punto = payload[0].payload as PuntoMetaVsVenta
   const filas = [
-    { nombre: NOMBRES.meta, valor: punto.meta, color: colores.meta },
-    ...(punto.ventas !== null ? [{ nombre: NOMBRES.ventas, valor: punto.ventas, color: colores.ventas }] : []),
+    { nombre: nombres.meta, valor: punto.meta, color: colores.meta },
+    ...(punto.ventas !== null ? [{ nombre: nombres.ventas, valor: punto.ventas, color: colores.ventas }] : []),
   ]
   return (
     <div className="card-mode-actual rounded shadow-sm px-3 py-2" style={{ minWidth: 200 }}>

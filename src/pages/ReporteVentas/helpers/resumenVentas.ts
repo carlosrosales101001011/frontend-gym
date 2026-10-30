@@ -1,4 +1,4 @@
-import { groupBy } from '@/helpers/arrays'
+import { groupBy, uniqueById } from '@/helpers/arrays'
 import { sumBy } from '@/helpers/reports'
 import type { MembresiaVentaReporteProps, VentaReporteVentasProps } from '../store/reporteVentasSlice'
 import { ID_TODOS } from '../store/reporteVentasSlice'
@@ -32,13 +32,30 @@ export const ventaCumpleFiltroMembresia = (venta: VentaReporteVentasProps, filtr
   sinFiltroMembresia(filtro) || (venta.membresias ?? []).some((membresia) => cumpleFiltroMembresia(membresia, filtro))
 
 /**
- * Lo vendido en una venta para el reporte: solo membresías; con programa y/o plan elegidos,
- * solo las membresías que los cumplen. (Base de "Total vendido" y de los gráficos.)
+ * Lo que cuenta una membresía de la fila:
+ * - por fecha de venta: su monto (montoTotal).
+ * - por fecha de pago: la parte del pago que le toca, proporcional a su peso entre las membresías de la venta
+ *   (ej. venta con Funcional 600 y Yoga 400, pago de 500 -> Funcional 300 y Yoga 200). Si las membresías no
+ *   tienen monto, el pago se reparte en partes iguales. Así lo repartido suma exactamente el pago.
+ */
+export const montoMembresiaFila = (venta: VentaReporteVentasProps, membresia: MembresiaVentaReporteProps) => {
+  if (!venta.pago) return Number(membresia.montoTotal) || 0
+  const membresias = venta.membresias ?? []
+  const totalMembresias = sumBy(membresias, (m) => Number(m.montoTotal) || 0)
+  return totalMembresias > 0
+    ? venta.pago.monto * (Number(membresia.montoTotal) || 0) / totalMembresias
+    : venta.pago.monto / Math.max(membresias.length, 1)
+}
+
+/**
+ * Lo que suma una fila en el reporte (base de "Total vendido/ingresado", cards y gráficos):
+ * por fecha de venta, sus membresías; por fecha de pago, lo pagado. Con programa y/o plan elegidos,
+ * solo la parte de las membresías que los cumplen.
  */
 export const montoVendidoVenta = (venta: VentaReporteVentasProps, filtro: FiltroMembresia) =>
   sinFiltroMembresia(filtro)
-    ? Number(venta.montoTotal_membresia) || 0
-    : sumBy((venta.membresias ?? []).filter((m) => cumpleFiltroMembresia(m, filtro)), (m) => Number(m.montoTotal) || 0)
+    ? (venta.pago ? venta.pago.monto : Number(venta.montoTotal_membresia) || 0)
+    : sumBy((venta.membresias ?? []).filter((m) => cumpleFiltroMembresia(m, filtro)), (m) => montoMembresiaFila(venta, m))
 
 /** Deuda de una venta: su total real (membresías + productos, con descuento) menos lo pagado; nunca negativa */
 const deudaVenta = (venta: VentaReporteVentasProps) =>
@@ -51,15 +68,17 @@ const deudaVenta = (venta: VentaReporteVentasProps) =>
  */
 export const calcularResumenVentas = (ventas: VentaReporteVentasProps[], filtro: FiltroMembresia): ResumenVentas => {
   const totalVendido = sumBy(ventas, (venta) => montoVendidoVenta(venta, filtro))
+  // Pagado / no pagado son de cada venta una sola vez (por fecha de pago, una venta con dos pagos son dos filas)
+  const ventasUnicas = uniqueById(ventas)
 
   // Deuda por cliente: se suman sus ventas del rango y cuenta si queda algo por pagar
-  const deudaPorCliente = Object.values(groupBy(ventas, (venta) => venta.id_cli)).map((ventasCliente) => sumBy(ventasCliente, deudaVenta))
+  const deudaPorCliente = Object.values(groupBy(ventasUnicas, (venta) => venta.id_cli)).map((ventasCliente) => sumBy(ventasCliente, deudaVenta))
 
   return {
     totalVendido: redondear2(totalVendido),
     numeroClientes: new Set(ventas.map((venta) => venta.id_cli)).size,
-    montoPagado: redondear2(sumBy(ventas, (venta) => Number(venta.montoPagos) || 0)),
-    montoNoPagado: redondear2(sumBy(ventas, deudaVenta)),
+    montoPagado: redondear2(sumBy(ventasUnicas, (venta) => Number(venta.montoPagos) || 0)),
+    montoNoPagado: redondear2(sumBy(ventasUnicas, deudaVenta)),
     clientesConDeuda: deudaPorCliente.filter((deuda) => redondear2(deuda) > 0).length,
   }
 }

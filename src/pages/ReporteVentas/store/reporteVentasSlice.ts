@@ -20,14 +20,27 @@ export type PlanReporteVentasProps = {
   label_tipo_tarifa: string,
 };
 
+/** Pago (ingreso) del rango (de /detalleventa-pagos/rango-fechas) */
+export type PagoReporteVentasProps = {
+  id: number,
+  id_venta: number,
+  /** yyyy-MM-dd */
+  fecha_pago: string,
+  id_forma_pago: number,
+  monto: number,
+};
+
 /**
- * Venta del rango (de /venta/rango-fechas), con sus membresías.
+ * Fila del reporte: una venta del rango (de /venta/rango-fechas), con sus membresías.
+ * Con fecha de pago, cada fila es un pago del rango con los datos de su venta (`pago` viene lleno).
  * Los decimales pueden llegar como string. Los montoTotal_* ya tienen el descuento restado.
  */
 export type VentaReporteVentasProps = {
   id: number,
   fecha_venta: string,
   id_cli: number,
+  label_nombres_apellidos_cli: string | null,
+  label_documento_cli: string | null,
   id_empl: number,
   label_nombres_apellidos_empl: string,
   id_sucursal: number,
@@ -35,10 +48,14 @@ export type VentaReporteVentasProps = {
   label_origen: string,
   /** Tipo de cliente de la venta: Nuevo, Renovación, Reinscripción (terminología venta/cliente/tipo) */
   id_tipo_cli: number | null,
+  label_tipo_cli: string | null,
+  n_comprobante: string | null,
   montoTotal_membresia: number | string,
   montoTotal_productos: number | string,
   montoPagos: number | string,
   membresias: MembresiaVentaReporteProps[],
+  /** Con fecha de pago: el pago (ingreso) que representa esta fila; null por fecha de venta */
+  pago: PagoReporteVentasProps | null,
 };
 
 // Filtros del header del reporte de ventas (estado propio de este reporte)
