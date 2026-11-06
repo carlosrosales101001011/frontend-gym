@@ -24,7 +24,7 @@ export type EstadoEvento = {
   value: number,
   label: string,
   color: string,
-  /** El evento no se puede abrir ni editar desde la agenda (lo gestiona el administrador) */
+  /** El evento no se puede abrir ni editar desde la agenda (solo lo gestiona un super usuario) */
   bloqueado?: boolean,
 }
 
@@ -48,11 +48,13 @@ export const armarEstados = (terminologias: { value: number, label: string }[]):
 export const obtenerEstado = (estados: EstadoEvento[], id_estado: number): EstadoEvento =>
   estados.find((estado) => estado.value === id_estado) ?? { value: id_estado, label: 'Sin estado', color: COLOR_OTRO_ESTADO }
 
-export const esEventoBloqueado = (estados: EstadoEvento[], evento: EventoAgendaProps) =>
-  Boolean(obtenerEstado(estados, evento.id_estado).bloqueado)
+/** Para un super usuario ningún evento está bloqueado */
+export const esEventoBloqueado = (estados: EstadoEvento[], evento: EventoAgendaProps, esSuperUsuario = false) =>
+  !esSuperUsuario && Boolean(obtenerEstado(estados, evento.id_estado).bloqueado)
 
-/** Estados que el nutricionista puede asignar en el formulario (los bloqueados no) */
-export const estadosSeleccionables = (estados: EstadoEvento[]) => estados.filter((estado) => !estado.bloqueado)
+/** Estados que se pueden asignar en el formulario (los bloqueados, solo un super usuario) */
+export const estadosSeleccionables = (estados: EstadoEvento[], esSuperUsuario = false) =>
+  esSuperUsuario ? estados : estados.filter((estado) => !estado.bloqueado)
 
 /** Estado con el que nace una cita: Reprogramada (o el primero que se pueda elegir) */
 export const idEstadoInicial = (estados: EstadoEvento[]) =>

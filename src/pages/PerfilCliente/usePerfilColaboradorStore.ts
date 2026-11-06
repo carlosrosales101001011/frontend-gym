@@ -42,6 +42,31 @@ export const usePerfilColaboradorStore = () => {
             setloading(false)
         }
     }
+    /**
+     * Elimina al cliente (borrado lógico: DELETE /persona/id_tipo/2/id/:id) tras confirmarlo.
+     * Avisa el resultado; devuelve true si se eliminó.
+     */
+    const eliminarCliente = async(id:number, nombre:string)=>{
+        const { isConfirmed } = await Swal.fire({
+            icon: 'warning',
+            title: '¿Eliminar cliente?',
+            html: `Se eliminará a <strong>${nombre}</strong>. Ya no aparecerá en los listados ni en los buscadores.`,
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: 'var(--bs-danger)',
+            focusCancel: true,
+        })
+        if (!isConfirmed) return false
+        try {
+            await httpClient.delete(`/persona/id_tipo/${ID_TIPO_CLIENTE}/id/${id}`);
+            await Swal.fire({ icon: 'success', title: 'Cliente eliminado', timer: 1500, showConfirmButton: false });
+            return true
+        } catch (error) {
+            await Swal.fire({ icon: 'error', title: 'No se pudo eliminar el cliente', html: mensajeError(error) });
+            return false
+        }
+    }
     const obtenerContratoxEmpleado = async(uid_empleado:string)=>{
         try {
             const { data } = await httpClient.get(`/contrato-empleado/uid_empleado/${uid_empleado}`)
@@ -54,6 +79,7 @@ export const usePerfilColaboradorStore = () => {
   return {
     obtenerContratoxEmpleado,
     actualizarDatosPersonales,
+    eliminarCliente,
     obtenerDataColaboradorxUID,
     loading,
   }

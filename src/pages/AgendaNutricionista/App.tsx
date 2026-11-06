@@ -7,6 +7,7 @@ import { InputCR } from "@/components/TextFields/InputCR"
 import { ButtonCR } from "@/components/Button/ButtonCR"
 import IconCR from "@/components/Icons/IconCR"
 import { normalizeText } from "@/helpers/strings"
+import { useSesionStore } from "@/hook/useSesionStore"
 import { useAgendaNutricionistaStore } from "./hook/useAgendaNutricionistaStore"
 import { useAgendaTiempoReal } from "./hook/useAgendaTiempoReal"
 import { initialStateAgendaNutricionista, type EventoAgendaProps } from "./store/agendaNutricionistaSlice"
@@ -31,6 +32,7 @@ const MS_APLICAR_BUSQUEDA = 400
 
 export const App = () => {
   const { eventos, eventosBuscados, cargandoEventos, minutosxcli, estados, obtenerEventos, buscarCitasCliente, obtenerEstados } = useAgendaNutricionistaStore()
+  const { usuario, obtenerUsuarioSesion } = useSesionStore()
   const [vista, setVista] = useState<VistaCalendario>('semana')
   const [fecha, setFecha] = useState(new Date())
   // Solo se piden las citas de lo que se ve (mes, semana o día); se vuelve a pedir al cambiar de vista o de fecha
@@ -108,6 +110,7 @@ export const App = () => {
 
   useEffect(() => {
     obtenerEstados()
+    if (!usuario) obtenerUsuarioSesion()
   }, [])
 
   /** Las citas solo se agendan desde un slot de la vista semana: el slot define fecha y horario */
@@ -124,8 +127,8 @@ export const App = () => {
     })
   }
   const onAbrirEvento = (evento: EventoAgendaProps) => {
-    // Los eventos importantes (bloqueados) no se pueden editar desde la agenda
-    if (esEventoBloqueado(estados, evento)) return
+    // Los eventos importantes (bloqueados) no se pueden editar desde la agenda, salvo un super usuario
+    if (esEventoBloqueado(estados, evento, usuario?.is_super_user)) return
     setModalEvento({ show: true, evento })
   }
   const onCerrarModal = () => {

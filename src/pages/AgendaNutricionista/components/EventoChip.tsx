@@ -19,7 +19,8 @@ type EventoChipProps = {
 export const EventoChip = ({ evento, onClick, style, dosLineas = false, resaltado = false }: EventoChipProps) => {
   const { estados } = useAppSelector((state) => state.AGENDA_NUTRICIONISTA)
   const estado = obtenerEstado(estados, evento.id_estado)
-  const bloqueado = esEventoBloqueado(estados, evento)
+  const esSuperUsuario = useAppSelector((state) => state.SESION.usuario?.is_super_user)
+  const bloqueado = esEventoBloqueado(estados, evento, esSuperUsuario)
   return (
     <button
       type="button"
@@ -27,7 +28,7 @@ export const EventoChip = ({ evento, onClick, style, dosLineas = false, resaltad
       style={{ backgroundColor: estado.color, ...style }}
       title={bloqueado
         ? `${evento.hora_inicio} - ${evento.hora_fin} · ${TEXTO_EVENTO_BLOQUEADO} (no editable)`
-        : `${evento.hora_inicio} - ${evento.hora_fin} · ${evento.label_cliente ?? ''} · ${evento.label_nutricionista ?? ''} · ${estado.label}`}
+        : `${evento.hora_inicio} - ${evento.hora_fin} · ${evento.label_cliente || TEXTO_EVENTO_BLOQUEADO}${evento.label_nutricionista ? ` · ${evento.label_nutricionista}` : ''} · ${estado.label}`}
       onClick={(e) => {
         // Evita que el click llegue a la celda del día / slot de atrás
         e.stopPropagation()
@@ -40,7 +41,7 @@ export const EventoChip = ({ evento, onClick, style, dosLineas = false, resaltad
         <span className="fw-bold">{evento.hora_inicio} - {evento.hora_fin}</span>
         <span className="opacity-75"> · {duracionEvento(evento)} min</span>
       </span>{' '}
-      <span className="agenda__evento-nombre">{bloqueado ? TEXTO_EVENTO_BLOQUEADO : evento.label_cliente}</span>
+      <span className="agenda__evento-nombre">{evento.label_cliente || TEXTO_EVENTO_BLOQUEADO}</span>
     </button>
   )
 }

@@ -6,6 +6,7 @@ import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
 import { BuscadorPersona } from '@/components/BuscadorPersona/BuscadorPersona'
 import type { ItemResultado } from '@/components/ModalSearching/ModalSearching'
 import { useForm } from '@/hook/useForm'
+import { useAppSelector } from '@/stores/Store'
 import { localDateStringToDate } from '@/helpers/getDate'
 import type { EventoAgendaProps } from '../store/agendaNutricionistaSlice'
 import { useAgendaNutricionistaStore } from '../hook/useAgendaNutricionistaStore'
@@ -15,6 +16,7 @@ import {
   DURACIONES_CITA,
   duracionEvento,
   estadosSeleccionables,
+  obtenerEstado,
   sumarMinutos,
   tituloVista,
 } from '../helpers/agendaHelpers'
@@ -40,7 +42,8 @@ type ModalCustomEventoProps = {
 
 export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoProps) => {
   const { eventos, estados, guardarEvento, eliminarEvento, obtenerCitasDeCliente } = useAgendaNutricionistaStore()
-  const { register, formState: { errors }, handleSubmit, setError } = useForm<EventoAgendaProps>({ mode: 'onChange', defaultValues: evento })
+  const esSuperUsuario = useAppSelector((state) => state.SESION.usuario?.is_super_user)
+  const { register, formState: { errors }, handleSubmit, setError, setValue, watch } = useForm<EventoAgendaProps>({ mode: 'onChange', defaultValues: evento })
   const [cliente, setCliente] = useState(() => aPersona(evento.id_cli, evento.label_cliente))
   const [nutricionista, setNutricionista] = useState(() => aPersona(evento.id_nutricionista, evento.label_nutricionista))
   // Al editar se respeta la duración guardada si es una de las permitidas
@@ -48,6 +51,16 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
     DURACIONES_CITA.some((d) => d.value === duracionEvento(evento)) ? duracionEvento(evento) : DURACION_CITA_DEFAULT)
   const horaFin = sumarMinutos(evento.hora_inicio, duracion)
   const esEdicion = evento.id !== 0
+  /** Estado "Importante": la cita solo ocupa el horario, sin cliente ni nutricionista (quedan en 0 y ocultos) */
+  const esBloqueado = (id_estado: unknown) => Boolean(obtenerEstado(estados, Number(id_estado)).bloqueado)
+  const importante = esBloqueado(watch('id_estado'))
+  const onCambiarEstado = (id_estado: unknown) => {
+    if (!esBloqueado(id_estado)) return
+    setCliente(null)
+    setNutricionista(null)
+    setValue('id_cli', 0)
+    setValue('id_nutricionista', 0)
+  }
 
   // Historial: todas las citas del cliente elegido (de cualquier fecha), pedidas al backend
   const [citasCliente, setCitasCliente] = useState<EventoAgendaProps[]>([])
@@ -64,8 +77,8 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
     const valores: EventoAgendaProps = {
       ...evento,
       hora_fin: horaFin,
-      id_cli: Number(data.id_cli),
-      id_nutricionista: Number(data.id_nutricionista),
+      id_cli: importante ? 0 : Number(data.id_cli),
+      id_nutricionista: importante ? 0 : Number(data.id_nutricionista),
       id_estado: Number(data.id_estado),
       // Para mostrarlos en el calendario sin recargar (el hook no los envía al backend)
       label_cliente: cliente?.nombre,
@@ -74,9 +87,11 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
     // Por seguridad: el slot pudo ocuparse mientras el modal estaba abierto
     const cruce = buscarCruce(valores, eventos)
     if (cruce) {
-      setError('id_cli', {
+      // El error va en un campo visible: con "Importante" el de cliente está oculto
+      setError(importante ? 'id_estado' : 'id_cli', {
         type: 'validate',
-        message: `Se cruza con el evento de ${cruce.label_cliente ?? ''} (${cruce.hora_inicio} - ${cruce.hora_fin})`,
+        // Sin nombre: es una cita importante
+        message: `Se cruza con ${cruce.label_cliente ? `el evento de ${cruce.label_cliente}` : 'un evento importante'} (${cruce.hora_inicio} - ${cruce.hora_fin})`,
       })
       return
     }
@@ -103,29 +118,29 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
           </div>
           <Row className="g-3">
             {/* Columna 1: datos de la cita */}
-            <Col lg={6}>
+            <Col lg={importante ? 12 : 6}>
               <Row className="g-2">
-                <Col lg={12}>
+                <Col lg={12} className={importante ? 'd-none' : ''}>
                   <BuscadorPersona
                     idTipo={ID_TIPO_CLIENTE}
                     label="Cliente"
                     placeholder="Buscar Cliente por nombre, DNI o Telefono"
                     value={cliente}
                     onSelect={setCliente}
-                    onChange={register('id_cli', { min: { value: 1, message: 'Selecciona un cliente' } }).onChange}
+                    onChange={register('id_cli', { min: { value: 1, message: 'Selecciona un cliente' }, disabled: importante }).onChange}
                     soloNombre
                     required
                   />
                   <span className="text-danger fw-bold px-2" style={{ fontSize: '11px' }}>{errors.id_cli?.message}</span>
                 </Col>
-                <Col lg={12}>
+                <Col lg={12} className={importante ? 'd-none' : ''}>
                   <BuscadorPersona
                     idTipo={ID_TIPO_COLABORADOR}
                     label="Nutricionista"
                     placeholder="Buscar Nutricionista por nombre, DNI o Telefono"
                     value={nutricionista}
                     onSelect={setNutricionista}
-                    onChange={register('id_nutricionista', { min: { value: 1, message: 'Selecciona un nutricionista' } }).onChange}
+                    onChange={register('id_nutricionista', { min: { value: 1, message: 'Selecciona un nutricionista' }, disabled: importante }).onChange}
                     soloNombre
                     required
                   />
@@ -141,16 +156,19 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
                   />
                 </Col>
                 <Col lg={12}>
-                  <InputSelectCR options={estadosSeleccionables(estados)} {...register('id_estado', {
-                    required: 'Este campo es obligatorio'
+                  <InputSelectCR options={estadosSeleccionables(estados, esSuperUsuario)} {...register('id_estado', {
+                    required: 'Este campo es obligatorio',
+                    onChange: (e) => onCambiarEstado((e.currentTarget as unknown as { value: string }).value),
                   })} label="Estado" name="id_estado" messageErrors={errors.id_estado?.message} />
                 </Col>
               </Row>
             </Col>
             {/* Columna 2: citas del cliente, se activa al seleccionar un cliente */}
-            <Col lg={6}>
-              <HistorialCitasCliente eventos={citasCliente} id_cli={cliente?.id} idEvento={evento.id} />
-            </Col>
+            {!importante && (
+              <Col lg={6}>
+                <HistorialCitasCliente eventos={citasCliente} id_cli={cliente?.id} idEvento={evento.id} />
+              </Col>
+            )}
           </Row>
           <div className="d-flex align-items-center mt-2">
             <ButtonCR label={'Guardar'} type="submit" />

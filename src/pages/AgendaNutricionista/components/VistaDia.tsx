@@ -18,6 +18,7 @@ type VistaDiaProps = {
 /** Lista de los eventos del día ordenados por hora */
 export const VistaDia = ({ fecha, eventos, cargando = false, onSeleccionarEvento, idResaltado }: VistaDiaProps) => {
   const { estados } = useAppSelector((state) => state.AGENDA_NUTRICIONISTA)
+  const esSuperUsuario = useAppSelector((state) => state.SESION.usuario?.is_super_user)
   const eventosDia = eventosDelDia(eventos, fecha)
 
   if (cargando) return <SkeletonEventosCalendario variante="dia" />
@@ -30,7 +31,7 @@ export const VistaDia = ({ fecha, eventos, cargando = false, onSeleccionarEvento
     <div className="d-flex flex-column gap-2">
       {eventosDia.map((evento) => {
         const estado = obtenerEstado(estados, evento.id_estado)
-        const bloqueado = esEventoBloqueado(estados, evento)
+        const bloqueado = esEventoBloqueado(estados, evento, esSuperUsuario)
         return (
           <div
             key={evento.id}
@@ -42,9 +43,9 @@ export const VistaDia = ({ fecha, eventos, cargando = false, onSeleccionarEvento
               {evento.hora_inicio} - {evento.hora_fin}
               <div className="small fw-normal opacity-75">{duracionEvento(evento)} min</div>
             </div>
-            {bloqueado ? (
+            {!evento.label_cliente ? (
               <div className="flex-grow-1 fw-bold d-flex align-items-center gap-2">
-                <IconCR name="lock" size={14} /> {TEXTO_EVENTO_BLOQUEADO}
+                {bloqueado && <IconCR name="lock" size={14} />} {TEXTO_EVENTO_BLOQUEADO}
               </div>
             ) : (
               <div className="flex-grow-1">

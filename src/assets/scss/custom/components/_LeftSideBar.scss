@@ -28,6 +28,16 @@
     background-color: rgba(0, 0, 0, 0.203);
   }
 
+  // Modo nocturno (todo lo que no es data-theme="light", ver _variables-custom): sidebar negro;
+  // el hover / activo aclara en vez de oscurecer (sobre negro no se vería)
+  :root:not([data-theme="light"]) & {
+    background-color: $bg-black;
+    .sidebar-link:hover,
+    .sidebar-link-focus{
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
   // Logo arriba del menú (solo con el sidebar abierto; cerrado va en el topbar)
   .sidebar__logo {
     display: flex;

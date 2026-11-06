@@ -20,6 +20,33 @@ body{
   font-size: 13px;
   color: $color-actual;
 }
+
+// Texto blanco sobre cualquier fondo de color (variantes de botón, bg-* y badges), menos los fondos blanco / light
+// y los bg-* con bg-opacity-* (casi blancos).
+// El `*` de arriba pinta todo con el color del tema; aquí se fuerza el blanco en el elemento y en su contenido.
+// Incluye los outline-* cuando se rellenan (hover / activo).
+$variantes-texto-blanco: primary, secondary, success, danger, warning, info, dark;
+@each $variante in $variantes-texto-blanco {
+  .btn-#{$variante},
+  .btn-#{$variante} *,
+  .btn-outline-#{$variante}:hover,
+  .btn-outline-#{$variante}:hover *,
+  .btn-outline-#{$variante}.active,
+  .btn-outline-#{$variante}.active *,
+  .btn-outline-#{$variante}:active,
+  .btn-outline-#{$variante}:active *,
+  // Con bg-opacity-* el fondo queda casi blanco: conserva su color de texto
+  .bg-#{$variante}:not([class*="bg-opacity-"]),
+  .bg-#{$variante}:not([class*="bg-opacity-"]) *,
+  .text-bg-#{$variante},
+  .text-bg-#{$variante} * {
+    color: $white !important;
+  }
+}
+.bg-black,
+.bg-black * {
+  color: $white !important;
+}
 @import "custom/components/DataTable";
 
 @import "custom/components/TextFields";

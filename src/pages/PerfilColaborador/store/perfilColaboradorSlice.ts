@@ -28,6 +28,9 @@ export type ColaboradorProps = {
   url_avatar?: string;
   /** Foto vigente en blob_storage con su encuadre (solo lectura: se guarda con PATCH /blob-storage/id/:id) */
   avatar?: ({ id: number } & AjusteFoto) | null;
+  /** Fecha de registro y de la última actualización (las pone el backend; solo lectura) */
+  fecha_registro?: string;
+  updatedAt?: string;
 };
 export type ColaboradorState={
     colaborador: ColaboradorProps,
