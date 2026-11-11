@@ -1,13 +1,16 @@
 import { TabsCR } from '@/components/Tabs/TabsCR'
 import { TabCR } from '@/components/Tabs/TabCR'
-import { TabDatosPersonales } from '../Tabs/TabDatosPersonales'
-import { TabContactoEmergencia } from '../Tabs/TabContactoEmergencia'
+import { TabDatosNutricionales } from '../Tabs/TabDatosNutricionales/TabDatosNutricionales'
+import { TabEvaluacionCorporal } from '../Tabs/TabEvaluacionCorporal/TabEvaluacionCorporal'
+import { TabHistoriaAlimentaria } from '../Tabs/TabHistoriaAlimentaria/TabHistoriaAlimentaria'
+import { TabReporteNutricionista } from '../Tabs/TabReporteNutricionista/TabReporteNutricionista'
+import { TabPlanNutricional } from '../Tabs/TabPlanNutricional/TabPlanNutricional'
 import { useSearchParams } from 'react-router-dom'
 export const InfoTabColaborador = () => {
   
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const activeTab = searchParams.get('view-tab') || 'datos-personales';
+    const activeTab = searchParams.get('view-tab') || 'datos-nutricionales';
 
     const handleSelect = (key: string | null) => {
         if (!key) return;
@@ -20,7 +23,7 @@ export const InfoTabColaborador = () => {
 
   return (
     <TabsCR
-        defaultActiveKey="profile"
+        defaultActiveKey="datos-nutricionales"
         id="uncontrolled-tab-example"
         activeKey={activeTab}
         onSelect={handleSelect}
@@ -29,19 +32,19 @@ export const InfoTabColaborador = () => {
         classNamePanel='card card-mode-actual p-3'
     >
       <TabCR eventKey="datos-nutricionales" title="Datos nutricionales">
-          <TabDatosPersonales/>
+          <TabDatosNutricionales/>
       </TabCR>
       <TabCR eventKey="evaluacion-corporal" title="Evaluación corporal">
-          <TabDatosPersonales/>
+          <TabEvaluacionCorporal/>
       </TabCR>
       <TabCR eventKey="historia-alimentaria" title="Historia alimentaria">
-        <TabContactoEmergencia/>
+        <TabHistoriaAlimentaria/>
       </TabCR>
       <TabCR eventKey="reporte-nutricionista" title="Reporte nutricionista">
-        <TabContactoEmergencia/>
+        <TabReporteNutricionista/>
       </TabCR>
       <TabCR eventKey="plan-nutricional" title="Plan nutricional">
-        <TabContactoEmergencia/>
+        <TabPlanNutricional/>
       </TabCR>
     </TabsCR>
   )

@@ -1,7 +1,7 @@
 
 import { Col, Row } from 'react-bootstrap'
 import { useEffect, useState } from 'react'
-import { usePerfilColaboradorStore } from '../hook/usePerfilColaboradorStore'
+import { usePerfilColaboradorStore } from '../../hook/usePerfilColaboradorStore'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/stores/Store';
 import { useParams } from 'react-router-dom';
@@ -15,12 +15,12 @@ import { InputCR } from '@/components/TextFields/InputCR'
 /** Datos más juntos (la mitad del espacio normal): vertical m-1 p-1 → p-1, horizontal 1.5rem → 0.75rem */
 const JUNTOS = 'p-1'
 const FILA_JUNTA = { '--bs-gutter-x': '0.75rem' } as React.CSSProperties
-type TabDatosPersonalesProps = {
+type TabDatosNutricionalesProps = {
   /** Si el tab está a la vista: cada vez que se activa se vuelven a pedir los datos (por defecto siempre) */
   activo?: boolean
 }
-/** Datos del paciente, solo lectura */
-export const TabDatosPersonales = ({ activo = true }: TabDatosPersonalesProps) => {
+/** Datos nutricionales: datos del paciente (solo lectura) y objetivo principal */
+export const TabDatosNutricionales = ({ activo = true }: TabDatosNutricionalesProps) => {
   // El perfil de cliente usa :uid_person; se mantiene :uid_cliente por la pantalla anterior de PerfilCliente
   const { uid_person, uid_cliente } = useParams<{ uid_person: string, uid_cliente: string }>();
   const uid = uid_person ?? uid_cliente ?? '';
