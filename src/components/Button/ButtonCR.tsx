@@ -23,18 +23,22 @@ export const ButtonCR: React.FC<AppButtonProps> = ({
   id,
   ref,
   type='button',
-  disabled
+  disabled,
+  style,
+  // El resto (title, form, aria-*, onMouseEnter, etc.) va directo al botón
+  ...props
 }) => {
 
   return (
     <Button
+      {...props}
       ref={ref}
       type={type}
       id={id}
       variant={variant}
       disabled={disabled}
       className={`${className} m-1 d-inline-flex align-items-center justify-content-center gap-2`}
-      style={{padding: '4px 8px'}}
+      style={{padding: '4px 8px', ...style}}
       onClick={onClick}
     >
       {icon && iconPosition === "left" && icon}

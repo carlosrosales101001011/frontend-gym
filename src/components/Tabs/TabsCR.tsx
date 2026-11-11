@@ -17,6 +17,10 @@ export type TabsCRProps = {
   /** Prefijo de los ids de accesibilidad (si no se pasa, se genera) */
   id?: string
   className?: string
+  /** Clases extra de la fila de títulos (ej. 'card p-2' para ponerla en su propio card) */
+  classNameLista?: string
+  /** Clases extra de cada panel (ej. 'card p-3') */
+  classNamePanel?: string
 }
 
 type PestanaInterna = TabCRProps & { key: string }
@@ -37,6 +41,8 @@ export const TabsCR = ({
   mountOnEnter = false,
   id,
   className,
+  classNameLista,
+  classNamePanel,
 }: TabsCRProps) => {
   const idGenerado = useId()
   const prefijo = id ?? `tabs-cr-${idGenerado.replace(/:/g, '')}`
@@ -78,7 +84,7 @@ export const TabsCR = ({
 
   return (
     <div className={classNames('tabs-cr', `tabs-cr--${variant}`, className)}>
-      <div className="tabs-cr__lista" role="tablist">
+      <div className={classNames('tabs-cr__lista', classNameLista)} role="tablist">
         {pestanas.map((pestana, i) => {
           const activa = pestana.key === claveActiva
           return (
@@ -111,7 +117,7 @@ export const TabsCR = ({
             id={`${prefijo}-panel-${pestana.key}`}
             aria-labelledby={`${prefijo}-tab-${pestana.key}`}
             hidden={!activa}
-            className="tabs-cr__panel"
+            className={classNames('tabs-cr__panel', classNamePanel)}
           >
             {pestana.children}
           </div>

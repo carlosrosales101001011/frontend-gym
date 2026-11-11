@@ -100,6 +100,16 @@ export const useAgendaNutricionistaStore = () => {
       }
     }
 
+    /** Uid del cliente, para enlazar a su perfil (undefined si no se pudo obtener) */
+    const obtenerUidCliente = async (id_cli: number, signal?: AbortSignal): Promise<string | undefined> => {
+      try {
+        const { data } = await httpClient.get(`/persona/id_tipo/2/id/${id_cli}/uid`, { signal })
+        return data.uid
+      } catch (e) {
+        if (!signal?.aborted) console.log(e)
+      }
+    }
+
     /** Estados de cita con su color; se piden una vez */
     const obtenerEstados = async () => {
       if (estados.length) return
@@ -152,6 +162,7 @@ export const useAgendaNutricionistaStore = () => {
     obtenerEventos,
     buscarCitasCliente,
     obtenerCitasDeCliente,
+    obtenerUidCliente,
     obtenerEstados,
     guardarEvento,
     eliminarEvento,

@@ -1,4 +1,4 @@
-import { FaUser, FaHome, FaCog, FaCheck, FaTimes, FaQuestion, FaLock } from "react-icons/fa";
+import { FaUser, FaHome, FaCog, FaCheck, FaTimes, FaQuestion, FaLock, FaExclamationTriangle } from "react-icons/fa";
 import { MdDashboard, MdKeyboardArrowLeft, MdKeyboardArrowRight, MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight, MdOutlineImageNotSupported } from "react-icons/md";
 import type { IconType } from 'react-icons';
 import { LuArrowDown, LuArrowUp, LuArrowUpDown } from "react-icons/lu";
@@ -76,6 +76,7 @@ export type IconName =
   | 'no-icon'
   | 'trash'
   | 'times'
+  | 'warning'
   | 'question'
   | 'sun'
   | 'moon'
@@ -153,6 +154,7 @@ const icons: Record<IconName, IconType> = {
   'no-icon': MdOutlineImageNotSupported,
   trash: FaRegTrashAlt,
   times: FaTimes,
+  warning: FaExclamationTriangle,
   question: FaQuestion,
   sun: MdOutlineLightMode,
   moon: MdOutlineDarkMode,

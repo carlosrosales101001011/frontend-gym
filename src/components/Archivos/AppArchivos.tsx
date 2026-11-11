@@ -5,7 +5,7 @@ import { ImageCR } from '@/components/ImageCR/ImageCR'
 import { getBlobStorageUrl } from '@/helpers/blobUrl'
 import { formatDate } from '@/helpers/FormatDate'
 import { tamanoArchivo } from '@/helpers/tamanoArchivo'
-import { EXTENSIONES_PERMITIDAS, errorArchivo, estiloTipo, nombreOriginal, tipoArchivo } from './tipoArchivo'
+import { EXTENSIONES_PERMITIDAS, MB_MAXIMO_ARCHIVO, errorArchivo, estiloTipo, nombreOriginal, tipoArchivo } from './tipoArchivo'
 import { useArchivos, type ArchivoProps } from './useArchivos'
 
 type AppArchivosProps = {
@@ -62,7 +62,7 @@ export const AppArchivos = ({ uid_location }: AppArchivosProps) => {
         <span className="archivos-cr__subir-titulo">
           {subiendo > 0 ? `Subiendo ${subiendo} archivo${subiendo > 1 ? 's' : ''}...` : 'Subir archivos'}
         </span>
-        <span className="archivos-cr__subir-detalle">Haz click o arrastra aquí · Imágenes, PDF, Word o Excel · Máx. 10 MB</span>
+        <span className="archivos-cr__subir-detalle">Haz click o arrastra aquí · Imágenes, PDF, Word o Excel · Máx. {MB_MAXIMO_ARCHIVO} MB</span>
       </button>
       <input ref={inputRef} type="file" multiple accept={EXTENSIONES_PERMITIDAS} hidden onChange={onElegir} />
 

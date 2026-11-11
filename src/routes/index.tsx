@@ -32,11 +32,13 @@ const GestionCompromisosPagos = lazy(() => import('@/pages/GestionCompromisosPag
 const GestionCuestionarios = lazy(() => import('@/pages/GestionCuestionarios'));
 // TODO: PERFILES
 const Perfil = lazy(() => import('@/pages/perfil'));
+const PerfilClinico = lazy(() => import('@/pages/PerfilClinico'));
 const PerfilColaborador = lazy(() => import('@/pages/PerfilColaborador/Index'));
 const PerfilUser = lazy(() => import('@/pages/PerfilUser'));
 // const PerfilCliente = lazy(() => import('@/pages/PerfilCliente/Index'));
 //TODO: CONFIGURACIONES APROXI
 const GestionModulos = lazy(() => import('@/pages/GestionModulos'));
+const GestionPacientes =lazy(() => import('@/pages/GestionPacientes'));
 const GestionSecciones = lazy(() => import('@/pages/GestionSecciones'));
 const GestionEntidadxUser = lazy(() => import('@/pages/GestionEntidadxUser'));
 const GestionSeccionXmodulouser = lazy(() => import('@/pages/GestionSeccionXmodulouser'));
@@ -116,6 +118,10 @@ export const AppRoutes = () => {
             <Route element={<ProfileGuard gestion="gestion-usuario"/>}>
               <Route path="gestion-usuario" element={<GestionUsuario/>}/>
               <Route path="perfil-usuario/:uid_person" element={<PerfilUser/>}/>
+            </Route>
+            <Route element={<ProfileGuard gestion="gestion-pacientes"/>}>
+              <Route path="gestion-pacientes" element={<GestionPacientes/>}/>
+              <Route path="perfil-paciente/:uid_person" element={<PerfilClinico/>}/>
             </Route>
             <Route element={<ProfileGuard gestion="gestion-clientes"/>}>
               <Route path="gestion-clientes" element={<GestionClientes/>}/>

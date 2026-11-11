@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
+import { useParams } from 'react-router-dom'
+import IconCR from '@/components/Icons/IconCR'
 import ModalCR from '@/components/Modal/ModalCR'
 import { ButtonCR } from '@/components/Button/ButtonCR'
+import { BtnAdd, BtnDelete, BtnUpdate } from '@/components/Button/buttonsCrud'
 import { InputSelectCR } from '@/components/TextFields/InputSelectCR'
 import { BuscadorPersona } from '@/components/BuscadorPersona/BuscadorPersona'
 import type { ItemResultado } from '@/components/ModalSearching/ModalSearching'
@@ -41,7 +44,8 @@ type ModalCustomEventoProps = {
 }
 
 export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoProps) => {
-  const { eventos, estados, guardarEvento, eliminarEvento, obtenerCitasDeCliente } = useAgendaNutricionistaStore()
+  const { eventos, estados, guardarEvento, eliminarEvento, obtenerCitasDeCliente, obtenerUidCliente } = useAgendaNutricionistaStore()
+  const { url_modulo } = useParams<{ url_modulo: string }>()
   const esSuperUsuario = useAppSelector((state) => state.SESION.usuario?.is_super_user)
   const { register, formState: { errors }, handleSubmit, setError, setValue, watch } = useForm<EventoAgendaProps>({ mode: 'onChange', defaultValues: evento })
   const [cliente, setCliente] = useState(() => aPersona(evento.id_cli, evento.label_cliente))
@@ -64,11 +68,18 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
 
   // Historial: todas las citas del cliente elegido (de cualquier fecha), pedidas al backend
   const [citasCliente, setCitasCliente] = useState<EventoAgendaProps[]>([])
+  // Uid junto al cliente consultado: mientras llega el del cliente nuevo, "Ver perfil" queda desactivado
+  const [perfilCliente, setPerfilCliente] = useState<{ id: number, uid?: string } | null>(null)
+  const uidCliente = perfilCliente?.id === cliente?.id ? perfilCliente?.uid : undefined
   useEffect(() => {
     if (!cliente?.id) return
     const ctrl = new AbortController()
     obtenerCitasDeCliente(cliente.id, ctrl.signal).then((citas) => {
       if (!ctrl.signal.aborted) setCitasCliente(citas)
+    })
+    const { id } = cliente
+    obtenerUidCliente(id, ctrl.signal).then((uid) => {
+      if (!ctrl.signal.aborted) setPerfilCliente({ id, uid })
     })
     return () => ctrl.abort()
   }, [cliente?.id])
@@ -170,12 +181,22 @@ export const ModalCustomEvento = ({ show, onHide, evento }: ModalCustomEventoPro
               </Col>
             )}
           </Row>
-          <div className="d-flex align-items-center mt-2">
-            <ButtonCR label={'Guardar'} type="submit" />
-            <ButtonCR label={'Cancelar'} variant="link" onClick={onHide} />
-            {esEdicion && (
-              <ButtonCR label={'Eliminar'} variant="danger" className="ms-auto" onClick={onEliminar} />
+          <div className="d-flex flex-wrap align-items-center mt-2">
+            {esEdicion
+              ? <BtnUpdate label="Actualizar cita" type="submit" />
+              : <BtnAdd label="Agregar cita" type="submit" />}
+            {/* En otra pestaña: la cita que se está editando no se pierde */}
+            {cliente && !importante && (
+              <ButtonCR
+                label="Ver perfil"
+                variant="outline-primary"
+                icon={<IconCR name="eye" size={14} className="" />}
+                disabled={!uidCliente}
+                onClick={() => window.open(`/${url_modulo}/perfil-paciente/${uidCliente}`, '_blank')}
+              />
             )}
+            {esEdicion && <BtnDelete label="Eliminar cita" onClick={onEliminar} />}
+            <ButtonCR label={'Cancelar'} variant="link" className="ms-auto" onClick={onHide} />
           </div>
         </form>
       </ModalCR.Body>

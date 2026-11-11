@@ -9,7 +9,7 @@ import { usePerfilColaboradorStore } from '@/pages/PerfilCliente/usePerfilColabo
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/stores/Store';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ButtonCR } from '@/components/Button/ButtonCR'
+import { BtnDelete, BtnUpdate } from '@/components/Button/buttonsCrud'
 import { useTerminologiaPersona } from '@/hook/usePropiedadesStore'
 import { CardSeccionCR } from '@/components/CardSeccion/CardSeccionCR'
 import { useMembresiaActual } from '@/pages/GestionAsistencias/hook/useMembresiaActual'
@@ -163,9 +163,8 @@ export const TabDatosPersonales = ({ activo = true }: TabDatosPersonalesProps) =
             </Col>
             </Row>
           <div className='d-flex gap-2'>
-            <ButtonCR onClick={onSubmitActualizar} variant='danger' className='flex-fill' label={'Actualizar datos'}/>
-            {/* Blanco con texto y borde rojo: se distingue de "Actualizar datos" en ambos temas */}
-            <ButtonCR onClick={onEliminar} variant='light' className='flex-fill bg-white text-danger border-danger' label={'Eliminar cliente'}/>
+            <BtnUpdate onClick={onSubmitActualizar} className='flex-fill' label='Actualizar datos'/>
+            <BtnDelete onClick={onEliminar} className='flex-fill' label='Eliminar cliente'/>
           </div>
         </form>
     </div>

@@ -10,8 +10,10 @@ const TIPOS = {
 
 export type TipoArchivo = keyof typeof TIPOS | 'otro'
 
-/** Tamaño máximo por archivo (10 MB) */
-export const TAMANO_MAXIMO_ARCHIVO = 10 * 1024 * 1024
+/** Tamaño máximo por archivo, en MB (para los textos) */
+export const MB_MAXIMO_ARCHIVO = 100
+/** Tamaño máximo por archivo, en bytes */
+export const TAMANO_MAXIMO_ARCHIVO = MB_MAXIMO_ARCHIVO * 1024 * 1024
 
 /** Para el <input type="file" accept>: todas las extensiones permitidas */
 export const EXTENSIONES_PERMITIDAS = Object.values(TIPOS).flatMap((tipo) => tipo.extensiones).join(',')
@@ -39,6 +41,6 @@ export const nombreOriginal = (nameImage: string, extension: string) =>
 /** Motivo por el que no se puede subir un archivo ('' si se puede) */
 export const errorArchivo = (archivo: File) => {
   if (tipoArchivo(extensionDe(archivo.name)) === 'otro') return `"${archivo.name}": solo se permiten imágenes, PDF, Word y Excel`
-  if (archivo.size > TAMANO_MAXIMO_ARCHIVO) return `"${archivo.name}": supera los 10 MB`
+  if (archivo.size > TAMANO_MAXIMO_ARCHIVO) return `"${archivo.name}": supera los ${MB_MAXIMO_ARCHIVO} MB`
   return ''
 }

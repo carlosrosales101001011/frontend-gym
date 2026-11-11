@@ -3,4 +3,4 @@
  * valida contra las secciones del usuario; las valida ProfileGuard con la sección de gestión que las contiene.
  * Si se agrega una ruta de perfil en routes/index.tsx, va también aquí.
  */
-export const RUTAS_PERFIL = ['perfil-usuario', 'perfil-cliente', 'perfil-colaborador']
+export const RUTAS_PERFIL = ['perfil-usuario', 'perfil-cliente', 'perfil-colaborador', 'perfil-paciente']

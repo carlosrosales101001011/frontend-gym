@@ -1,0 +1,47 @@
+import { useEffect, useState } from "react"
+import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
+import { ModalCustomClientes } from "@/pages/GestionClientes/ModalCustomClientes"
+import { DataTableClientes } from "./DataTableClientes"
+import { useClientesStore } from "./useClientesStore"
+import { useSeguimientoMembresiaStore } from "@/pages/SeguimientoMembresia/useSeguimientoMembresiaStore"
+import { useQueryParams } from "@/hook/useQueryParams"
+import { querys } from "@/types/parametros"
+import type { isOpenModalCustom } from "@/types/props"
+
+export const App = () => {
+    const [isOpenModalCustom, setisOpenModalCustom] = useState<isOpenModalCustom>({id: 0, isCopy: false,  isOpen: false})
+    const { searcher } = useClientesStore()
+    const { obtenerMembresiaSeguimiento } = useSeguimientoMembresiaStore()
+    const {  get } = useQueryParams();
+    const querySearch = (get(querys.search)||'')
+    const queryColumnas = get(querys.columnas)
+    const page = Number(get(querys.page))
+    const show = Number(get(querys.show))
+    // Seguimiento de membresías: de aquí sale si el cliente está activo o inactivo
+    useEffect(() => {
+        obtenerMembresiaSeguimiento()
+    }, [])
+    useEffect(() => {
+        const ctrl = new AbortController();
+        searcher(ctrl.signal).catch(e => {
+        if (e.name !== 'CanceledError') console.error(e);
+        });
+        return () => ctrl.abort();
+    }, [querySearch, queryColumnas, page, show])
+    const onCloseModalCustom = ()=>{
+        setisOpenModalCustom({id:0, isCopy: false, isOpen: false})
+    }
+    const onOpenModalCustom = (id:number)=>{
+        setisOpenModalCustom({id, isCopy: false, isOpen: true})
+    }
+  return (
+    <div className="m-1">
+        <PageBreadCumb title={'Gestion de pacientes'}/>
+        <ModalCustomClientes id={isOpenModalCustom.id} onHide={onCloseModalCustom} show={isOpenModalCustom.isOpen} />
+        <div>
+            <DataTableClientes
+            onOpenModalCustom={onOpenModalCustom}/>
+        </div>
+    </div>
+  )
+}

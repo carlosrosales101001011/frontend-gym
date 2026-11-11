@@ -8,8 +8,13 @@ const ErrorCodeMessages: { [key: number]: string } = {
 	404: 'Resource or page not found',
 };
 
+let ultimoCodigoError: number | undefined;
+/** Código HTTP (404, 500...) de la última petición que falló; undefined si no hubo respuesta (sin conexión, tiempo agotado) */
+export const codigoUltimoError = () => ultimoCodigoError;
+
 function HttpClient() {
 	const _errorHandler = (error: AxiosError) =>{
+		ultimoCodigoError = error.response?.status;
 		// Token vencido o inválido: se cierra la sesión y se va al login (salvo en el propio login,
 		// donde un 401 solo significa credenciales incorrectas)
 		if (error.response?.status === 401 && !error.config?.url?.includes('/user/login')) {

@@ -17,6 +17,7 @@ import { getBlobUrl } from '@/helpers/blobUrl'
 import type { AjusteFoto } from '@/components/Avatar/encuadreFoto'
 import Swal from 'sweetalert2'
 import { mensajeError } from '@/helpers/mensajeError'
+import { alertaError, mostrarAlerta } from '@/components/Alerta/alertas'
 import { AppContactoEmergencia } from '@/components/GestionContactoEmergencia/AppContactoEmergencia'
 import type { ContactoEmergenciaForm } from '@/components/GestionContactoEmergencia/useContactoEmergenciaStore'
 
@@ -200,6 +201,7 @@ export const ModalCustomClientes = ({show, onHide, id, onCreado}:props) => {
       } else if (quitarFotoGuardada && uidAvatarActual) {
         await eliminarAvatar(uidAvatarActual)
       }
+      mostrarAlerta({ variante: 'success', concepto: id !== 0 ? 'Datos actualizados con éxito' : 'Cliente agregado con éxito' })
       onCancelar()
     }
     const onCancelar = ()=>{
@@ -214,7 +216,7 @@ export const ModalCustomClientes = ({show, onHide, id, onCreado}:props) => {
         <ModalCR.Title>Agregar Cliente</ModalCR.Title>
       </ModalCR.Header>
       <ModalCR.Body>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit((data) => onSubmit(data).catch(() => alertaError()))}>
               <Row>
                 <Col lg={3}>
                   <div className='d-flex justify-content-center pt-3'>

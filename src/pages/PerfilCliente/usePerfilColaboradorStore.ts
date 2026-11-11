@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import httpClient from "@/common/helpers/httpClient";
-import { mensajeError } from "@/helpers/mensajeError";
+import { alertaError, mostrarAlerta } from "@/components/Alerta/alertas";
 import { onSetDataColaborador, type ColaboradorProps } from "@/pages/PerfilCliente/store/perfilColaboradorSlice";
 import { useState } from "react";
 import { onSetContratosColaborador } from "@/pages/PerfilCliente/store/contratoColaboradorSlice";
@@ -26,17 +26,17 @@ export const usePerfilColaboradorStore = () => {
     }
     /**
      * Guarda "Datos personales" (PATCH /persona/id_tipo/2/id/:id) y vuelve a pedir la persona por el uid de la URL.
-     * Avisa si se guardó o por qué no. Devuelve true si se guardó.
+     * Avisa si se guardó o no. Devuelve true si se guardó.
      */
     const actualizarDatosPersonales = async(id:number, uid_person:string, datos:Partial<ColaboradorProps>)=>{
         setloading(true)
         try {
             await httpClient.patch(`/persona/id_tipo/${ID_TIPO_CLIENTE}/id/${id}`, payloadDatosPersonales(datos));
             await obtenerDataColaboradorxUID(uid_person);
-            await Swal.fire({ icon: 'success', title: 'Datos actualizados', timer: 1500, showConfirmButton: false });
+            mostrarAlerta({ variante: 'success', concepto: 'Datos actualizados con éxito' });
             return true
-        } catch (error) {
-            await Swal.fire({ icon: 'error', title: 'No se pudieron actualizar los datos', html: mensajeError(error) });
+        } catch {
+            alertaError();
             return false
         }finally{
             setloading(false)
@@ -60,10 +60,10 @@ export const usePerfilColaboradorStore = () => {
         if (!isConfirmed) return false
         try {
             await httpClient.delete(`/persona/id_tipo/${ID_TIPO_CLIENTE}/id/${id}`);
-            await Swal.fire({ icon: 'success', title: 'Cliente eliminado', timer: 1500, showConfirmButton: false });
+            mostrarAlerta({ variante: 'success', concepto: 'Eliminado con éxito' });
             return true
-        } catch (error) {
-            await Swal.fire({ icon: 'error', title: 'No se pudo eliminar el cliente', html: mensajeError(error) });
+        } catch {
+            alertaError();
             return false
         }
     }

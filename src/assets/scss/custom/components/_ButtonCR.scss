@@ -9,3 +9,14 @@
 .btn-outline-primary:active * {
   color: $white;
 }
+
+// BtnDelete: blanco con texto, ícono y borde rojos, en ambos temas
+.btn-delete-cr {
+  background-color: $white !important;
+  border-color: $danger !important;
+
+  &,
+  & * {
+    color: $danger !important;
+  }
+}

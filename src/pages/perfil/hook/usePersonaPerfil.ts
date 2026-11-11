@@ -12,6 +12,9 @@ export type PersonaPerfilProps = {
   apellido_materno: string
   email_personal: string
   telefono: string
+  label_tipo_documento?: string | null
+  numero_documento?: string
+  label_distrito?: string | null
   uid_avatar?: string
   /** Ubicación de sus comentarios (comentario.uid_location) */
   uid_comentario?: string

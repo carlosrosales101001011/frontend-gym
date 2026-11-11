@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { AvatarFoto } from '@/components/Avatar/AvatarFoto'
 import { ajusteAvatarUltimo } from '@/components/Avatar/encuadreFoto'
 import { ModalCustomAvatar } from '@/components/ModalCustomAvatar/ModalCustomAvatar'
@@ -9,16 +9,11 @@ import { getBlobUrl } from '@/helpers/blobUrl'
 import { CardActivoDesde } from './components/CardActivoDesde'
 import { useFotoPerfil } from './hook/useFotoPerfil'
 import { useInfoCliente } from './hook/useInfoCliente'
-import { useEliminarCliente } from './hook/useEliminarCliente'
-import { ButtonCR } from '@/components/Button/ButtonCR'
-import IconCR from '@/components/Icons/IconCR'
 
 /** Tarjeta del perfil: foto, nombre, racha de membresías, email y teléfono del cliente (carga propia) */
 export const CardInfo = () => {
-  const { url_modulo, uid_person } = useParams<{ url_modulo: string, uid_person: string }>()
-  const navigate = useNavigate()
+  const { uid_person } = useParams<{ uid_person: string }>()
   const { persona, cargando, obtenerInfo } = useInfoCliente()
-  const { eliminando, eliminarCliente } = useEliminarCliente()
   const { subiendo, subirFoto, eliminarFoto } = useFotoPerfil()
   const [showModalAvatar, setShowModalAvatar] = useState(false)
 
@@ -36,12 +31,6 @@ export const CardInfo = () => {
   const nombreCompleto = persona
     ? [persona.nombres, persona.apellido_paterno, persona.apellido_materno].filter(Boolean).join(' ')
     : ''
-
-  /** Al eliminarlo, vuelve a la lista de clientes */
-  const onEliminar = async () => {
-    if (!persona) return
-    if (await eliminarCliente(persona.id, nombreCompleto)) navigate(`/${url_modulo}/gestion-clientes`, { replace: true })
-  }
 
   return (
     <div className='card-info d-flex flex-column position-relative' style={{ minHeight: '200px' }}>
@@ -66,6 +55,14 @@ export const CardInfo = () => {
               <span className='card-info__nombre color-mode-actual'>{nombreCompleto}</span>
               <div className='card-info__contacto'>
                 <div className='card-info__campo'>
+                  <span className='card-info__etiqueta'>{persona.label_tipo_documento?.trim() || 'Documento'}:</span>
+                  <span className='text-break'>{persona.numero_documento?.trim() || <span className='opacity-75'>Sin documento</span>}</span>
+                </div>
+                <div className='card-info__campo'>
+                  <span className='card-info__etiqueta'>Distrito:</span>
+                  <span className='text-break'>{persona.label_distrito?.trim() || <span className='opacity-75'>Sin distrito</span>}</span>
+                </div>
+                <div className='card-info__campo'>
                   <span className='card-info__etiqueta'>Email:</span>
                   <span className='text-break'>{persona.email_personal?.trim() || <span className='opacity-75'>Sin email</span>}</span>
                 </div>
@@ -88,15 +85,6 @@ export const CardInfo = () => {
           />
           <div className='card-info__activo'>
             <CardActivoDesde/>
-          </div>
-          <div className='mt-auto pt-3 d-flex justify-content-center'>
-            <ButtonCR
-              label={eliminando ? 'Eliminando...' : 'Eliminar cliente'}
-              icon={<IconCR name='trash' size={14} />}
-              variant='outline-danger'
-              disabled={eliminando}
-              onClick={onEliminar}
-            />
           </div>
         </>
       )}
