@@ -35,7 +35,8 @@ export type CitaNutricionProps = {
 /** Lo que se envía al registrar: congelamiento con fechas, regalo con días */
 export type NuevaExtension =
   | { id_tipo_extension: typeof ID_EXTENSION_CONGELAMIENTO, fecha_inicio: string, fecha_fin: string, observacion: string }
-  | { id_tipo_extension: typeof ID_EXTENSION_REGALO, fecha_inicio: string, dias_habiles: number, observacion: string }
+  // Regalo sin fecha de inicio: el back lo hace empezar al terminar la membresía (fecha_vencimiento del seguimiento)
+  | { id_tipo_extension: typeof ID_EXTENSION_REGALO, dias_habiles: number, observacion: string }
 
 /** Detalle de una membresía del perfil: sus extensiones (congelamiento / regalo), las citas de nutrición y las asistencias del cliente */
 export const useDetalleMembresia = () => {

@@ -200,7 +200,7 @@ type FormExtensionProps = {
   onGuardar: (extension: NuevaExtension) => void
 }
 
-/** Formulario de un congelamiento (desde / hasta) o un regalo (desde / días); ambos con observación */
+/** Formulario de un congelamiento (desde / hasta) o un regalo (solo días: empieza al vencer la membresía); ambos con observación */
 const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMaximo, congelamientos, onCancelar, onGuardar }: FormExtensionProps) => {
   const [desde, setDesde] = useState('')
   const [hasta, setHasta] = useState('')
@@ -211,11 +211,11 @@ const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMa
   // Congelamiento: días corridos de desde a hasta, ambos incluidos
   const diasCongelamiento = desde && hasta ? differenceInCalendarDays(parseISO(hasta), parseISO(desde)) + 1 : 0
   const cruce = desde && hasta ? congelamientos.find((c) => c.fecha_inicio <= hasta && c.fecha_fin >= desde) : undefined
-  // Ambos empiezan dentro de la membresía; solo el congelamiento no se puede cruzar con otro
+  // El congelamiento empieza dentro de la membresía y no se puede cruzar con otro
   const errorDesde = !desde ? 'Indica desde cuándo'
     : inicioMinimo && desde < inicioMinimo ? `Debe empezar desde el ${fecha(inicioMinimo)} (inicio)`
     : desde > inicioMaximo ? `Debe empezar a más tardar el ${fecha(inicioMaximo)} (vencimiento)`
-    : detalle === 'congelamiento' && cruce ? `Se cruza con el congelamiento del ${fecha(cruce.fecha_inicio)} al ${fecha(cruce.fecha_fin)}` : ''
+    : cruce ? `Se cruza con el congelamiento del ${fecha(cruce.fecha_inicio)} al ${fecha(cruce.fecha_fin)}` : ''
   const errores = detalle === 'congelamiento'
     ? {
         desde: errorDesde,
@@ -224,7 +224,6 @@ const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMa
           : diasCongelamiento > diasMaximos ? `Le quedan ${dias(diasMaximos)} de congelamiento` : '',
       }
     : {
-        desde: errorDesde,
         dias: !/^\d+$/.test(diasRegalo) || Number(diasRegalo) < 1 ? 'Ingresa un número entero mayor a 0'
           : Number(diasRegalo) > diasMaximos ? `Máximo ${diasMaximos} días` : '',
       }
@@ -237,7 +236,7 @@ const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMa
     if (!valido) return
     onGuardar(detalle === 'congelamiento'
       ? { id_tipo_extension: ID_EXTENSION_CONGELAMIENTO, fecha_inicio: desde, fecha_fin: hasta, observacion: observacion.trim() }
-      : { id_tipo_extension: ID_EXTENSION_REGALO, fecha_inicio: desde, dias_habiles: Number(diasRegalo), observacion: observacion.trim() })
+      : { id_tipo_extension: ID_EXTENSION_REGALO, dias_habiles: Number(diasRegalo), observacion: observacion.trim() })
   }
 
   return (
@@ -261,10 +260,7 @@ const FormExtension = ({ detalle, diasMaximos, guardando, inicioMinimo, inicioMa
           </>
         ) : (
           <>
-            <Col md={6}>
-              <InputCR type="date" label="Desde" value={desde} min={inicioMinimo} max={inicioMaximo}
-                onChange={(e) => setDesde(e.target.value)} messageErrors={mostrar(errores.desde ?? '')} />
-            </Col>
+            {/* Sin "Desde": el regalo empieza al vencer la membresía */}
             <Col md={6}>
               <InputCR label={`Días de regalo (máx. ${diasMaximos})`} inputMode="numeric" value={diasRegalo}
                 onChange={(e) => setDiasRegalo(e.target.value)} messageErrors={mostrar(errores.dias ?? '')} />
