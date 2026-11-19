@@ -29,6 +29,8 @@ const GestionTC = lazy(() => import('@/pages/GestionTipoCambio'));
 const GestionTermGrupoFinanzas = lazy(() => import('@/pages/GestionTermGrupoFinanzas'));
 const GestionTerminologiaFinanzas = lazy(() => import('@/pages/GestionTerminologiaFinanzas'));
 const GestionCompromisosPagos = lazy(() => import('@/pages/GestionCompromisosPagos'));
+const GestionIngredientes = lazy(() => import('@/pages/GestionIngredientes'));
+const GestionRecetas = lazy(() => import('@/pages/GestionRecetas'));
 const GestionCuestionarios = lazy(() => import('@/pages/GestionCuestionarios'));
 // TODO: PERFILES
 const Perfil = lazy(() => import('@/pages/perfil'));
@@ -108,6 +110,8 @@ export const AppRoutes = () => {
             <Route path="reporte-ventas" element={<ReporteVentas/>}/>
             <Route path="reporte-citas-nutricion" element={<ReporteCitasNutricion/>}/>
             <Route path="compromisos-pago" element={<GestionCompromisosPagos/>}/>
+            <Route path="gestion-ingredientes" element={<GestionIngredientes/>}/>
+            <Route path="gestion-recetas" element={<GestionRecetas/>}/>
             <Route path="modulo-x-user" element={<ModulosxUsuario/>}/>
             <Route path="asistencia" element={<GestionAsistencias/>}/>
             <Route path="gestion-cuestionario" element={<GestionCuestionarios/>}/>

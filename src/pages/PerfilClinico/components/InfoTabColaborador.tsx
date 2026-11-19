@@ -27,17 +27,18 @@ export const InfoTabColaborador = () => {
         id="uncontrolled-tab-example"
         activeKey={activeTab}
         onSelect={handleSelect}
-        // Títulos de las pestañas en un card (en fila: .card es flex-column; fijo arriba al hacer scroll) y el contenido en otro
-        classNameLista='card card-mode-actual p-2 flex-row position-sticky top-0 z-3'
+        // Títulos de las pestañas en un card (en fila: .card es flex-column), fijos debajo de las fechas al bajar;
+        // el contenido en otro card, sin scroll propio
+        classNameLista='card card-mode-actual p-2 flex-row perfil-clinico__tabs-fija'
         classNamePanel='card card-mode-actual p-3'
     >
-      <TabCR eventKey="datos-nutricionales" title="Datos nutricionales">
+      <TabCR eventKey="datos-generales" title="Datos generales">
           <TabDatosNutricionales/>
       </TabCR>
       <TabCR eventKey="evaluacion-corporal" title="Evaluación corporal">
           <TabEvaluacionCorporal/>
       </TabCR>
-      <TabCR eventKey="historia-alimentaria" title="Historia alimentaria">
+      <TabCR eventKey="antecedentes" title="Antecedentes">
         <TabHistoriaAlimentaria/>
       </TabCR>
       <TabCR eventKey="reporte-nutricionista" title="Reporte nutricionista">

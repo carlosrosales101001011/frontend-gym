@@ -1,14 +1,14 @@
-import { useState } from 'react'
 import { CardSeccionCR } from '@/components/CardSeccion/CardSeccionCR'
 import { InputCR } from '@/components/TextFields/InputCR'
+import { usePerfilNutricional } from '../../hook/usePerfilNutricional'
 
-/** Observación de la evaluación corporal. Por ahora solo en pantalla: todavía no se guarda en la base */
+/** Observación de la evaluación corporal de la fecha elegida: se guarda al salir del campo */
 export const CardObservacionEvaluacion = () => {
-  const [observacion, setObservacion] = useState('')
+  const { propsTexto } = usePerfilNutricional()
 
   return (
     <CardSeccionCR titulo="Observación de la evaluación corporal" className="mb-3">
-      <InputCR type="text-area" label="" value={observacion} onChange={(e) => setObservacion(e.target.value)} />
+      <InputCR type="text-area" label="" {...propsTexto('observacion_corporal')} />
     </CardSeccionCR>
   )
 }

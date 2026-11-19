@@ -29,6 +29,7 @@ export const InputSelectCR: React.FC<SelectCRProps> = ({
   required = false,
   autoFocus = false,
   onBlur,
+  disabled = false,
 }) => {
   const hasError = messageErrors.trim().length !== 0;
   const classNameLabel = LabelColor ?? "";
@@ -116,6 +117,7 @@ const customStyles: StylesConfig<SelectOption, false> = {
           ref={ref}
           placeholder=''
           autoFocus={autoFocus}
+          isDisabled={disabled}
           maxMenuHeight={OPTION_HEIGHT * VISIBLE_OPTIONS}
           noOptionsMessage={() => 'Sin opciones'}
           menuPortalTarget={document.body}

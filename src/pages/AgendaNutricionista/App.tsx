@@ -3,10 +3,10 @@ import { addDays, addMonths, addWeeks, parseISO } from "date-fns"
 import { Spinner } from "react-bootstrap"
 import { PageBreadCumb } from "@/components/PageBreadCumb/PageBreadCumb"
 import { ContadorCoincidencias } from "@/components/SinResultados/ContadorCoincidencias"
-import { InputCR } from "@/components/TextFields/InputCR"
+import { ModalBuscarCliente } from "@/components/BuscadorPersona/ModalBuscarCliente"
+import type { PersonaBuscada } from "@/components/BuscadorPersona/useBuscarPersona"
 import { ButtonCR } from "@/components/Button/ButtonCR"
 import IconCR from "@/components/Icons/IconCR"
-import { normalizeText } from "@/helpers/strings"
 import { useSesionStore } from "@/hook/useSesionStore"
 import { useAgendaNutricionistaStore } from "./hook/useAgendaNutricionistaStore"
 import { useAgendaTiempoReal } from "./hook/useAgendaTiempoReal"
@@ -26,9 +26,6 @@ const MOVER_FECHA: Record<VistaCalendario, (fecha: Date, cantidad: number) => Da
   // Sin domingos: de sábado se pasa a lunes y de lunes a sábado
   dia: (fecha, cantidad) => saltarDomingo(addDays(fecha, cantidad), cantidad > 0 ? 1 : -1),
 }
-
-/** Cuánto después de dejar de escribir se aplica la búsqueda de clientes */
-const MS_APLICAR_BUSQUEDA = 400
 
 export const App = () => {
   const { eventos, eventosBuscados, cargandoEventos, minutosxcli, estados, obtenerEventos, buscarCitasCliente, obtenerEstados } = useAgendaNutricionistaStore()
@@ -56,23 +53,20 @@ export const App = () => {
     if (/^\d{2}:\d{2}$/.test(valor)) desplazarAHora(valor)
   }
 
-  // Buscador de clientes: solo se ven sus citas y el calendario va a la más reciente
-  const [busquedaCliente, setBusquedaCliente] = useState('')
-  // Lo que filtra: se aplica a los ms de dejar de escribir; mientras tanto se muestra el loading
-  const [textoBuscado, setTextoBuscado] = useState('')
+  // Buscador de clientes ("Buscar" abre el modal de clientes): solo se ven sus citas y el calendario va a la más reciente
+  const [showBuscarCliente, setShowBuscarCliente] = useState(false)
+  const [clienteBuscado, setClienteBuscado] = useState<{ id: number, nombre: string } | null>(null)
   const [buscandoCliente, setBuscandoCliente] = useState(false)
-  const temporizadorBusqueda = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(() => () => clearTimeout(temporizadorBusqueda.current), [])
   /** Citas del cliente buscado (de cualquier fecha, las trae el backend), la de fecha más reciente primero */
   const ordenarMasRecientePrimero = (citas: EventoAgendaProps[]) =>
     [...citas].sort((a, b) => `${b.fecha} ${b.hora_inicio}`.localeCompare(`${a.fecha} ${a.hora_inicio}`))
-  // Buscando: solo las citas del cliente; sin texto: las del rango que se ve
-  const eventosVisibles = textoBuscado ? ordenarMasRecientePrimero(eventosBuscados) : eventos
+  // Buscando: solo las citas del cliente; sin cliente: las del rango que se ve
+  const eventosVisibles = clienteBuscado ? ordenarMasRecientePrimero(eventosBuscados) : eventos
   // Coincidencia en la que está el calendario (las flechas la mueven); se ajusta si el socket quitó citas
   const [indiceCoincidencia, setIndiceCoincidencia] = useState(0)
   const indiceActual = Math.min(indiceCoincidencia, Math.max(eventosVisibles.length - 1, 0))
   // Cita en la que está el buscador: se pinta con borde brillante
-  const idResaltado = textoBuscado ? eventosVisibles[indiceActual]?.id : undefined
+  const idResaltado = clienteBuscado ? eventosVisibles[indiceActual]?.id : undefined
   /** Lleva el calendario a la fecha (y en la vista semana, a la hora) de la cita */
   const irACita = (cita: EventoAgendaProps) => {
     setFecha(saltarDomingo(parseISO(cita.fecha)))
@@ -87,21 +81,22 @@ export const App = () => {
     setIndiceCoincidencia(nuevo)
     irACita(eventosVisibles[nuevo])
   }
-  const onBuscarCliente = (valor: string) => {
-    setBusquedaCliente(valor)
+  /** Cliente elegido en el modal: se piden sus citas (todas sus fechas) y el calendario va a la más reciente */
+  const onElegirCliente = async (persona: PersonaBuscada) => {
+    const nombre = `${persona.nombres} ${persona.apellido_paterno} ${persona.apellido_materno}`.trim()
     setBuscandoCliente(true)
-    clearTimeout(temporizadorBusqueda.current)
-    temporizadorBusqueda.current = setTimeout(async () => {
-      const texto = normalizeText(valor)
-      // Las citas del cliente se piden al backend (todas sus fechas); sin texto se vuelve a las del rango
-      const citas = texto ? await buscarCitasCliente(valor.trim()) : []
-      setTextoBuscado(texto)
-      setBuscandoCliente(false)
-      setIndiceCoincidencia(0)
-      // Solo al buscar (no cuando el socket recarga las citas): el calendario va a la cita de fecha más reciente
-      const masReciente = ordenarMasRecientePrimero(citas)[0]
-      if (masReciente) irACita(masReciente)
-    }, MS_APLICAR_BUSQUEDA)
+    const citas = await buscarCitasCliente(persona.id)
+    setClienteBuscado({ id: persona.id, nombre })
+    setBuscandoCliente(false)
+    setIndiceCoincidencia(0)
+    // Solo al buscar (no cuando el socket recarga las citas)
+    const masReciente = ordenarMasRecientePrimero(citas)[0]
+    if (masReciente) irACita(masReciente)
+  }
+  /** Quita el cliente buscado: se vuelven a ver las citas del rango */
+  const onQuitarCliente = () => {
+    setClienteBuscado(null)
+    setIndiceCoincidencia(0)
   }
   const [modalEvento, setModalEvento] = useState<{ show: boolean, evento: EventoAgendaProps }>({
     show: false,
@@ -140,7 +135,7 @@ export const App = () => {
   // Sin skeleton: es una recarga en segundo plano y no debe parpadear
   const recargarAgenda = () => {
     obtenerEventos(rango, undefined, false)
-    if (textoBuscado) buscarCitasCliente(busquedaCliente.trim(), false)
+    if (clienteBuscado) buscarCitasCliente(clienteBuscado.id, false)
   }
   useAgendaTiempoReal(recargarAgenda, (cambio) => {
     if (cambio.accion === 'crear') return
@@ -188,17 +183,26 @@ export const App = () => {
           )}
           buscador={(
             <div className="d-flex align-items-center gap-2 ms-2">
-              <div style={{ width: 220 }}>
-                <InputCR
-                  label="Buscar cliente"
-                  value={busquedaCliente}
-                  onChange={(e) => onBuscarCliente(e.target.value)}
-                  aria-label="Buscar citas de un cliente"
+              {/* Texto (no botón): "Buscar 🔍" abre el modal de clientes; con un cliente elegido, su nombre y la x para quitarlo */}
+              {clienteBuscado ? (
+                <span className="d-inline-flex align-items-center gap-1 fw-semibold text-nowrap">
+                  {clienteBuscado.nombre}
+                  <ButtonCR variant="link" className="p-0 lh-1 text-reset" label={<IconCR name="times" size={14} />} title="Quitar búsqueda" aria-label="Quitar búsqueda" onClick={onQuitarCliente} />
+                </span>
+              ) : (
+                <ButtonCR
+                  variant="link"
+                  className="p-0 text-reset text-decoration-none"
+                  label={<span className="d-inline-flex align-items-center gap-1">Buscar <IconCR name="search" size={14} /></span>}
+                  title="Buscar las citas de un cliente"
+                  aria-label="Buscar las citas de un cliente"
+                  onClick={() => setShowBuscarCliente(true)}
                 />
-              </div>
+              )}
+              <ModalBuscarCliente show={showBuscarCliente} onHide={() => setShowBuscarCliente(false)} onSelect={onElegirCliente} />
               {buscandoCliente && <Spinner animation="border" size="sm" role="status" aria-label="Buscando" />}
-              {!buscandoCliente && textoBuscado && eventosVisibles.length === 0 && <ContadorCoincidencias total={0} />}
-              {!buscandoCliente && textoBuscado && eventosVisibles.length > 0 && (
+              {!buscandoCliente && clienteBuscado && eventosVisibles.length === 0 && <ContadorCoincidencias total={0} />}
+              {!buscandoCliente && clienteBuscado && eventosVisibles.length > 0 && (
                 <div className="d-flex align-items-center gap-1">
                   <ButtonCR variant="outline-secondary" className="btn-sm" onClick={() => moverCoincidencia(-1)} icon={<IconCR name="arrowUp" size={14} />} title="Coincidencia anterior (más reciente)" />
                   <ButtonCR variant="outline-secondary" className="btn-sm" onClick={() => moverCoincidencia(1)} icon={<IconCR name="arrowDown" size={14} />} title="Coincidencia siguiente" />

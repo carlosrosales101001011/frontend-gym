@@ -1,6 +1,6 @@
 
 import { Col, Row } from 'react-bootstrap'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { usePerfilColaboradorStore } from '../../hook/usePerfilColaboradorStore'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/stores/Store';
@@ -11,7 +11,9 @@ import { formatDate } from '@/helpers/FormatDate'
 import { differenceInYears } from 'date-fns'
 import { FieldInfo } from '@/components/FieldText/FieldInfo'
 import { localDateStringToDate } from '@/helpers/getDate'
-import { InputCR } from '@/components/TextFields/InputCR'
+import { CardObjetivoPrincipal } from './CardObjetivoPrincipal'
+import { CardHabitosEstiloVida } from './CardHabitosEstiloVida'
+import { CardFotosPaciente } from './CardFotosPaciente'
 /** Datos más juntos (la mitad del espacio normal): vertical m-1 p-1 → p-1, horizontal 1.5rem → 0.75rem */
 const JUNTOS = 'p-1'
 const FILA_JUNTA = { '--bs-gutter-x': '0.75rem' } as React.CSSProperties
@@ -26,8 +28,6 @@ export const TabDatosNutricionales = ({ activo = true }: TabDatosNutricionalesPr
   const uid = uid_person ?? uid_cliente ?? '';
   const { obtenerDataColaboradorxUID, loading } = usePerfilColaboradorStore()
   const {colaborador} = useSelector((state: RootState)=>state.PERFIL_COLABORADOR)
-  // Por ahora solo en pantalla: todavía no se guarda en la base
-  const [objetivoPrincipal, setObjetivoPrincipal] = useState('')
   const { data:dataGeneroPersona, cargar:cargarGeneroPersona } = useTerminologiaPersona('GeneroPersona');
   // Fecha de la base (yyyy-mm-dd o ISO) como día local, sin corrimiento por zona horaria
   const nacimiento = colaborador.fecha_nacimiento ? localDateStringToDate(String(colaborador.fecha_nacimiento).slice(0, 10)) : null
@@ -39,7 +39,7 @@ export const TabDatosNutricionales = ({ activo = true }: TabDatosNutricionalesPr
   if (loading)return( <>LOADING</>)
     return (
     <div>
-          {/* 3 columnas: en la 1ra van los cards; en la 2da el objetivo principal; la 3ra queda libre */}
+          {/* 3 columnas: en la 1ra van los cards; en la 2da el objetivo principal; en la 3ra hábitos y estilo de vida */}
           <Row>
             <Col lg={4}>
               {/* Solo lectura: se editan desde la gestión de pacientes */}
@@ -60,12 +60,13 @@ export const TabDatosNutricionales = ({ activo = true }: TabDatosNutricionalesPr
                 </Row>
               </CardSeccionCR>
             </Col>
-            <Col lg={4}>
-              <CardSeccionCR titulo="Objetivo principal" className="mb-3">
-                <InputCR type="text-area" label="" value={objetivoPrincipal} onChange={(e) => setObjetivoPrincipal(e.target.value)}/>
-              </CardSeccionCR>
+            <Col lg={4} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
+              <CardFotosPaciente />
             </Col>
-            <Col lg={4}></Col>
+            <Col lg={4}>
+              <CardHabitosEstiloVida />
+              <CardObjetivoPrincipal />
+            </Col>
           </Row>
     </div>
   )

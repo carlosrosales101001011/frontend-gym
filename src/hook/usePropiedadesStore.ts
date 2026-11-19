@@ -90,10 +90,19 @@ const TERMINOLOGIAS = {
   distritosCallao: ['persona', 'distrito', 'Callao'],
   motivoCompromisoPago: ['compromiso', 'pago', 'motivo'], //compromisos_pago_cliente.id_motivo
   estadoCompromisoPago: ['compromiso', 'pago', 'estado'], //compromisos_pago_cliente.id_estado
+  unidadIngrediente: ['nutricion', 'ingrediente', 'unidad'], //Gramo, Taza... (ingrediente_unidad.id_unidad)
+  alergenoIngrediente: ['nutricion', 'ingrediente', 'alergeno'], //Gluten, Lácteos... (ingrediente_alergeno.id_alergeno)
+  // Pestaña Antecedentes del perfil del paciente (insertadas con un .sql que ya se borró)
+  antecedentesPersonales: ['perfil-paciente', 'tipos-antecedentes', 'antecedentes_personales'],
+  antecedentesFamiliares: ['perfil-paciente', 'tipos-antecedentes', 'antecedentes_familiares'],
+  lesionesPaciente: ['perfil-paciente', 'tipos-antecedentes', 'lesiones'],
+  alergiasIntoleranciasPaciente: ['perfil-paciente', 'tipos-antecedentes', 'alergias_intolerancias'],
+  // Card Objetivo principal del perfil del paciente (back/sql/seed-perfil-paciente-objetivos.sql)
+  objetivosPrincipales: ['perfil-paciente', 'tipos-objetivos', 'objetivos_principales'],
   
 } as const;
 
-type TerminologiaKey = keyof typeof TERMINOLOGIAS;
+export type TerminologiaKey = keyof typeof TERMINOLOGIAS;
 export const useTerminologiaPersona = (key: TerminologiaKey) => {
   const [entidad, grupo, sub] = TERMINOLOGIAS[key];
   return useTerminologia(entidad, grupo, sub);

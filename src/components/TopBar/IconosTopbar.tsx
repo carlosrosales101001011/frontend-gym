@@ -2,6 +2,7 @@ import IconCR from '@/components/Icons/IconCR'
 import { useThemeStore } from '@/components/TopBar/useThemeStore'
 import { IndicadorConexion } from '@/components/TopBar/IndicadorConexion'
 import { Notificaciones } from '@/components/TopBar/Notificaciones'
+import { ComentariosTopbar } from '@/components/TopBar/ComentariosTopbar'
 
 /** Íconos de la barra superior (notificaciones, conexión y modo claro/nocturno): se usan en el Topbar y en el Home */
 export const IconosTopbar = () => {
@@ -10,6 +11,7 @@ export const IconosTopbar = () => {
   return (
     <div className="d-flex align-items-center">
       <Notificaciones />
+      <ComentariosTopbar />
       <IndicadorConexion />
       <button type="button" className="topbar__icon me-2" onClick={toggleTheme} title={textoTema} aria-label={textoTema}>
         <IconCR name={theme === 'dark' ? 'sun' : 'moon'} size={18} />

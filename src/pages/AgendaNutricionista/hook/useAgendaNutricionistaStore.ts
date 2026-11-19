@@ -73,11 +73,11 @@ export const useAgendaNutricionistaStore = () => {
       }
     }
 
-    /** Todas las citas (de cualquier fecha) de los clientes cuyo nombre contiene q; las devuelve además de guardarlas */
-    const buscarCitasCliente = async (q: string, conSkeleton = true) => {
+    /** Todas las citas activas (de cualquier fecha) del cliente; las devuelve además de guardarlas */
+    const buscarCitasCliente = async (id_cli: number, conSkeleton = true) => {
       if (conSkeleton) dispatch(onSetCargandoEventos(true))
       try {
-        const { data } = await httpClient.get('/agenda-nutricionista/rango', { params: { q } })
+        const { data } = await httpClient.get('/agenda-nutricionista/rango', { params: { id_cli } })
         const citas = (data.lista as CitaApi[]).map(desdeApi)
         dispatch(onSetEventosBuscados(citas))
         return citas

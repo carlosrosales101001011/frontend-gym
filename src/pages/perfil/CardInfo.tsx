@@ -9,7 +9,7 @@ import { LoadingOverlay } from '@/components/Loading/LoadingOverlay'
 import { PageBreadCumb } from '@/components/PageBreadCumb/PageBreadCumb'
 import { getBlobUrl } from '@/helpers/blobUrl'
 import { CardActivoDesde } from './components/CardActivoDesde'
-import { ModalBuscarCliente } from './components/ModalBuscarCliente'
+import { ModalBuscarCliente } from '@/components/BuscadorPersona/ModalBuscarCliente'
 import { useFotoPerfil } from './hook/useFotoPerfil'
 import { useInfoCliente } from './hook/useInfoCliente'
 
@@ -116,7 +116,7 @@ export const CardInfo = () => {
             onActualizar={async (archivo) => alTerminar(await subirFoto(persona, archivo))}
             onEliminar={async () => alTerminar(await eliminarFoto(persona))}
           />
-          <ModalBuscarCliente show={showBuscarCliente} onHide={() => setShowBuscarCliente(false)} onSelect={irAlCliente} />
+          <ModalBuscarCliente show={showBuscarCliente} onHide={() => setShowBuscarCliente(false)} onSelect={({ uid }) => uid && irAlCliente(uid)} />
           <div className='card-info__activo'>
             <CardActivoDesde/>
           </div>

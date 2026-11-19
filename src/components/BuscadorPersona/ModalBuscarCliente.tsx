@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { ModalSearching, type ItemResultado } from '@/components/ModalSearching/ModalSearching'
-import { useBuscarPersona } from '@/components/BuscadorPersona/useBuscarPersona'
+import { useBuscarPersona, type PersonaBuscada } from '@/components/BuscadorPersona/useBuscarPersona'
 import { ajusteAvatarUltimo } from '@/components/Avatar/encuadreFoto'
 import { getBlobUrl } from '@/helpers/blobUrl'
 
@@ -10,8 +10,8 @@ const ID_TIPO_CLIENTE = 2
 type ModalBuscarClienteProps = {
   show: boolean
   onHide: () => void
-  /** uid del cliente elegido (para abrir su perfil) */
-  onSelect: (uid: string) => void
+  /** Cliente elegido (ej. su uid para abrir el perfil o su id para buscar sus citas) */
+  onSelect: (persona: PersonaBuscada) => void
 }
 
 /** Modal de búsqueda de personas, solo clientes (por nombre, DNI o teléfono) */
@@ -30,10 +30,10 @@ export const ModalBuscarCliente = ({ show, onHide, onSelect }: ModalBuscarClient
   })), [personas])
 
   const elegir = (id: number) => {
-    const uid = personas.find((persona) => persona.id === id)?.uid
-    if (!uid) return
+    const persona = personas.find((p) => p.id === id)
+    if (!persona) return
     onHide()
-    onSelect(uid)
+    onSelect(persona)
   }
 
   return (

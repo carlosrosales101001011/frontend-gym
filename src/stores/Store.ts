@@ -45,6 +45,8 @@ import { reporteCitasSlice } from "@/pages/ReporteCitasNutricion/store/reporteCi
 import { compromisoPagoSlice } from "@/pages/GestionCompromisosPagos/store/compromisoPagoSlice";
 import { asistenciasSlice } from "@/pages/GestionAsistencias/store/asistenciasSlice";
 import { modulosUsuarioSlice } from "@/pages/GestionModuloxUsuario/store/modulosUsuarioSlice";
+import { ingredienteSlice } from "@/pages/GestionIngredientes/store/ingredienteSlice";
+import { recetaSlice } from "@/pages/GestionRecetas/store/recetaSlice";
 
 export const store = configureStore({
     reducer: {
@@ -92,7 +94,9 @@ export const store = configureStore({
     REPORTE_CITAS: reporteCitasSlice.reducer,
     COMPROMISO_PAGO: compromisoPagoSlice.reducer,
     ASISTENCIAS: asistenciasSlice.reducer,
-    MODULOS_USUARIO: modulosUsuarioSlice.reducer
+    MODULOS_USUARIO: modulosUsuarioSlice.reducer,
+    INGREDIENTE: ingredienteSlice.reducer,
+    RECETA: recetaSlice.reducer,
 }
 })
 
