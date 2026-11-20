@@ -51,6 +51,13 @@ export type PerfilNutricional = {
   porcentaje_obesidad: Decimal
   masa_esqueletica: Decimal
   mineral_oseo: Decimal
+  // Análisis de composición corporal (agua en L, el resto en kg)
+  agua_corporal_total: Decimal
+  proteinas: Decimal
+  minerales: Decimal
+  /** MME: masa músculo esquelética (kg) */
+  masa_musculo_esqueletica: Decimal
+  masa_grasa_corporal: Decimal
   observacion_corporal: string | null
   // Antecedentes: ids separados por coma, "¿Cuáles?" y observación
   antecedentes_personales: string | null

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Swal from 'sweetalert2'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/stores/Store'
 import { ButtonCR } from '@/components/Button/ButtonCR'
@@ -29,9 +30,24 @@ const Etiqueta = ({ registro }: { registro: PerfilNutricional }) => (
  */
 export const FilaFechas = () => {
   const { colaborador } = useSelector((state: RootState) => state.PERFIL_COLABORADOR)
-  const { registros, registro, cargando, seleccionar } = usePerfilNutricional()
-  const [mostrarModal, setMostrarModal] = useState(false)
+  const { registros, registro, cargando, seleccionar, eliminarFecha } = usePerfilNutricional()
+  /** Modal abierto: agregar una fecha nueva o editar la elegida */
+  const [modal, setModal] = useState<'agregar' | 'editar' | null>(null)
   const indice = registros.findIndex((r) => r.id === registro?.id)
+
+  /** Pide confirmación y da de baja la fecha elegida (con todos sus datos) */
+  const confirmarEliminar = async () => {
+    if (!registro) return
+    const { isConfirmed } = await Swal.fire({
+      icon: 'warning',
+      title: '¿Eliminar la fecha?',
+      text: `${textoFecha(registro.fecha)}${registro.nombrePerfil ? ` · ${registro.nombrePerfil}` : ''}: se quitarán todos sus datos.`,
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+    })
+    if (isConfirmed) eliminarFecha(registro)
+  }
 
   /** Fecha a un costado de la elegida; si no hay, el lugar queda vacío */
   const lateral = (i: number) => (
@@ -63,6 +79,15 @@ export const FilaFechas = () => {
           {lateral(indice - 1)}
           {/* Elegida: al medio, resaltada */}
           <div className="text-center" style={{ width: ANCHO_FECHA }} title={registro.nombrePerfil ?? undefined}>
+            {/* Arriba de la fecha elegida: editar (fecha y nombre) o eliminar */}
+            <div className="d-flex justify-content-center gap-3 mb-1">
+              <span className="cursor-pointer" title="Editar fecha" aria-label="Editar fecha" role="button" onClick={() => setModal('editar')}>
+                <IconCR name="edit" size={14} />
+              </span>
+              <span className="cursor-pointer text-danger" title="Eliminar fecha" aria-label="Eliminar fecha" role="button" onClick={confirmarEliminar}>
+                <IconCR name="trash" size={14} />
+              </span>
+            </div>
             <span className="d-inline-block mw-100 bg-primary text-white rounded px-3 py-1 fw-bold">
               <Etiqueta registro={registro} />
             </span>
@@ -88,9 +113,16 @@ export const FilaFechas = () => {
         title="Agregar fecha"
         aria-label="Agregar fecha"
         disabled={cargando || !colaborador.id}
-        onClick={() => setMostrarModal(true)}
+        onClick={() => setModal('agregar')}
       />
-      <ModalAgregarFecha show={mostrarModal} onHide={() => setMostrarModal(false)} id_cli={colaborador.id} />
+      {/* key: al abrir se monta de nuevo con los datos de la fecha a editar (o vacío al agregar) */}
+      <ModalAgregarFecha
+        key={modal === 'editar' ? `editar-${registro?.id}` : 'agregar'}
+        show={modal !== null}
+        onHide={() => setModal(null)}
+        id_cli={colaborador.id}
+        registroEditar={modal === 'editar' ? registro : null}
+      />
     </div>
   )
 }

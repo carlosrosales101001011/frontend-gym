@@ -29,6 +29,9 @@ export type AsistenciaProps = {
 /** Tipo con el que arranca una asistencia nueva: "Entrada" (terminología asistencia/tipo/persona) */
 export const ID_SUBTIPO_ASISTENCIA_POR_DEFECTO = 6141
 
+/** persona.id_tipo de los colaboradores: solo ellos pasan por el modal (eligen el Tipo); los clientes se registran directo */
+export const ID_TIPO_COLABORADOR = 1
+
 export type AsistenciasState = {
   asistencias: AsistenciaProps[];
 };

@@ -23,23 +23,22 @@ export const CardEvaluacionAntropometrica = () => {
   return (
     <CardSeccionCR titulo="Evaluación antropométrica" className="mb-3">
       <Row>
-        <Col xs={6}><InputCR label="Peso (kg)" {...propsDecimal('peso')} /></Col>
-        <Col xs={6}><InputCR label="Talla (m)" {...propsDecimal('talla')} /></Col>
+        <Col xs={3}><InputCR label="Peso (kg)" {...propsDecimal('peso')} /></Col>
+        <Col xs={3}><InputCR label="Talla (m)" {...propsDecimal('talla')} /></Col>
         {/* IMC a lado de la talla: se calcula solo; en negrita con el color de su clasificación */}
-        <Col xs={4}>
+        <Col xs={6}>
           <div className="m-2">
-            <div className="small opacity-75">IMC</div>
             {clasificacionImc ? (
-              <div className={`fw-bold text-${clasificacionImc.color}`}>{imc} · {clasificacionImc.texto}</div>
+              <div className={`fw-bold text-${clasificacionImc.color}`}>IMC: {imc} {clasificacionImc.texto}</div>
             ) : (
               <div className="fw-bold opacity-50">—</div>
             )}
           </div>
         </Col>
-        <Col xs={6}><InputCR label="Cintura (cm)" {...propsDecimal('cintura')} /></Col>
-        <Col xs={6}><InputCR label="Cadera (cm)" {...propsDecimal('cadera')} /></Col>
+        <Col xs={3}><InputCR label="Cintura (cm)" {...propsDecimal('cintura')} /></Col>
+        <Col xs={3}><InputCR label="Cadera (cm)" {...propsDecimal('cadera')} /></Col>
         {/* Relación cintura-cadera debajo del IMC: se calcula sola, no se edita */}
-        <Col xs={4}><InputCR label="Cintura / cadera" value={calcularCinturaCadera(valor('cintura'), valor('cadera'))} readOnly disabled /></Col>
+        <Col xs={6}><InputCR label="Cintura / cadera" value={calcularCinturaCadera(valor('cintura'), valor('cadera'))} readOnly disabled /></Col>
         {PERIMETROS.map(({ campo, label }) => <Col xs={6} key={campo}><InputCR label={label} {...propsDecimal(campo)} /></Col>)}
       </Row>
     </CardSeccionCR>

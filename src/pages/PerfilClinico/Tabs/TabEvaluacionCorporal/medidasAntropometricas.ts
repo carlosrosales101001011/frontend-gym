@@ -25,6 +25,13 @@ export const clasificarImc = (imc: string) => {
   return { texto: 'Obesidad', color: 'danger' } as const
 }
 
+/** PGC (porcentaje de grasa corporal) = masa grasa corporal (kg) / peso (kg) × 100, con 1 decimal; vacío si falta un dato */
+export const calcularPgc = (masaGrasa: Medida, peso: Medida) => {
+  const grasa = aNumero(masaGrasa)
+  const kg = aNumero(peso)
+  return grasa !== null && kg ? ((grasa / kg) * 100).toFixed(1) : ''
+}
+
 /** Relación cintura-cadera = cintura (cm) / cadera (cm), con 2 decimales; vacío si falta un dato */
 export const calcularCinturaCadera = (cintura: Medida, cadera: Medida) => {
   const cmCintura = aNumero(cintura)

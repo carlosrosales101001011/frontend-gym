@@ -7,6 +7,7 @@ import { formatDate } from '@/helpers/FormatDate'
 import { mensajeError } from '@/helpers/mensajeError'
 import { alertaMembresia, membresiaVigente } from '@/helpers/alertaMembresia'
 import type { MembresiaActualProps } from '@/types/membresiaActual'
+import type { OpcionesSelect } from '@/types/props'
 
 /** Tipo de evento de una asistencia registrada a mano (terminología persona/asistencia/tipo) */
 export const TIPO_EVENTO_MANUAL = 'manual'
@@ -33,7 +34,9 @@ export const useRegistrarAsistencia = () => {
   }
 
   const registrarAsistencia = async (idPersona: number, nombre: string, esCliente: boolean) => {
-    const idManual = tiposEvento.find((tipo) => normalizeText(tipo.label) === TIPO_EVENTO_MANUAL)?.value
+    // Si se eligió a la persona antes de que llegaran los tipos de evento, se esperan aquí
+    const tipos: OpcionesSelect[] = tiposEvento.length ? tiposEvento : (await cargarTiposEvento()) ?? []
+    const idManual = tipos.find((tipo) => normalizeText(tipo.label) === TIPO_EVENTO_MANUAL)?.value
     if (!idManual) {
       await Swal.fire({ icon: 'error', title: 'No se pudo registrar', text: 'Falta el tipo de evento "Manual" en la terminología (persona / asistencia / tipo)' })
       return false

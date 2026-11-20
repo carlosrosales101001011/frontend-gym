@@ -2,26 +2,34 @@ import { useState, type FormEvent } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import ModalCR from '@/components/Modal/ModalCR'
 import { ButtonCR } from '@/components/Button/ButtonCR'
-import { BtnAdd } from '@/components/Button/buttonsCrud'
+import { BtnAdd, BtnUpdate } from '@/components/Button/buttonsCrud'
 import { InputCR } from '@/components/TextFields/InputCR'
 import { formatDate } from '@/helpers/FormatDate'
 import { usePerfilNutricional } from '../hook/usePerfilNutricional'
+import type { PerfilNutricional } from '../hook/usePerfilNutricionalStore'
 
 type ModalAgregarFechaProps = {
   show: boolean
   onHide: () => void
   /** Paciente (PERSONA.id) */
   id_cli: number
+  /** Fecha a editar; sin ella, el modal agrega una nueva */
+  registroEditar?: PerfilNutricional | null
 }
 
 const MAX_NOMBRE = 80
 const hoy = () => formatDate(new Date(), 'yyyy-mm-dd', 'yyyy-mm-dd')
 
-/** Agrega una fecha al perfil nutricional del paciente: fecha y nombre del perfil (ej. "Evaluación inicial") */
-export const ModalAgregarFecha = ({ show, onHide, id_cli }: ModalAgregarFechaProps) => {
-  const { agregarFecha } = usePerfilNutricional()
-  const [fecha, setFecha] = useState(hoy)
-  const [nombrePerfil, setNombrePerfil] = useState('')
+/**
+ * Agrega o edita una fecha del perfil nutricional del paciente: fecha y nombre del perfil (ej. "Evaluación inicial").
+ * Al editar arranca con los datos de la fecha (montar con un key distinto por fecha para que los tome).
+ */
+export const ModalAgregarFecha = ({ show, onHide, id_cli, registroEditar = null }: ModalAgregarFechaProps) => {
+  const { agregarFecha, editarFecha } = usePerfilNutricional()
+  const inicialFecha = () => registroEditar?.fecha.slice(0, 10) ?? hoy()
+  const inicialNombre = () => registroEditar?.nombrePerfil ?? ''
+  const [fecha, setFecha] = useState(inicialFecha)
+  const [nombrePerfil, setNombrePerfil] = useState(inicialNombre)
   const [enviado, setEnviado] = useState(false)
   const [guardando, setGuardando] = useState(false)
 
@@ -29,8 +37,8 @@ export const ModalAgregarFecha = ({ show, onHide, id_cli }: ModalAgregarFechaPro
   const errorNombre = enviado && !nombrePerfil.trim() ? 'El nombre del perfil es obligatorio' : ''
 
   const cerrar = () => {
-    setFecha(hoy())
-    setNombrePerfil('')
+    setFecha(inicialFecha())
+    setNombrePerfil(inicialNombre())
     setEnviado(false)
     onHide()
   }
@@ -40,7 +48,8 @@ export const ModalAgregarFecha = ({ show, onHide, id_cli }: ModalAgregarFechaPro
     setEnviado(true)
     if (!fecha || !nombrePerfil.trim()) return
     setGuardando(true)
-    const guardado = await agregarFecha(id_cli, { fecha, nombrePerfil: nombrePerfil.trim() })
+    const datos = { fecha, nombrePerfil: nombrePerfil.trim() }
+    const guardado = registroEditar ? await editarFecha(registroEditar, datos) : await agregarFecha(id_cli, datos)
     setGuardando(false)
     if (guardado) cerrar()
   }
@@ -48,7 +57,7 @@ export const ModalAgregarFecha = ({ show, onHide, id_cli }: ModalAgregarFechaPro
   return (
     <ModalCR show={show} onHide={cerrar} size="sm">
       <ModalCR.Header>
-        <ModalCR.Title>Agregar fecha</ModalCR.Title>
+        <ModalCR.Title>{registroEditar ? 'Editar fecha' : 'Agregar fecha'}</ModalCR.Title>
       </ModalCR.Header>
       <ModalCR.Body>
         <form onSubmit={onSubmit}>
@@ -70,7 +79,11 @@ export const ModalAgregarFecha = ({ show, onHide, id_cli }: ModalAgregarFechaPro
             </Col>
           </Row>
           <div className="d-flex align-items-center mt-2">
-            <BtnAdd label="Agregar fecha" type="submit" disabled={guardando} />
+            {registroEditar ? (
+              <BtnUpdate label="Guardar cambios" type="submit" disabled={guardando} />
+            ) : (
+              <BtnAdd label="Agregar fecha" type="submit" disabled={guardando} />
+            )}
             <ButtonCR label="Cancelar" variant="link" className="ms-auto" onClick={cerrar} />
           </div>
         </form>

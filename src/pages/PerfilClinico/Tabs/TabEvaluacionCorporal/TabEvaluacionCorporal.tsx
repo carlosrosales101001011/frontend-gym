@@ -5,6 +5,7 @@ import { CuadroSegmento } from './CuadroSegmento'
 import { CardEvaluacionAntropometrica } from './CardEvaluacionAntropometrica'
 import { CardObservacionEvaluacion } from './CardObservacionEvaluacion'
 import { CardParametrosInvestigacion } from './CardParametrosInvestigacion'
+import { CardComposicionCorporal } from './CardComposicionCorporal'
 import { usePerfilNutricional } from '../../hook/usePerfilNutricional'
 
 /** Evaluación corporal del paciente en la fecha elegida: lo escrito se guarda al salir de cada campo */
@@ -13,7 +14,7 @@ export const TabEvaluacionCorporal = () => {
 
   return (
   <Row>
-    <Col lg={5}>
+    <Col lg={6}>
       <CardSeccionCR titulo="Análisis segmental" className="mb-3">
         {/* Lado derecho del paciente a la izquierda de la pantalla (como si estuviera de frente); brazo arriba, pierna abajo */}
         <div className="d-flex justify-content-center align-items-center gap-2">
@@ -32,11 +33,18 @@ export const TabEvaluacionCorporal = () => {
       </CardSeccionCR>
         <CardObservacionEvaluacion />
     </Col>
-      <Col lg={4}>
-        <CardEvaluacionAntropometrica />
-      </Col>
-      <Col lg={3}>
-      <CardParametrosInvestigacion />
+      <Col lg={6}>
+      <Row>
+        <Col lg={6}>
+          <CardComposicionCorporal />
+        </Col>
+        <Col lg={6}>
+        <CardParametrosInvestigacion />
+        </Col>
+        <Col lg={12}>
+            <CardEvaluacionAntropometrica />
+        </Col>
+      </Row>
       </Col>
   </Row>
   )

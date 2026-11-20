@@ -75,6 +75,31 @@ export const usePerfilNutricional = () => {
     }
   }
 
+  /** Cambia la fecha y el nombre del perfil de una fecha (se reordena y queda elegida). Devuelve true si se guardó */
+  const editarFecha = async (registroEditar: PerfilNutricional, cambios: { fecha: string, nombrePerfil: string }) => {
+    try {
+      await httpClient.patch(`/perfil-nutricional/${registroEditar.id}`, cambios)
+      await cargar(registroEditar.id_cli, registroEditar.id)
+      return true
+    } catch {
+      alertaError()
+      return false
+    }
+  }
+
+  /** Da de baja una fecha y elige la siguiente (o la anterior si era la última) */
+  const eliminarFecha = async (registroEliminar: PerfilNutricional) => {
+    const lista = estado().registros
+    const indice = lista.findIndex((r) => r.id === registroEliminar.id)
+    const vecina = lista[indice + 1] ?? lista[indice - 1]
+    try {
+      await httpClient.delete(`/perfil-nutricional/${registroEliminar.id}`)
+      await cargar(registroEliminar.id_cli, vecina?.id)
+    } catch {
+      alertaError()
+    }
+  }
+
   /** Guarda en la fecha elegida (se ve al instante; si falla, vuelve a lo anterior y avisa) */
   const guardar = async (cambios: CambiosPerfil) => {
     const anterior = registroSeleccionado()
@@ -130,6 +155,8 @@ export const usePerfilNutricional = () => {
     seleccionar: estado().seleccionar,
     cargar,
     agregarFecha,
+    editarFecha,
+    eliminarFecha,
     guardar,
     valor,
     propsDecimal,
