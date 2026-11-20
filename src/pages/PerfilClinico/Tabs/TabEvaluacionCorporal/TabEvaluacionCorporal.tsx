@@ -13,7 +13,7 @@ export const TabEvaluacionCorporal = () => {
 
   return (
   <Row>
-    <Col lg={6}>
+    <Col lg={5}>
       <CardSeccionCR titulo="Análisis segmental" className="mb-3">
         {/* Lado derecho del paciente a la izquierda de la pantalla (como si estuviera de frente); brazo arriba, pierna abajo */}
         <div className="d-flex justify-content-center align-items-center gap-2">
@@ -32,14 +32,12 @@ export const TabEvaluacionCorporal = () => {
       </CardSeccionCR>
         <CardObservacionEvaluacion />
     </Col>
-    <Col lg={6}>
-      <Col lg={12}>
+      <Col lg={4}>
         <CardEvaluacionAntropometrica />
       </Col>
-      <Col lg={12}>
+      <Col lg={3}>
       <CardParametrosInvestigacion />
       </Col>
-    </Col>
   </Row>
   )
 }

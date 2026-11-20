@@ -1,11 +1,11 @@
 // Perfil del paciente: al bajar, la fila de fechas y los títulos de las pestañas quedan fijos arriba.
-// Solo la tarjeta del nombre se va con el scroll.
 
 // Fila de fechas: pegada al borde superior de la vista (usa margen, no padding, para no dejar franja transparente)
 .perfil-clinico__fechas-fija {
   position: sticky;
   top: 0;
   z-index: 3;
+  background-color: $bg-actual; // sin card, pero tapa lo que pasa debajo al bajar
 }
 
 // Títulos de las pestañas: justo debajo de la fila de fechas (su alto lo mide App.tsx en --alto-fila-fechas)
@@ -13,4 +13,5 @@
   position: sticky;
   top: var(--alto-fila-fechas, 0px);
   z-index: 2;
+  background-color: $bg-actual;
 }

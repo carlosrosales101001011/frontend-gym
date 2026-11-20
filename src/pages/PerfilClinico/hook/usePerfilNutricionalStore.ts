@@ -9,6 +9,7 @@ export type PerfilNutricional = {
   id_cli: number
   /** yyyy-MM-dd */
   fecha: string
+  nombrePerfil: string | null
   uid_image_fotoPerfil: string | null
   uid_image_fotoFrente: string | null
   // Hábitos y estilo de vida
@@ -69,8 +70,8 @@ export type PerfilNutricional = {
   cirugia_fecha: string | null
 }
 
-/** Lo que se puede guardar de una fecha (id, id_cli y fecha no) */
-export type CampoPerfil = Exclude<keyof PerfilNutricional, 'id' | 'id_cli' | 'fecha'>
+/** Lo que se puede guardar de una fecha (id, id_cli, fecha y nombrePerfil no: se eligen al agregarla) */
+export type CampoPerfil = Exclude<keyof PerfilNutricional, 'id' | 'id_cli' | 'fecha' | 'nombrePerfil'>
 export type CambiosPerfil = Partial<Pick<PerfilNutricional, CampoPerfil>>
 
 type PerfilNutricionalStore = {

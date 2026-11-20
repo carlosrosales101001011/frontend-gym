@@ -27,9 +27,9 @@ export const InfoTabColaborador = () => {
         id="uncontrolled-tab-example"
         activeKey={activeTab}
         onSelect={handleSelect}
-        // Títulos de las pestañas en un card (en fila: .card es flex-column), fijos debajo de las fechas al bajar;
+        // Títulos de las pestañas sin fondo, en fila, fijos debajo de las fechas al bajar;
         // el contenido en otro card, sin scroll propio
-        classNameLista='card card-mode-actual p-2 flex-row perfil-clinico__tabs-fija'
+        classNameLista='p-2 d-flex flex-row perfil-clinico__tabs-fija'
         classNamePanel='card card-mode-actual p-3'
     >
       <TabCR eventKey="datos-generales" title="Datos generales">

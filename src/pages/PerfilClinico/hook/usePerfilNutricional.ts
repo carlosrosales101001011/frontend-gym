@@ -1,7 +1,6 @@
 import type { ChangeEvent } from 'react'
 import httpClient from '@/common/helpers/httpClient'
 import { alertaError } from '@/components/Alerta/alertas'
-import { formatDate } from '@/helpers/FormatDate'
 import {
   usePerfilNutricionalStore,
   type CambiosPerfil,
@@ -64,14 +63,15 @@ export const usePerfilNutricional = () => {
     }
   }
 
-  /** Agrega la fecha de hoy (si ya existe, el back la devuelve y solo se elige) */
-  const agregarFecha = async (id_cli: number) => {
+  /** Agrega una fecha con su nombre de perfil y la elige. Devuelve true si se guardó */
+  const agregarFecha = async (id_cli: number, nueva: { fecha: string, nombrePerfil: string }) => {
     try {
-      const fecha = formatDate(new Date(), 'yyyy-mm-dd', 'yyyy-mm-dd')
-      const { data } = await httpClient.post('/perfil-nutricional', { id_cli, fecha })
+      const { data } = await httpClient.post('/perfil-nutricional', { id_cli, ...nueva })
       await cargar(id_cli, (data as PerfilNutricional).id)
+      return true
     } catch {
       alertaError()
+      return false
     }
   }
 

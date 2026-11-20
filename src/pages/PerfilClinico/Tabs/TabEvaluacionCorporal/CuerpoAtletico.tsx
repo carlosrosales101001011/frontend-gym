@@ -11,7 +11,7 @@ type CuerpoAtleticoProps = {
  * separados por una línea del color del fondo, para el análisis segmental.
  * Se dibuja la mitad izquierda y la derecha es su espejo.
  */
-export const CuerpoAtletico = ({ alto = 280 }: CuerpoAtleticoProps) => {
+export const CuerpoAtletico = ({ alto =180 }: CuerpoAtleticoProps) => {
   const mitad = (
     <>
       {/* Brazo */}

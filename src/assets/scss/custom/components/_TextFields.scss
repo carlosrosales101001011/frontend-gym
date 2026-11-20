@@ -283,3 +283,25 @@
 .inputselect--error .textfield-label {
   opacity: 1;
 }
+
+// InputLabel: label fijo a la izquierda y el InputCR al lado (sin label flotante)
+.input-label .textfield-label {
+  display: none;
+}
+.input-label__texto {
+  flex-shrink: 0;
+  margin: 0.5rem 0 0.5rem 0.5rem; // como el m-2 del InputCR, sin el de la derecha (lo pone el campo)
+  min-height: 32px; // alto del campo: el texto queda centrado con él
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: $color-actual;
+  opacity: .75;
+  overflow-wrap: anywhere;
+}
+// Sin espacio al lado: el label arriba del campo, pegado a él
+.input-label--arriba .input-label__texto {
+  min-height: 0;
+  margin: 0.5rem 0.5rem -0.25rem;
+  font-size: 13px;
+}

@@ -15,6 +15,16 @@ export const calcularImc = (peso: Medida, talla: Medida) => {
   return kg && m ? (kg / (m * m)).toFixed(1) : ''
 }
 
+/** Clasificación del IMC (OMS) y su color de Bootstrap: verde normal, amarillo bajo peso o sobrepeso, rojo obesidad */
+export const clasificarImc = (imc: string) => {
+  const valor = aNumero(imc)
+  if (valor === null) return null
+  if (valor < 18.5) return { texto: 'Bajo peso', color: 'warning' } as const
+  if (valor < 25) return { texto: 'Normal', color: 'success' } as const
+  if (valor < 30) return { texto: 'Sobrepeso', color: 'warning' } as const
+  return { texto: 'Obesidad', color: 'danger' } as const
+}
+
 /** Relación cintura-cadera = cintura (cm) / cadera (cm), con 2 decimales; vacío si falta un dato */
 export const calcularCinturaCadera = (cintura: Medida, cadera: Medida) => {
   const cmCintura = aNumero(cintura)
