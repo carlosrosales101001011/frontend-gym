@@ -38,6 +38,8 @@ export type ModuloActualProps = {
 }
 /** Tipo de módulo que se muestra en el Home y en "Mis módulos" (los personales no) */
 export const ID_TIPO_MODULO_EMPRESARIAL = 2012;
+/** Tipo de módulo personal (se asigna entero al registrar un usuario) */
+export const ID_TIPO_MODULO_PERSONAL = 2013;
 
 export type SeccionProp = {
     id_modulouser:number;

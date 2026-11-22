@@ -5,7 +5,7 @@ import type { ModuloDisponibleProps, SeccionDisponibleProps } from '../store/usu
 /** Fila de GET /modulo-x-user/user/secciones: una sección del usuario con su módulo y las entidades de la sección */
 export type FilaSeccionModuloUser = {
   id_seccion: number
-  moduloUser: { id_modulo: number, modulo: { label: string } }
+  moduloUser: { id_modulo: number, modulo: { label: string, id_tipo?: number } }
   seccion: { label: string, entidades?: { id_entidad: number }[] }
 }
 
@@ -24,7 +24,7 @@ export const agruparSeccionesPorModulo = (filas: FilaSeccionModuloUser[]): Modul
       label: fila.seccion.label,
       ids_entidad: [...new Set((fila.seccion.entidades ?? []).map((entidad) => entidad.id_entidad))],
     }]))
-    return { id_modulo, label: modulo.label, secciones: [...secciones.values()] }
+    return { id_modulo, label: modulo.label, id_tipo: modulo.id_tipo, secciones: [...secciones.values()] }
   })
 
 /** Módulos con solo sus secciones que cumplen `incluir` (los módulos que quedan vacíos se quitan) */

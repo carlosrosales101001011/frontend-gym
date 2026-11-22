@@ -3,7 +3,7 @@ import httpClient from '@/common/helpers/httpClient'
 import { mensajeError } from '@/helpers/mensajeError'
 import { payloadDatosPersonales } from '@/helpers/payloadDatosPersonales'
 import type { AjusteFoto } from '@/components/Avatar/encuadreFoto'
-import type { ModuloUsuarioProps } from '@/pages/GestionModuloxUsuario/store/modulosUsuarioSlice'
+import type { ModuloUsuarioProps, SeccionProps } from '@/pages/GestionModuloxUsuario/store/modulosUsuarioSlice'
 
 /** Id de tipo de persona "colaborador" */
 export const ID_TIPO_COLABORADOR = 1
@@ -118,5 +118,20 @@ export const usePerfilUsuario = () => {
     return data
   }
 
-  return { obtenerPerfil, actualizarSistema, actualizarDatosColaborador, obtenerColaboradores, obtenerModulos }
+  /** Catálogo de secciones y las que puede dar quien administra en un módulo del usuario */
+  const obtenerSeccionesPermitidas = async (idModuloUser: number): Promise<{ catalogo: SeccionProps[], idsPermitidas: number[] }> => {
+    const { data } = await httpClient.get(`/seccion-x-modulouser/modulo-usuario/${idModuloUser}`)
+    return { catalogo: data.catalogo, idsPermitidas: data.idsPermitidas }
+  }
+
+  /** Deja en el módulo del usuario estas secciones (entre las que puede dar quien administra). Devuelve el módulo actualizado */
+  const guardarSeccionesModulo = async (idModuloUser: number, ids_seccion: number[]): Promise<ModuloUsuarioProps> => {
+    const { data } = await httpClient.put(`/seccion-x-modulouser/modulo-usuario/${idModuloUser}`, { ids_seccion })
+    return data
+  }
+
+  return {
+    obtenerPerfil, actualizarSistema, actualizarDatosColaborador, obtenerColaboradores, obtenerModulos,
+    obtenerSeccionesPermitidas, guardarSeccionesModulo,
+  }
 }

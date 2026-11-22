@@ -61,7 +61,8 @@ const InputSwitchCR = ({
   const hasError = Boolean(messageErrors);
 
   return (
-    <div className={`mb-3 ${wrapperClassName}`}>
+    // mb-3 por defecto; si wrapperClassName trae su propio mb-*, se usa ese (antes mb-3 le ganaba a mb-0)
+    <div className={`${/(^|\s)mb-/.test(wrapperClassName) ? '' : 'mb-3 '}${wrapperClassName}`}>
       <div className={`form-check d-flex gap-2 align-items-center form-switch ${reverse ? "form-check-reverse" : ""}`}>
         <input
           {...rest}

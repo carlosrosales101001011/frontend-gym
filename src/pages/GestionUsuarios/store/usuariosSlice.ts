@@ -45,9 +45,18 @@ export type SeccionDisponibleProps = {
   ids_entidad: number[];
 }
 
+/** Módulo personal del catálogo (modulo id_tipo 2013): se asigna entero, sin secciones */
+export type ModuloPersonalProps = {
+  id: number;
+  label: string;
+  descripcion?: string;
+}
+
 export type ModuloDisponibleProps = {
   id_modulo: number;
   label: string;
+  /** Empresarial (2012) o personal (2013) */
+  id_tipo?: number;
   secciones: SeccionDisponibleProps[];
 }
 
@@ -69,6 +78,10 @@ export type UserState = {
   idsSeccionAsignadas: number[],
   /** Módulos y secciones de quien registra: solo puede asignar lo que él tiene */
   modulosDisponibles: ModuloDisponibleProps[],
+  /** Todos los módulos personales del catálogo (paso "Módulos personales") */
+  modulosPersonales: ModuloPersonalProps[],
+  /** Módulos personales elegidos; null = aún no se tocó (van todos marcados) */
+  idsModulosPersonales: number[] | null,
   /** Permisos de quien registra: solo puede otorgar las acciones que tiene autorizadas */
   permisosCreador: PermisoEntidadProps[],
   /** Quien registra es super usuario: puede otorgar todas las acciones, tenga o no el permiso */
@@ -99,6 +112,8 @@ export const initialStateUser: UserState = {
   user: initialUser,
   idsSeccionAsignadas: [],
   modulosDisponibles: [],
+  modulosPersonales: [],
+  idsModulosPersonales: null,
   permisosCreador: [],
   creadorEsSuperUsuario: false,
   opcionesEmpleados: [],
@@ -117,6 +132,12 @@ export const usuariosSlice = createSlice({
     onSetModulosDisponibles: (state, action: PayloadAction<ModuloDisponibleProps[]>) => {
       state.modulosDisponibles = action.payload;
     },
+    onSetModulosPersonales: (state, action: PayloadAction<ModuloPersonalProps[]>) => {
+      state.modulosPersonales = action.payload;
+    },
+    onSetModulosPersonalesAsignados: (state, action: PayloadAction<number[]>) => {
+      state.idsModulosPersonales = action.payload;
+    },
     onSetPermisosCreador: (state, action: PayloadAction<{ permisos: PermisoEntidadProps[], esSuperUsuario: boolean }>) => {
       state.permisosCreador = action.payload.permisos;
       state.creadorEsSuperUsuario = action.payload.esSuperUsuario;
@@ -128,6 +149,7 @@ export const usuariosSlice = createSlice({
     onResetRegistro: (state) => {
       state.user = initialUser;
       state.idsSeccionAsignadas = [];
+      state.idsModulosPersonales = null;
     },
     onSetDataUsers:(state, action: PayloadAction<UserProps[]>)=>{
       state.users = action.payload;
@@ -139,6 +161,8 @@ export const {
   onSetUser,
   onSetSeccionesAsignadas,
   onSetModulosDisponibles,
+  onSetModulosPersonales,
+  onSetModulosPersonalesAsignados,
   onSetPermisosCreador,
   onSetOpcionesEmpleados,
   onResetRegistro,

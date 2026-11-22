@@ -18,6 +18,7 @@ const FORMATOS = {
     'dd/mm/yyyy hh:mm:ss': 'dd/MM/yyyy HH:mm:ss',
     'hh:mm': 'HH:mm',
     'hh:mm:ss': 'HH:mm:ss',
+    'hh:mmam': `hh:mm'${AM_PM}'`, // 10:50pm
     // Con nombres (DDDD = día de la semana, MMMM = mes, [texto] = literal)
     'DDDD dd [de] MMMM [del] yyyy': "EEEE dd 'de' MMMM 'del' yyyy",
     'DDDD dd [de] MMMM': "EEEE dd 'de' MMMM",

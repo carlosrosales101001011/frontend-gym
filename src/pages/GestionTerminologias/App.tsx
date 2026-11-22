@@ -11,6 +11,8 @@ import { ColumnaEntidades } from "@/pages/GestionTerminologias/components/Column
 import { ColumnaGrupos } from "@/pages/GestionTerminologias/components/ColumnaGrupos";
 import { ColumnaSubgrupos } from "@/pages/GestionTerminologias/components/ColumnaSubgrupos";
 import { useAppSelector } from "@/stores/Store";
+import { Card1 } from "@/components/Cards/Card1/Card1";
+import { CLASE_CARD_TERMINOLOGIAS } from "@/pages/GestionTerminologias/components/ColumnaSeleccion";
 type propStateModalCustom = {
   id: number;
   isOpen: boolean;
@@ -65,11 +67,19 @@ export const App = () => {
           />
         </Col>
         <Col lg={6}>
-        <ButtonCR label={'Agregar Nuevo'} onClick={()=>onOpenModalCustom(0)} icon={<IconCR name='plus' size={14}/>}/>
-          <DataTableView
-            data={terminologiasFiltradas}
-            onOpenModalCustom={onOpenModalCustom}
-          />
+          <Card1 className={CLASE_CARD_TERMINOLOGIAS}>
+            <Card1.Header className="d-flex align-items-center justify-content-between">
+              Valores
+              <ButtonCR label={'Agregar Nuevo'} onClick={()=>onOpenModalCustom(0)} icon={<IconCR name='plus' size={14}/>}/>
+            </Card1.Header>
+            <Card1.Body className="p-2">
+              <DataTableView
+                data={terminologiasFiltradas}
+                onOpenModalCustom={onOpenModalCustom}
+              />
+            </Card1.Body>
+            <Card1.Footer className="small opacity-75">{terminologiasFiltradas.length} valores</Card1.Footer>
+          </Card1>
         </Col>
       </Row>
       

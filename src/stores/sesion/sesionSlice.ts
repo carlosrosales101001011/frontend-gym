@@ -5,6 +5,8 @@ export type UsuarioSesionProps = {
     id: number,
     nombres: string,
     apellidos: string,
+    /** Nombre de usuario para iniciar sesión (se muestra como @usuario); null en los usuarios creados antes */
+    usuario?: string | null,
     label_rol: string,
     /** Puede otorgar cualquier permiso y cambiar contraseñas de otros usuarios */
     is_super_user?: boolean,

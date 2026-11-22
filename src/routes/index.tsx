@@ -65,6 +65,7 @@ const GestionAsistencias = lazy(() => import('@/pages/GestionAsistencias'));
 const ReporteAsistenciasClientes = lazy(() => import('@/pages/ReporteAsistenciaClientes'));
 const ReporteClientesActivos = lazy(() => import('@/pages/ReporteClientesActivos'));
 const ReportePosiblesVentas = lazy(() => import('@/pages/ReportePosiblesVentas'));
+const GestionSeccionesParaUsuarios = lazy(() => import('@/pages/GestionSeccionesParaUsuarios'));
 // const InformacionEmpresa = lazy(() => import('@/pages/InformacionEmpresa'));
 export const AppRoutes = () => {
   return (  
@@ -91,10 +92,11 @@ export const AppRoutes = () => {
             <Route path="gestion-impuestos" element={<GestionImpuestos/>}/>
             <Route path="terminologias-financieras" element={<GestionTermGrupoFinanzas/>}/>
             <Route path="terminologias-grupos-financieros" element={<GestionTerminologiaFinanzas/>}/>
-            <Route path="gestion-modulos" element={<GestionSeccionXmodulouser/>}/>
+            <Route path="gestion-modulos" element={<GestionModulos/>}/>
             <Route path="gestion-secciones" element={<GestionSecciones/>}/>
             <Route path="gestion-entidad-user" element={<GestionEntidadxUser/>}/>
             <Route path="gestion-seccion-modulouser" element={<GestionSeccionXmodulouser/>}/>
+            <Route path="secciones-para-usuarios" element={<GestionSeccionesParaUsuarios/>}/>
             <Route path="gestion-seccion-entidad" element={<GestionSeccionXentidad/>}/>
             <Route path="realizar-compra" element={<Compras/>}/>
             <Route path="gestion-programas" element={<GestionProgramasEntrenamiento/>}/>

@@ -7,14 +7,18 @@ import {
   onResetRegistro,
   onSetDataUsers,
   onSetModulosDisponibles,
+  onSetModulosPersonales,
+  onSetModulosPersonalesAsignados,
   onSetOpcionesEmpleados,
   onSetPermisosCreador,
   onSetSeccionesAsignadas,
   onSetUser,
+  type ModuloPersonalProps,
   type PermisoEntidadProps,
   type UserProps,
 } from "../store/usuariosSlice";
 import type { UsuarioSesionProps } from "@/stores/sesion/sesionSlice";
+import { ID_TIPO_MODULO_PERSONAL } from "@/stores/permisos/permisoSlice";
 import { agruparSeccionesPorModulo, type FilaSeccionModuloUser } from "../helpers/seccionesPorModulo";
 
 /** Colaborador (persona id_tipo 1) para el select "Empleado" */
@@ -35,7 +39,7 @@ type ModuloUserBackend = { id: number, id_modulo: number }
 
 export const useGestionUsuariosStore = () => {
   const dispatch = useAppDispatch()
-  const { user, idsSeccionAsignadas, modulosDisponibles, permisosCreador, creadorEsSuperUsuario, opcionesEmpleados } = useAppSelector((state) => state.USER)
+  const { user, idsSeccionAsignadas, modulosDisponibles, modulosPersonales, idsModulosPersonales, permisosCreador, creadorEsSuperUsuario, opcionesEmpleados } = useAppSelector((state) => state.USER)
   const { searcher } = useCrudhook<UserProps>('/user', onSetDataUsers)
   const { obtenerAll: obtenerColaboradoresApi } = useCrudhook<ColaboradorProps>('/persona/id_tipo/1')
 
@@ -90,7 +94,27 @@ export const useGestionUsuariosStore = () => {
    * Registra el usuario con sus accesos, en orden: usuario → módulos → secciones de cada módulo → permisos.
    * Los módulos salen de las secciones asignadas. Devuelve true si se guardó (y refresca la tabla).
    */
-  const guardarUsuario = async (permisos: PermisoEntidadProps[], idsSecciones: number[] = idsSeccionAsignadas) => {
+  /** Todos los módulos personales del catálogo (GET /modulo, id_tipo 2013) */
+  const obtenerModulosPersonales = async () => {
+    try {
+      const { data }: { data: { lista: (ModuloPersonalProps & { id_tipo: number })[] } } = await httpClient.get('/modulo')
+      dispatch(onSetModulosPersonales(data.lista
+        .filter((modulo) => modulo.id_tipo === ID_TIPO_MODULO_PERSONAL)
+        .map(({ id, label, descripcion }) => ({ id, label, descripcion }))))
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  /**
+   * Registra el usuario: módulos empresariales con las secciones elegidas y módulos personales enteros (sin secciones).
+   * idsPersonales: módulos personales marcados (por defecto todos los del catálogo)
+   */
+  const guardarUsuario = async (
+    permisos: PermisoEntidadProps[],
+    idsSecciones: number[] = idsSeccionAsignadas,
+    idsPersonales: number[] = idsModulosPersonales ?? modulosPersonales.map((modulo) => modulo.id),
+  ) => {
     try {
       // id_userParent no se envía: el backend lo toma del token de quien registra
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -102,14 +126,16 @@ export const useGestionUsuariosStore = () => {
       const secciones = modulosDisponibles
         .flatMap((modulo) => modulo.secciones)
         .filter((seccion) => idsSecciones.includes(seccion.id_seccion))
-      const idsModulo = [...new Set(secciones.map((seccion) => seccion.id_modulo))]
+      const idsModulo = [...new Set([...secciones.map((seccion) => seccion.id_modulo), ...idsPersonales])]
 
       const { data: modulosUser }: { data: ModuloUserBackend[] } = await httpClient.post('/modulo-x-user/bulk',
         idsModulo.map((id_modulo) => ({ id_user, id_modulo, is_fijado: false, is_favorito: false })))
-      await httpClient.post('/seccion-x-modulouser/bulk', secciones.map((seccion) => ({
-        id_modulouser: modulosUser.find((moduloUser) => moduloUser.id_modulo === seccion.id_modulo)?.id,
-        id_seccion: seccion.id_seccion,
-      })))
+      if (secciones.length > 0) {
+        await httpClient.post('/seccion-x-modulouser/bulk', secciones.map((seccion) => ({
+          id_modulouser: modulosUser.find((moduloUser) => moduloUser.id_modulo === seccion.id_modulo)?.id,
+          id_seccion: seccion.id_seccion,
+        })))
+      }
       if (permisos.length > 0) {
         await httpClient.post('/entidad-x-user/bulk', permisos.map((permiso) => ({
           id_user,
@@ -174,6 +200,11 @@ export const useGestionUsuariosStore = () => {
     user,
     idsSeccionAsignadas,
     modulosDisponibles,
+    modulosPersonales,
+    /** Módulos personales marcados (todos mientras no se toquen) */
+    idsModulosPersonales: idsModulosPersonales ?? modulosPersonales.map((modulo) => modulo.id),
+    obtenerModulosPersonales,
+    asignarModulosPersonales: (ids: number[]) => dispatch(onSetModulosPersonalesAsignados(ids)),
     permisosCreador,
     creadorEsSuperUsuario,
     opcionesEmpleados,

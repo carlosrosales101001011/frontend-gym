@@ -1,4 +1,8 @@
-import { ListGroup } from 'react-bootstrap';
+import { Badge, ListGroup } from 'react-bootstrap';
+import { Card1 } from '@/components/Cards/Card1/Card1';
+
+/** Clases de los cards de la pantalla (entidades, grupos, subgrupos y valores): alto del contenido (100vh - topbar), el body hace scroll */
+export const CLASE_CARD_TERMINOLOGIAS = 'view-h-100';
 
 type Props = {
   titulo: string;
@@ -10,8 +14,13 @@ type Props = {
 /** Columna de seleccion generica: lista clickeable con una opcion "Todas" siempre al inicio. */
 export const ColumnaSeleccion = ({ titulo, opciones, valorSeleccionado, onSeleccionar }: Props) => {
   return (
-    <div>
-      <h6>{titulo}</h6>
+    <Card1 className={CLASE_CARD_TERMINOLOGIAS}>
+      {/* Título y, a la derecha, cuántos ítems tiene */}
+      <Card1.Header className="d-flex align-items-center justify-content-between">
+        {titulo}
+        <Badge bg="secondary" pill>{opciones.length}</Badge>
+      </Card1.Header>
+      <Card1.Body className="p-2">
       <ListGroup>
         <ListGroup.Item
           action
@@ -34,6 +43,8 @@ export const ColumnaSeleccion = ({ titulo, opciones, valorSeleccionado, onSelecc
           <ListGroup.Item disabled>Sin opciones</ListGroup.Item>
         )}
       </ListGroup>
-    </div>
+      </Card1.Body>
+      {/* <Card1.Footer className="small opacity-75">{opciones.length} {titulo.toLowerCase()}</Card1.Footer> */}
+    </Card1>
   );
 };

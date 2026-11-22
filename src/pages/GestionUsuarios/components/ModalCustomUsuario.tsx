@@ -5,6 +5,7 @@ import { Stepper2 } from "@/components/Stepper/Stepper2";
 import { useGestionUsuariosStore } from "../hook/useGestionUsuariosStore";
 import { StepInformacion } from "../layouts/StepInformacion";
 import { StepModulos } from "../layouts/StepModulos";
+import { StepModulosPersonales } from "../layouts/StepModulosPersonales";
 
 type ModalCustomUsuarioProps = {
     show: boolean;
@@ -13,13 +14,14 @@ type ModalCustomUsuarioProps = {
 }
 
 // El paso "Entidades" (permisos CRUD por entidad, layouts/StepEntidades) está en pausa:
-// "Módulos" es el último paso y guarda el usuario sin permisos por entidad.
+// "Módulos personales" es el último paso y guarda el usuario sin permisos por entidad.
 const STEPS = [
   { title: "Información", description: "Datos principales" },
   { title: "Módulos", description: "Secciones a las que accede" },
+  { title: "Módulos personales", description: "Módulos propios del usuario" },
 ];
 
-/** Alta / edición de usuario en 2 pasos: pasos a la izquierda y el paso actual a la derecha */
+/** Alta / edición de usuario en 3 pasos: pasos a la izquierda y el paso actual a la derecha */
 export const ModalCustomUsuario = ({show, onHide, id}:ModalCustomUsuarioProps) => {
   const { resetRegistro } = useGestionUsuariosStore()
   const [step, setStep] = useState(0)
@@ -41,8 +43,9 @@ export const ModalCustomUsuario = ({show, onHide, id}:ModalCustomUsuarioProps) =
             <Stepper2 sinClickear steps={STEPS} orientation="vertical" currentStep={step} onChangeStep={setStep}/>
           </Col>
           <Col lg={9}>
-            {step===0 && <StepInformacion setStep={setStep}/>}
-            {step===1 && <StepModulos setStep={setStep} onGuardado={onCerrar}/>}
+            {step===0 && <StepModulosPersonales setStep={setStep} onGuardado={onCerrar}/>}
+            {step===1 && <StepInformacion setStep={setStep}/>}
+            {step===2 && <StepModulos setStep={setStep}/>}
           </Col>
         </Row>
       </ModalCR.Body>
