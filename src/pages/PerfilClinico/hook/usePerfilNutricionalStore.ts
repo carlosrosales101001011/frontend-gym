@@ -19,6 +19,8 @@ export type PerfilNutricional = {
   fuma_evida: boolean | null
   estres_evida: number | null
   actividadDiaria_evida: string | null
+  frecuencia_evacuacion: string | null
+  porciones_alimentos_x_dia: string | null
   // Ids de terminología separados por coma + lo escrito en "¿Cuál?"
   objetivo_principal: string | null
   objetivo_principal_cuales: string | null

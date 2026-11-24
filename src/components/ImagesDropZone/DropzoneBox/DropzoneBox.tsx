@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent, type KeyboardEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent, type KeyboardEvent, type SyntheticEvent } from 'react'
 import classNames from 'classnames'
 import IconCR from '@/components/Icons/IconCR'
+import { ImageCR } from '@/components/ImageCR/ImageCR'
 
 type DropzoneBoxProps = {
   /** Imagen a mostrar: un File recién elegido o la url de una ya guardada; null/undefined = cuadro vacío */
@@ -23,7 +24,8 @@ const esImagen = (archivo?: File | null): archivo is File => !!archivo && archiv
 
 /**
  * Cuadro para 1 imagen: se arrastra, se pega (Ctrl+V con el cuadro enfocado) o se elige con click / Enter.
- * Muestra la vista previa y, con onQuitar, un botón para quitarla. Solo acepta imágenes.
+ * Con imagen, el click la abre en pantalla completa (ImageCR) y un botón permite cambiarla; con onQuitar, otro la quita.
+ * Solo acepta imágenes.
  * Con imageReferencia, el cuadro vacío muestra esa imagen tenue de fondo como guía.
  */
 export const DropzoneBox = ({
@@ -54,22 +56,29 @@ export const DropzoneBox = ({
     if (!disabled) inputRef.current?.click()
   }
 
+  // El visor de ImageCR es un portal: sus eventos también llegan aquí y no son del cuadro
+  const esDelCuadro = (e: SyntheticEvent<HTMLDivElement>) => e.currentTarget.contains(e.target as Node)
+
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setArrastrando(false)
+    if (!esDelCuadro(e)) return
     cargar(e.dataTransfer.files[0])
   }
   const onDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
-    if (!disabled) setArrastrando(true)
+    if (!disabled && esDelCuadro(e)) setArrastrando(true)
   }
   const onPaste = (e: ClipboardEvent<HTMLDivElement>) => {
+    if (!esDelCuadro(e)) return
     const archivo = Array.from(e.clipboardData.files).find(esImagen)
     if (!archivo) return
     e.preventDefault()
     cargar(archivo)
   }
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    // Enter / espacio en los botones (cambiar, quitar, visor) es de ellos
+    if (e.target !== e.currentTarget) return
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       elegir()
@@ -86,7 +95,7 @@ export const DropzoneBox = ({
       tabIndex={disabled ? -1 : 0}
       aria-label={vistaPrevia ? 'Cambiar imagen' : texto}
       aria-disabled={disabled}
-      title={vistaPrevia ? 'Click, arrastra o pega para cambiar la imagen' : undefined}
+      title={vistaPrevia ? 'Arrastra o pega para cambiar la imagen' : undefined}
       className={classNames(
         'position-relative overflow-hidden rounded-3 d-flex align-items-center justify-content-center flex-shrink-0',
         { 'opacity-50': disabled },
@@ -109,7 +118,7 @@ export const DropzoneBox = ({
       <input ref={inputRef} type="file" accept="image/*" hidden onChange={onCambiarInput} />
 
       {vistaPrevia ? (
-        <img src={vistaPrevia} alt="Vista previa" className="w-100 h-100" style={{ objectFit: 'cover' }} />
+        <ImageCR src={vistaPrevia} alt="Vista previa" className="w-100 h-100" classNameContenedor="d-block w-100 h-100" style={{ objectFit: 'cover' }} />
       ) : (
         <>
           {/* Guía: imagen de ejemplo tenue detrás del texto; no recibe clicks */}
@@ -123,11 +132,28 @@ export const DropzoneBox = ({
         </>
       )}
 
+      {/* Cambiar: abre el selector de archivos (el click en la foto la amplía) */}
+      {vistaPrevia && !disabled && (
+        <button
+          type="button"
+          className="btn btn-light btn-sm rounded-circle position-absolute z-2 top-0 start-0 m-2 d-flex align-items-center justify-content-center shadow-sm"
+          style={{ width: 30, height: 30, padding: 0 }}
+          title="Cambiar imagen"
+          aria-label="Cambiar imagen"
+          onClick={(e) => {
+            e.stopPropagation()
+            elegir()
+          }}
+        >
+          <IconCR name="edit" size={14} />
+        </button>
+      )}
+
       {/* Quitar: no abre el selector de archivos */}
       {vistaPrevia && onQuitar && !disabled && (
         <button
           type="button"
-          className="btn btn-light btn-sm rounded-circle position-absolute top-0 end-0 m-2 d-flex align-items-center justify-content-center shadow-sm"
+          className="btn btn-light btn-sm rounded-circle position-absolute z-2 top-0 end-0 m-2 d-flex align-items-center justify-content-center shadow-sm"
           style={{ width: 30, height: 30, padding: 0 }}
           title="Quitar imagen"
           aria-label="Quitar imagen"

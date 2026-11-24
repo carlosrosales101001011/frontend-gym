@@ -24,6 +24,7 @@ const FORMATOS = {
     'DDDD dd [de] MMMM': "EEEE dd 'de' MMMM",
     'dd [de] MMMM [del] yyyy': "dd 'de' MMMM 'del' yyyy",
     'd MMMM yyyy': 'd MMMM yyyy', // 1 agosto 2026
+    'd MMMM [del] yyyy': "d MMMM 'del' yyyy", // 21 junio del 2026
     'd MMMM yyyy, hh:mmam': `d MMMM yyyy, hh:mm'${AM_PM}'`, // 21 julio 2026, 05:13pm
     'DDD dd MMM yyyy': 'EEE dd MMM yyyy',
     'dd MMM yyyy': 'dd MMM yyyy',

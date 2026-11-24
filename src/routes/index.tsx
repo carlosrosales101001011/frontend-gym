@@ -66,6 +66,7 @@ const ReporteAsistenciasClientes = lazy(() => import('@/pages/ReporteAsistenciaC
 const ReporteClientesActivos = lazy(() => import('@/pages/ReporteClientesActivos'));
 const ReportePosiblesVentas = lazy(() => import('@/pages/ReportePosiblesVentas'));
 const GestionSeccionesParaUsuarios = lazy(() => import('@/pages/GestionSeccionesParaUsuarios'));
+const GestionTiposNotificaciones = lazy(() => import('@/pages/GestionTiposNotificaciones'));
 // const InformacionEmpresa = lazy(() => import('@/pages/InformacionEmpresa'));
 export const AppRoutes = () => {
   return (  
@@ -73,6 +74,7 @@ export const AppRoutes = () => {
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path=":url_modulo/*" element={<ProtectedRoutes/>}>
             {/* INVENTARIO */}
+            <Route path="tipos-notificaciones" element={<GestionTiposNotificaciones/>}/>
             <Route path="punto-venta" element={<PuntoVenta/>}/>
             <Route path="gestion-proveedores" element={<GestionProveedores/>}/>
             <Route path="gestion-productos" element={<GestionProductos/>}/>

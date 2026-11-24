@@ -29,9 +29,9 @@ const ACTIVIDAD_DIARIA: Opcion[] = [
 const valorDeTexto = (opciones: Opcion[], texto?: string | null) => opciones.find((o) => o.label === texto)?.value ?? 0
 const textoDeValor = (opciones: Opcion[], valor: number) => opciones.find((o) => o.value === valor)?.label ?? null
 
-/** Hábitos y estilo de vida del paciente en la fecha elegida: los números se guardan al salir del campo y las listas al elegir */
+/** Hábitos y estilo de vida del paciente en la fecha elegida: lo escrito se guarda al salir del campo y las listas al elegir */
 export const CardHabitosEstiloVida = () => {
-  const { registro, valor, guardar, propsDecimal } = usePerfilNutricional()
+  const { registro, valor, guardar, propsDecimal, propsTexto } = usePerfilNutricional()
   const fuma = valor('fuma_evida')
 
   return (
@@ -78,6 +78,12 @@ export const CardHabitosEstiloVida = () => {
             defaultValue={String(valorDeTexto(ACTIVIDAD_DIARIA, valor('actividadDiaria_evida')))}
             onChange={(e) => guardar({ actividadDiaria_evida: textoDeValor(ACTIVIDAD_DIARIA, Number(e.target.value)) })}
           />
+        </Col>
+        <Col xs={6}>
+          <InputCR label="Frecuencia de evacuación" maxLength={100} {...propsTexto('frecuencia_evacuacion')} />
+        </Col>
+        <Col xs={6}>
+          <InputCR label="Porciones de alimentos por día" maxLength={100} {...propsTexto('porciones_alimentos_x_dia')} />
         </Col>
       </Row>
     </CardSeccionCR>

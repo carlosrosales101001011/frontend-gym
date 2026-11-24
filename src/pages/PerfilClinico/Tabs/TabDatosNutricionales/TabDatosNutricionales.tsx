@@ -41,29 +41,22 @@ export const TabDatosNutricionales = ({ activo = true }: TabDatosNutricionalesPr
     <div>
           {/* 3 columnas: en la 1ra van los cards; en la 2da el objetivo principal; en la 3ra hábitos y estilo de vida */}
           <Row>
-            <Col lg={4}>
+            <Col lg={6} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
+              <CardFotosPaciente />
               {/* Solo lectura: se editan desde la gestión de pacientes */}
               <CardSeccionCR titulo="Datos personales" className="mb-3">
                 <Row style={FILA_JUNTA}>
-                  <Col xs={6}><FieldInfo className={JUNTOS} label="Nombres" value={colaborador.nombres || '—'}/></Col>
-                  <Col xs={6}><FieldInfo className={JUNTOS} label="Apellidos" value={[colaborador.apellido_paterno, colaborador.apellido_materno].filter(Boolean).join(' ') || '—'}/></Col>
-                  <Col xs={6}><FieldInfo className={JUNTOS} label="Sexo" value={dataGeneroPersona.find((g) => g.value === Number(colaborador.id_genero))?.label ?? '—'}/></Col>
-                  <Col xs={6}><FieldInfo className={JUNTOS} label="Fecha de nacimiento" value={nacimiento ? formatDate(nacimiento, 'yyyy-mm-dd', 'dd/mm/yyyy') : '—'}/></Col>
-                  <Col xs={6}><FieldInfo className={JUNTOS} label="Edad" value={nacimiento ? `${differenceInYears(new Date(), nacimiento)} años` : '—'}/></Col>
-                </Row>
-              </CardSeccionCR>
-              <CardSeccionCR titulo="Contacto" className="mb-3">
-                {/* Solo lectura, igual que "Datos personales" */}
-                <Row style={FILA_JUNTA}>
-                  <Col xs={6}><FieldInfo className={JUNTOS} label="Teléfono" value={colaborador.telefono?.trim() || '—'}/></Col>
-                  <Col xs={6}><FieldInfo className={JUNTOS} label="Email personal" value={<span className="text-break">{colaborador.email_personal?.trim() || '—'}</span>}/></Col>
+                  <Col xs={4}><FieldInfo className={JUNTOS} label="Nombres" value={colaborador.nombres || '—'}/></Col>
+                  <Col xs={4}><FieldInfo className={JUNTOS} label="Apellidos" value={[colaborador.apellido_paterno, colaborador.apellido_materno].filter(Boolean).join(' ') || '—'}/></Col>
+                  <Col xs={4}><FieldInfo className={JUNTOS} label="Sexo" value={dataGeneroPersona.find((g) => g.value === Number(colaborador.id_genero))?.label ?? '—'}/></Col>
+                  <Col xs={4}><FieldInfo className={JUNTOS} label="Fecha de nacimiento" value={nacimiento ? formatDate(nacimiento, 'yyyy-mm-dd', 'dd/mm/yyyy') : '—'}/></Col>
+                  <Col xs={4}><FieldInfo className={JUNTOS} label="Edad" value={nacimiento ? `${differenceInYears(new Date(), nacimiento)} años` : '—'}/></Col>
+                  <Col xs={4}><FieldInfo className={JUNTOS} label="Teléfono" value={colaborador.telefono?.trim() || '—'}/></Col>
+                  <Col xs={4}><FieldInfo className={JUNTOS} label="Email personal" value={<>{colaborador.email_personal?.trim() || '—'}</>}/></Col>
                 </Row>
               </CardSeccionCR>
             </Col>
-            <Col lg={4} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
-              <CardFotosPaciente />
-            </Col>
-            <Col lg={4}>
+            <Col lg={6}>
               <CardHabitosEstiloVida />
               <CardObjetivoPrincipal />
             </Col>
