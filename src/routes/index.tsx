@@ -67,6 +67,7 @@ const ReporteClientesActivos = lazy(() => import('@/pages/ReporteClientesActivos
 const ReportePosiblesVentas = lazy(() => import('@/pages/ReportePosiblesVentas'));
 const GestionSeccionesParaUsuarios = lazy(() => import('@/pages/GestionSeccionesParaUsuarios'));
 const GestionTiposNotificaciones = lazy(() => import('@/pages/GestionTiposNotificaciones'));
+const GestionAlergenos = lazy(() => import('@/pages/GestionAlergenos'));
 // const InformacionEmpresa = lazy(() => import('@/pages/InformacionEmpresa'));
 export const AppRoutes = () => {
   return (  
@@ -75,6 +76,7 @@ export const AppRoutes = () => {
       <Route path=":url_modulo/*" element={<ProtectedRoutes/>}>
             {/* INVENTARIO */}
             <Route path="tipos-notificaciones" element={<GestionTiposNotificaciones/>}/>
+            <Route path="alergenos-alimentarios" element={<GestionAlergenos/>}/>
             <Route path="punto-venta" element={<PuntoVenta/>}/>
             <Route path="gestion-proveedores" element={<GestionProveedores/>}/>
             <Route path="gestion-productos" element={<GestionProductos/>}/>
@@ -115,7 +117,7 @@ export const AppRoutes = () => {
             <Route path="reporte-citas-nutricion" element={<ReporteCitasNutricion/>}/>
             <Route path="compromisos-pago" element={<GestionCompromisosPagos/>}/>
             <Route path="gestion-ingredientes" element={<GestionIngredientes/>}/>
-            <Route path="gestion-recetas" element={<GestionRecetas/>}/>
+            <Route path="recetas" element={<GestionRecetas/>}/>
             <Route path="modulo-x-user" element={<ModulosxUsuario/>}/>
             <Route path="asistencia" element={<GestionAsistencias/>}/>
             <Route path="gestion-cuestionario" element={<GestionCuestionarios/>}/>

@@ -147,9 +147,15 @@ export const PdfPerfilNutricional = ({ paciente, sexo, registro: r, registros, m
           <Dato label="Objetivos específicos" valor={marcados.objetivos} ancho="100%" />
         </Seccion>
 
-        <Seccion titulo="Análisis segmental">
-          {segmentos.map(([nombre, magra, grasa]) => (
-            <Dato key={String(nombre)} label={String(nombre)} valor={`Masa magra: ${mostrar(magra)} kg\nGrasa: ${mostrar(grasa)} kg`} />
+        <Seccion titulo="Análisis de masa magra segmental">
+          {segmentos.map(([nombre, magra]) => (
+            <Dato key={String(nombre)} label={`${nombre} (kg)`} valor={magra} />
+          ))}
+        </Seccion>
+
+        <Seccion titulo="Análisis de grasa segmental">
+          {segmentos.map(([nombre, , grasa]) => (
+            <Dato key={String(nombre)} label={`${nombre} (kg)`} valor={grasa} />
           ))}
         </Seccion>
 

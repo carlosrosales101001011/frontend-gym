@@ -7,11 +7,13 @@ import { useQueryParams } from "@/hook/useQueryParams"
 import { querys } from "@/types/parametros"
 import { useRecetaStore } from "@/pages/GestionRecetas/useRecetaStore"
 import { ModalCustomReceta } from "@/pages/GestionRecetas/ModalCustomReceta"
-import { DataTableRecetas } from "@/pages/GestionRecetas/DataTableRecetas"
+import { CardsRecetas } from "@/pages/GestionRecetas/CardsRecetas"
 
 export const App = () => {
   const { searcher } = useRecetaStore()
   const [isOpenModalCustom, setisOpenModalCustom] = useState<isOpenModalCustom>({id: 0, isCopy: false, isOpen: false})
+  /** Ya respondió la primera búsqueda de recetas */
+  const [cargado, setCargado] = useState(false)
   const onCloseModalCustom = ()=>{
       setisOpenModalCustom({id: 0, isCopy: false, isOpen: false})
   }
@@ -26,7 +28,7 @@ export const App = () => {
     const show = Number(get(querys.show))
     useEffect(() => {
       const ctrl = new AbortController();
-      searcher(ctrl.signal).catch(e => {
+      searcher(ctrl.signal).then(() => setCargado(true)).catch(e => {
         if (e.name !== 'CanceledError') console.error(e);
       });
       return () => ctrl.abort();
@@ -39,9 +41,9 @@ export const App = () => {
             <ModalCustomReceta id={isOpenModalCustom.id} onHide={onCloseModalCustom} show={isOpenModalCustom.isOpen} />
           )}
           <div>
-              <DataTableRecetas otrosBotones={
+              <CardsRecetas otrosBotones={
                   <ButtonCR label={'Agregar receta'} onClick={()=>onOpenModalCustom(0)} icon={<IconCR name='plus' size={14}/>}/>
-              } onOpenModalCustom={onOpenModalCustom} />
+              } onOpenModalCustom={onOpenModalCustom} cargado={cargado} />
           </div>
     </div>
   )

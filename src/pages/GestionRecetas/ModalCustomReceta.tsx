@@ -28,7 +28,7 @@ export const ModalCustomReceta = ({id, onHide, show}: {id: number, onHide: ()=>v
     const [cargando, setCargando] = useState(true)
     const [errores, setErrores] = useState<{ titulo?: string, porciones?: string, dificultad?: string, ingredientes?: string }>({})
 
-    // Opciones de ingredientes y, al editar, la receta completa (el listado no trae sus ingredientes)
+    // Opciones de ingredientes y, al editar, la receta completa
     useEffect(() => {
         const ctrl = new AbortController()
         Promise.all([

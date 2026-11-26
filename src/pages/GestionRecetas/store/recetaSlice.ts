@@ -32,8 +32,15 @@ export type RecetaProps = {
   dificultad: DificultadReceta | '',
   /** Viene en el listado y en el detalle */
   nutricion?: { total: NutricionProps, por_porcion: NutricionProps },
-  /** Solo vienen en el detalle (/recetas/id/:id) */
+  /** Viene en el listado y en el detalle */
   ingredientes?: RecetaIngredienteProps[],
+  /** Solo en las recetas de ejemplo: el backend todavía no guarda fotos */
+  imagen?: string,
+  /** Pasos separados por salto de línea. Solo en las recetas de ejemplo: el backend todavía no la guarda */
+  preparacion?: string,
+  /** Solo en las recetas de ejemplo: el backend todavía no lo guarda */
+  minutos_preparacion?: number,
+  /** Solo vienen en el detalle (/recetas/id/:id) */
   alergenos?: { id_alergeno: number, label_alergeno?: string | null }[],
 };
 
